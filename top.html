@@ -274,7 +274,7 @@
     let globalScores = {}; 
     let currentRoundingDecimals = 0; 
 
-    const TIME_LIMIT = 30;
+    const TIME_LIMIT = 30; // 🌟 تم توحيد الوقت لـ 30 ثانية لجميع الجولات
     let timeRemaining = TIME_LIMIT;
     let timerInterval;
 
@@ -575,8 +575,6 @@
             if (savedNamesA) document.getElementById('folder-a-names').value = savedNamesA;
             if (savedNamesB) document.getElementById('folder-b-names').value = savedNamesB;
             if (savedNamesC) document.getElementById('folder-c-names').value = savedNamesC;
-
-            // تم إلغاء تحديث عرض الدرجات التراكمية
             
         } catch (e) {
             console.error("Could not load scores from localStorage", e);
@@ -642,8 +640,6 @@
         }, 1000); 
     }
     
-    // تم إلغاء دالة updateGlobalScoresDisplay 
-
     function selectRandomPlayers(folderKey) {
         let students;
         
@@ -682,9 +678,6 @@
         tournamentSchedule = []; // إعادة ضبط جدول E3
         currentTournamentRound = 0;
         
-        // تم إلغاء تحديث عرض الدرجات التراكمية
-        // تم إلغاء تحديث عرض الدرجات التراكمية
-
         if (folderStudentsInPlay.length === 1) {
              const champion = folderStudentsInPlay[0];
              document.getElementById('feedback').innerHTML = `<h1>🏆 البطل هو: ${champion}! 🏆</h1>`;
@@ -827,7 +820,6 @@
         currentPlayer = 1;
         document.getElementById('answer-options-container').innerHTML = ''; 
         
-        // تم إلغاء تحديث عرض الدرجات التراكمية
         setTimeout(generateQuestion, 2000); 
     }
 
@@ -872,7 +864,6 @@
         folderStudentsInPlay = [...allStudentsByFolder[currentFolderKey]];
         
         // التحضير للجولة الأولى (سيتم استدعاء startNewRound من قبل المستخدم)
-        // تم إلغاء تحديث عرض الدرجات التراكمية
         document.getElementById('feedback').innerHTML = `تم تحميل الأسماء. اضغط "جولة إقصاء جديدة" للبدء بين متسابقين عشوائيين من ${folderNames[currentFolderKey]}.`;
         document.getElementById('q-num1').textContent = 'جاهزون للانطلاق!';
         document.getElementById('q-num2').textContent = '';
@@ -956,8 +947,7 @@
         const currentName = currentPlayer === 1 ? playerName1 : playerName2;
         document.getElementById('current-player').textContent = currentName;
         
-        let time = TIME_LIMIT;
-        if (isTieBreaker) time = 15; // وقت أقل للفاصل
+        let time = TIME_LIMIT; // 🌟 تم توحيد الوقت لـ 30 ثانية لجميع الجولات
 
         document.getElementById('timer-display').style.color = '#333';
         startTimer(time);
