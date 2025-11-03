@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة التدريب الرياضي المتقدم (للمسابقة)</title>
+    <title>منصة التدريب الإحصائي المتقدم (فردي)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <style>
         /* CSS مُخفف ومُنظم (كما في السابق) */
@@ -112,18 +112,18 @@
 <body>
 
 <div class="initiative-header">
-    <p class="title-line">منصة التدريب الرياضي (للمسابقة - إصدار iOS)</p>
+    <p class="title-line">منصة التدريب الإحصائي المتقدم (فردي)</p>
 </div>
 <div class="main-content">
     <div class="container" id="game-container">
         <h1>التدريب المتقدم</h1>
         
         <div class="names-input-section" id="names-input-section">
-             <label for="student-name-input">اسم المتدرب 1:</label>
-             <input type="text" id="student-name-input" placeholder="اكتب اسم المتدرب الأول">
+             <label for="student-name-input">اسم المتدرب:</label>
+             <input type="text" id="student-name-input" placeholder="اكتب اسم المتدرب">
              
-             <label for="opponent-name-input">اسم المتدرب 2 (اختياري):</label>
-             <input type="text" id="opponent-name-input" placeholder="اكتب اسم المتدرب الثاني">
+             <label for="opponent-name-input" style="display: none;">اسم المتدرب 2 (اختياري):</label>
+             <input type="text" id="opponent-name-input" style="display: none;" placeholder="اكتب اسم المتدرب الثاني">
         </div>
 
         <div class="round-setup" id="training-setup">
@@ -135,12 +135,10 @@
                 <option value="3">المستوى 3</option>
             </select>
             
-            <label for="operation-select">اختر القسم:</label>
-            <select id="operation-select">
-                <option value="STATS">الإحصاء (م.ح، منوال، مدى، وسيط)</option>
-                <option value="FRACTIONS">الكسور</option>
-                <option value="METRIC">التحويلات المترية (طول، وزن، سعة)</option>
-            </select>
+            <label for="operation-select">القسم:</label>
+            <select id="operation-select" disabled>
+                <option value="STATS" selected>الإحصاء (م.ح، منوال، مدى، وسيط)</option>
+                </select>
 
             <label for="time-limit-select">المدة الزمنية:</label>
             <select id="time-limit-select">
@@ -191,8 +189,7 @@
     let gameStarted = false; 
 
     let currentStudent = ""; 
-    let currentOpponent = ""; 
-    let currentPlayerTurn = 1; 
+    // تم إلغاء الحاجة لـ currentOpponent
     
     // 🔥 تصفير النقاط التراكمية (لأننا لا نستطيع حفظها في iOS)
     let globalScores = {}; 
@@ -200,18 +197,19 @@
     let TIME_LIMIT = 30; 
     let timeRemaining = TIME_LIMIT;
     let timerInterval = null; 
-    let timerStartTime = null; // لتتبع الوقت بدقة أكبر
+    let timerStartTime = null; 
     
     const TRAINING_MASTER_THRESHOLD = 8; 
     const QUESTIONS_PER_LEVEL = 10; 
     
-    // الوحدات المترية
+    // الوحدات المترية (تم الإبقاء عليها في الدوال لكن لن تستخدم في الواجهة)
     const METRIC_UNITS = {
         'LENGTH': { 'كم': 1000000, 'م': 1000, 'سم': 10, 'ملم': 1, 'كم_name': 'كيلومتر', 'م_name': 'متر', 'سم_name': 'سنتيمتر', 'ملم_name': 'ملليمتر' },
         'VOLUME': { 'كجم': 1000, 'جم': 1, 'ملجم': 0.001, 'كجم_name': 'كيلوجرام', 'جم_name': 'جرام', 'ملجم_name': 'ملليجرام' },
         'CAPACITY': { 'كل': 1000, 'لتر': 1, 'مل': 0.001, 'كل_name': 'كيلولتر', 'لتر_name': 'لتر', 'مل_name': 'ملليلتر' }
     };
     
+    // تم التركيز فقط على الإحصاء في القائمة المختصرة
     const SECTION_OPERATIONS = {
         'STATS': ['MEAN', 'MODE', 'RANGE', 'MEDIAN'],
         'FRACTIONS': ['SIMPLIFY', 'DEC_TO_FRAC', 'FRAC_TO_DEC', 'DEC_TO_PER', 'PER_TO_DEC', 'MIXED_TO_IMPROP', 'IMPROP_TO_MIXED', 'MIXED_TO_PER', 'PER_TO_MIXED'],
@@ -414,30 +412,23 @@
         
         const totalQuestionsForLevel = QUESTIONS_PER_LEVEL; 
         
-        const activePlayer = (currentPlayerTurn === 1) ? currentStudent : (currentOpponent || currentStudent);
-        const inactivePlayer = (currentPlayerTurn === 1) ? currentOpponent : currentStudent;
+        const activePlayer = currentStudent;
         
         let details = `القسم: **${opName}** | المستوى: **${formatArabicNumerals(currentLevel)}**`;
         let remaining = totalQuestionsForLevel - levelQuestionsAnswered;
         let thresholdInfo = `(المتبقي: **${formatArabicNumerals((remaining > 0 ? remaining : 0))}** سؤال)`;
         
-        let opponentInfo = '';
-        if (currentOpponent) {
-             opponentInfo = ` | نقاط ${inactivePlayer}: **${formatArabicNumerals(globalScores[inactivePlayer] || 0)}**`;
-        }
-
-
         document.getElementById('progress-display').innerHTML = 
             `المتدرب الحالي: **${activePlayer}** | ${details}<br>الإجابات الصحيحة: ${formatArabicNumerals(levelCorrectAnswers)} / ${formatArabicNumerals(levelQuestionsAnswered)}<br>
              ${thresholdInfo}<br>
-             النقاط التراكمية لـ ${activePlayer}: **${formatArabicNumerals(globalScores[activePlayer] || 0)}** ${opponentInfo}`;
+             النقاط التراكمية لـ ${activePlayer}: **${formatArabicNumerals(globalScores[activePlayer] || 0)}**`;
     }
     
     function handleTrainingAnswer(isCorrect) {
         
         levelQuestionsAnswered++;
         
-        const activePlayerName = (currentPlayerTurn === 1) ? document.getElementById('student-name-input').value.trim() : document.getElementById('opponent-name-input').value.trim();
+        const activePlayerName = currentStudent;
         
         if (isCorrect) {
             levelCorrectAnswers++;
@@ -445,11 +436,7 @@
             saveGlobalScores(); 
         }
         
-        if (currentOpponent) {
-             currentPlayerTurn = (currentPlayerTurn === 1) ? 2 : 1; 
-             const nextActivePlayer = (currentPlayerTurn === 1) ? document.getElementById('student-name-input').value.trim() : document.getElementById('opponent-name-input').value.trim();
-             currentStudent = nextActivePlayer; 
-        }
+        // تم إلغاء منطق تناوب الأدوار
         
         saveAppState(); 
 
@@ -466,14 +453,8 @@
             }, 2000); 
         }
         
-        if (currentOpponent) {
-            const nextActivePlayer = (currentPlayerTurn === 1) ? document.getElementById('student-name-input').value.trim() : document.getElementById('opponent-name-input').value.trim();
-            const nextInactivePlayer = (currentPlayerTurn === 1) ? document.getElementById('opponent-name-input').value.trim() : document.getElementById('student-name-input').value.trim();
-            
-            let playerDisplay = `**${nextActivePlayer}** (المستوى ${formatArabicNumerals(currentLevel)})`;
-            playerDisplay += ` | المنافس: **${nextInactivePlayer}**`;
-            document.getElementById('current-player').innerHTML = playerDisplay;
-        }
+        // تحديث اسم المتدرب الحالي (فردي)
+        document.getElementById('current-player').innerHTML = `**${currentStudent}** (المستوى ${formatArabicNumerals(currentLevel)})`;
     }
     
     function processTrainingLevelEnd() {
@@ -486,13 +467,6 @@
         document.getElementById('level-navigation').style.display = 'flex';
         disableChoices(true);
         
-        const student1Name = document.getElementById('student-name-input').value.trim();
-        const student2Name = document.getElementById('opponent-name-input').value.trim();
-        const finalWinner = currentOpponent && globalScores[student1Name] !== globalScores[student2Name] ? 
-                             (globalScores[student1Name] > globalScores[student2Name] ? student1Name : student2Name) : 
-                             null;
-
-
         if (mastered) {
              if (currentLevel < 3) {
                  document.getElementById('feedback').innerHTML = `<h1>🎉 مبروك! أتقنت المستوى **${formatArabicNumerals(currentLevel)}**! 🎉</h1>`;
@@ -501,11 +475,8 @@
                  document.getElementById('repeat-level-btn').textContent = `🔄 أعد المستوى ${formatArabicNumerals(currentLevel)}`;
              } else {
                  let finalMsg = `🏆 تهانينا! أتقنت جميع مستويات هذا القسم!`;
-                 if (finalWinner) {
-                      finalMsg += `<br>🥇 الفائز في النقاط الإجمالية هو: **${finalWinner}**!`;
-                 }
                  document.getElementById('feedback').innerHTML = `<h1>${finalMsg}</h1>
-                                                                 <h2>يمكنك اختيار قسم جديد أو إعادة التدريب.</h2>`;
+                                                                 <h2>يمكنك اختيار قسم جديد (إذا كانت الخيارات متاحة مستقبلاً) أو إعادة التدريب.</h2>`;
                  resetGameDisplay();
                  document.getElementById('activate-training-btn').style.display = 'block';
                  return;
@@ -516,9 +487,6 @@
              
         } else {
              let failMsg = `<h1>🤔 لم تتقن المستوى **${formatArabicNumerals(currentLevel)}** ( ${formatArabicNumerals(levelCorrectAnswers)}/${formatArabicNumerals(totalQuestions)} ).</h1>`;
-             if (finalWinner) {
-                  failMsg += `<br>🥇 الفائز في النقاط الإجمالية هو: **${finalWinner}**!`;
-             }
              document.getElementById('feedback').innerHTML = failMsg;
              
              document.getElementById('next-level-btn').style.display = 'none'; 
@@ -553,19 +521,14 @@
             return;
         }
         
-        generateQuestionQueue(opType, currentLevel);
+        // بما أن القسم ثابت، ننشئ قائمة الأسئلة الإحصائية للمستوى الحالي
+        generateQuestionQueue('STATS', currentLevel);
         document.getElementById('initial-level-select').value = currentLevel; 
         document.getElementById('level-navigation').style.display = 'none';
         
         
-        const activePlayer = (currentPlayerTurn === 1) ? currentStudent : (currentOpponent || currentStudent);
+        const activePlayer = currentStudent;
         let playerDisplay = `**${activePlayer}** (المستوى ${formatArabicNumerals(currentLevel)})`;
-        
-        if (currentOpponent) {
-             const inactivePlayer = (currentPlayerTurn === 1) ? currentOpponent : currentStudent;
-             playerDisplay += ` | المنافس: **${inactivePlayer}**`;
-             currentStudent = activePlayer; 
-        }
         
         document.getElementById('current-player').innerHTML = playerDisplay;
         document.getElementById('current-player').style.color = '#28a745';
@@ -611,7 +574,6 @@
         currentQuestionQueue = []; 
 
         currentLevel = 1; 
-        currentPlayerTurn = 1;
         
         globalScores = {};
         
@@ -623,23 +585,19 @@
         const nameInput = document.getElementById('student-name-input').value.trim().replace(/^['"]|['"]$/g, '');
         
         if (nameInput.length === 0) { 
-            document.getElementById('feedback').innerHTML = `<span class="wrong">❌ خطأ: يجب إدخال **اسم المتدرب 1** لبدء التدريب.</span>`;
+            document.getElementById('feedback').innerHTML = `<span class="wrong">❌ خطأ: يجب إدخال **اسم المتدرب** لبدء التدريب.</span>`;
             document.getElementById('activate-training-btn').style.display = 'block'; 
             document.getElementById('names-input-section').style.display = 'flex'; 
             return;
         }
         
-        const opponentInput = document.getElementById('opponent-name-input').value.trim().replace(/^['"]|['"]$/g, ''); 
-        
         currentStudent = nameInput;
-        currentOpponent = opponentInput; 
-        currentPlayerTurn = 1; 
+        // إلغاء تهيئة المنافس
         
         document.getElementById('student-name-input').value = currentStudent; 
         
         globalScores = {};
         globalScores[currentStudent] = 0;
-        if (currentOpponent) globalScores[currentOpponent] = 0;
         
         saveGlobalScores(); 
         
@@ -648,7 +606,7 @@
         TIME_LIMIT = parseInt(document.getElementById('time-limit-select').value);
 
         document.getElementById('activate-training-btn').style.display = 'none'; 
-        document.getElementById('names-input-section').style.display = 'none';
+        document.getElementById('names-input-section').style.display = 'flex'; // نعرضه كجزء من لوحة التحكم
 
         document.getElementById('level-navigation').style.display = 'flex'; 
         
@@ -657,9 +615,6 @@
         document.getElementById('repeat-level-btn').style.display = 'none';
         
         let playerDisplay = `**${currentStudent}** (المستوى ${formatArabicNumerals(currentLevel)})`;
-        if (currentOpponent) {
-             playerDisplay += ` | المنافس: **${currentOpponent}**`;
-        }
         document.getElementById('current-player').innerHTML = playerDisplay;
         document.getElementById('current-player').style.color = '#007BFF';
         
@@ -670,9 +625,7 @@
         updateTrainingProgressDisplay();
         saveAppState();
 
-        let startMessage = `✅ تم إعداد التدريب لـ **${currentStudent}**`;
-        if (currentOpponent) startMessage += ` والمنافس **${currentOpponent}**`;
-        startMessage += `. يبدأ ${currentStudent} الآن!`;
+        let startMessage = `✅ تم إعداد التدريب لـ **${currentStudent}**. ابدأ الآن!`;
         
         document.getElementById('feedback').innerHTML = `<span class="correct">${startMessage}</span>`;
         
@@ -687,16 +640,19 @@
         currentQuestionQueue = [];
         const operations = SECTION_OPERATIONS[section];
         
-        if (section === 'METRIC') {
-            const unitType = getRandomElement(operations); 
-            for (let i = 0; i < QUESTIONS_PER_LEVEL; i++) {
-                currentQuestionQueue.push({ op: unitType, level: level });
-            }
-        } else {
+        // بما أن القسم ثابت على STATS
+        if (section === 'STATS') {
             for (let i = 0; i < QUESTIONS_PER_LEVEL; i++) {
                 currentQuestionQueue.push({ op: getRandomElement(operations), level: level });
             }
+        } else {
+             // هذه الأقسام لن تستخدم فعليًا بناءً على تعديل الواجهة
+             const unitType = getRandomElement(operations); 
+             for (let i = 0; i < QUESTIONS_PER_LEVEL; i++) {
+                 currentQuestionQueue.push({ op: unitType, level: level });
+             }
         }
+
         // خلط الأسئلة
         for (let i = currentQuestionQueue.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -1043,7 +999,8 @@
     
     function generateQuestion() {
         if (currentQuestionQueue.length === 0) {
-            generateQuestionQueue(document.getElementById('operation-select').value, currentLevel);
+            // بما أن القسم ثابت، نستخدم 'STATS'
+            generateQuestionQueue('STATS', currentLevel);
             if (currentQuestionQueue.length === 0) {
                  document.getElementById('feedback').innerHTML = `<span class="wrong">❌ خطأ: لم يتم توليد أسئلة لهذا المستوى.</span>`;
                  return;
@@ -1058,12 +1015,12 @@
         
         questionData = {};
 
+        // بما أن القسم ثابت على STATS
         if (document.getElementById('operation-select').value === 'STATS') {
              questionData = generateStatsQuestion(level, opType);
-        } else if (document.getElementById('operation-select').value === 'FRACTIONS') {
-             questionData = generateFractionQuestion(level, opType);
-        } else if (document.getElementById('operation-select').value === 'METRIC') {
-             questionData = generateMetricConversion(opType, level); 
+        } else {
+             // هذه لن يتم تنفيذها فعليًا
+             questionData = generateStatsQuestion(level, opType);
         }
         
         if (!questionData || !questionData.result) {
@@ -1074,12 +1031,8 @@
         document.getElementById('expression-display').innerHTML = questionData.question;
         correctAnswer = questionData.result.toString(); 
 
-        let choices;
-        if (document.getElementById('operation-select').value === 'STATS' || document.getElementById('operation-select').value === 'METRIC') {
-             choices = generateGenericChoices(correctAnswer);
-        } else {
-             choices = generateFractionChoices(correctAnswer, opType);
-        }
+        // بما أن الإجابات إما أرقام أو 'لا يوجد' نستخدم generateGenericChoices
+        let choices = generateGenericChoices(correctAnswer);
         
         renderChoices(choices);
         
@@ -1097,6 +1050,9 @@
         
         disableChoices(true);
         document.getElementById('level-navigation').style.display = 'none';
+        
+        // إعداد عرض اسم المتدرب 1 فقط
+        document.getElementById('current-player').innerHTML = 'أدخل اسمك';
     });
 </script>
 </body>
