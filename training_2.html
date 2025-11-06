@@ -191,19 +191,20 @@
         }
         
         /* -------------------------------------------
-        ** 6. الأزرار (خيارات الإجابة)
+        ** 6. الأزرار (خيارات الإجابة) - تم التعديل هنا
         ** ------------------------------------------- */
         #answer-choices {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px; /* تقليل المسافة بين الأزرار */
+            /* 💥 التعديل الجديد لجعلها شبكة 2x2 */
+            display: grid; 
+            grid-template-columns: 1fr 1fr; /* عمودان متساويان */
+            grid-gap: 10px; /* المسافة بين الخلايا */
             margin-top: 20px;
+            justify-content: center; /* للمراكزة إذا كان العرض أصغر من max-width */
         }
         .choice-btn {
             padding: 15px; /* تقليل الحشو ليتناسب مع الشاشة */
             font-size: 1.8em; /* خط كبير لسهولة اللمس */
-            width: 48%; /* 48% لترك مسافة بسيطة بين الزرين */
+            /* ❌ تم حذف: width: 48%; */
             min-height: 80px; /* حد أدنى للارتفاع لسهولة الضغط */
             border: 3px solid #007BFF;
             border-radius: 12px;
@@ -262,7 +263,7 @@
                 gap: 20px;
             }
             .choice-btn {
-                width: 45%;
+                width: auto; /* ترك التحكم لـ Grid */
                 padding: 25px 35px;
                 font-size: 2.2em;
             }
@@ -376,14 +377,14 @@
 
     const ARABIC_LOCALE = 'ar-SA'; 
     
-    const TRAINING_MASTER_THRESHOLD = 8; 
+    const TRAINING_MASTER_THRESHOLD = 13; // 
     
     const LEVEL_QUESTIONS = {
-        1: 30, 
-        2: 30, 
-        3: 40, 
-        4: 10, 
-        5: 10 
+        1: 15, 
+        2: 15, 
+        3: 15, 
+        4: 15, 
+        5: 15  
     }; 
 
     const EVALUATION_QUESTIONS_TOTAL = 20; 
@@ -487,7 +488,7 @@
     
     function updateTrainingProgressDisplay() {
         const opType = document.getElementById('operation-select').value;
-        const totalQuestionsForLevel = LEVEL_QUESTIONS[currentLevel] || 10; 
+        const totalQuestionsForLevel = LEVEL_QUESTIONS[currentLevel] || 15; 
         
         let details = `المستوى: **${currentLevel}**`;
         let thresholdInfo = `(المطلوب للإتقان: ${TRAINING_MASTER_THRESHOLD.toLocaleString(ARABIC_LOCALE)})`; 
@@ -525,7 +526,7 @@
         updateTrainingProgressDisplay();
         
         const opType = document.getElementById('operation-select').value;
-        const totalQuestions = LEVEL_QUESTIONS[currentLevel] || 10; 
+        const totalQuestions = LEVEL_QUESTIONS[currentLevel] || 15; 
 
         if (opType === 'EVAL') {
              if (levelQuestionsAnswered >= EVALUATION_QUESTIONS_TOTAL) {
@@ -561,7 +562,7 @@
 
     function processTrainingLevelEnd() {
         clearTimer(); 
-        const totalQuestions = LEVEL_QUESTIONS[currentLevel] || 10; 
+        const totalQuestions = LEVEL_QUESTIONS[currentLevel] || 15; 
         const mastered = levelCorrectAnswers >= TRAINING_MASTER_THRESHOLD;
         const currentOp = document.getElementById('operation-select').value;
         
@@ -855,8 +856,8 @@
             case '+': 
             case '-':
                 const numDigits = Math.min(level, MAX_TOTAL_DIGITS);
-                // المستويات 4 و 5 للجمع والطرح قد تحتاج إلى منازل عشرية
-                const dec = (level >= 4) ? getRandomInt(1, 2) : 0; 
+                // **تم تعديل الكود:** تم تعيين المنازل العشرية إلى صفر (0)
+                const dec = 0; 
                 return { d1: numDigits, d2: numDigits, dec: dec }; 
                 
             case '*':
@@ -925,8 +926,9 @@
 
 
         if (op === '*' && level === 5) result = parseFloat(result.toFixed(4));
+        // تم إلغاء التعامل الخاص مع الأعداد العشرية هنا لـ (+) و (-) بعد التعديل في getNumberBounds
         if (op === '+' || op === '-') {
-             if (level >= 4 && maxDecimals > 0) result = parseFloat(result.toFixed(4));
+             result = Math.round(result); // ضمان أن الناتج عدد صحيح
         } 
 
         return { n1, n2, result };
@@ -1091,8 +1093,8 @@
         } else if (isTableQuestion) {
              const q = currentQuestionQueue.shift();
              questionData = generateOperationQuestionFromParams(q.n1, q.n2, op);
-             n1 = questionData.n1;
-             n2 = questionData.n2;
+             n1 = q.n1; // استخدام الأرقام من قائمة الانتظار
+             n2 = q.n2;
         } else {
             questionData = generateOperationQuestion(currentLevel, op);
             n1 = questionData.n1;
@@ -1148,40 +1150,64 @@
         isProcessing = false;
     }
     
+    // ----------------------------------------------------
+    // 💥 الدالة المعدلة لضمان توليد 4 خيارات مختلفة دائمًا
+    // ----------------------------------------------------
     function generateChoices(correctAnswer) {
         const choices = [correctAnswer];
         let attempts = 0;
         const maxAttempts = 100;
 
-        // توليد 3 خيارات خاطئة
+        // الهدف: 4 خيارات (الصحيحة + 3 خاطئة)
         while (choices.length < 4 && attempts < maxAttempts) {
             let fakeAnswer;
             
-            // محاولة إنشاء إجابة قريبة من الصحيحة
-            if (correctAnswer !== 0) {
-                const percentage = getRandomElement([-0.2, -0.1, -0.05, 0.05, 0.1, 0.2]);
-                const offset = correctAnswer * percentage;
+            // محاولة إنشاء إجابة قريبة من الصحيحة لـ 40 محاولة
+            if (attempts < 40 && correctAnswer !== 0) {
+                // توليد إزاحة صغيرة (10% - 20%)
+                const percentage = getRandomElement([-0.2, -0.1, 0.1, 0.2]);
+                let offset = correctAnswer * percentage;
+
+                // إذا كانت الإجابة الصحيحة عدد صحيح كبير، محاولة خطأ في منزلة
+                if (Number.isInteger(correctAnswer) && Math.abs(correctAnswer) >= 10 && attempts % 2 === 0) {
+                    const powerOfTen = Math.pow(10, getRandomInt(0, correctAnswer.toString().length - 2));
+                    offset = getRandomElement([-1, 1]) * powerOfTen;
+                }
+                
                 fakeAnswer = parseFloat((correctAnswer + offset).toFixed(4));
-            } else {
-                // إذا كانت الإجابة الصحيحة صفر، نختار أرقام صغيرة عشوائية
-                fakeAnswer = getRandomElement([-5, -3, -1, 1, 3, 5]);
-            }
             
-            // تجربة الإجابة الخطأ الأساسية (مثل خطأ في منزلة واحدة)
-            if (attempts % 5 === 0 && Number.isInteger(correctAnswer) && correctAnswer >= 10) {
-                const powerOfTen = Math.pow(10, getRandomInt(0, correctAnswer.toString().length - 2));
-                const errorAmount = getRandomElement([-1, 1]) * powerOfTen;
-                fakeAnswer = correctAnswer + errorAmount;
+            // توليد رقم عشوائي أبعد
+            } else {
+                // نطاق عشوائي كبير لضمان رقم مختلف
+                const range = Math.max(15, Math.abs(correctAnswer) * 0.75);
+                const randomOffset = getRandomInt(-range, range);
+                fakeAnswer = correctAnswer + randomOffset;
             }
 
-            // التقريب النهائي والتأكد من عدم التكرار
+            // التقريب والتأكد من التساوي في نوع العدد
             fakeAnswer = parseFloat(fakeAnswer.toFixed(4));
-            if (!choices.includes(fakeAnswer)) {
+            
+            // إذا كانت الإجابة الصحيحة عدد صحيح، يتم تقريب الإجابة الخاطئة أيضاً لتكون عدد صحيح
+            if (Number.isInteger(correctAnswer) || (document.getElementById('operation-select').value === '+' || document.getElementById('operation-select').value === '-')) {
+                 fakeAnswer = Math.round(fakeAnswer);
+            } 
+            
+            // يجب أن يكون الخيار الخاطئ مختلفاً عن الصحيح وعن باقي الخيارات الخاطئة
+            if (fakeAnswer !== correctAnswer && !choices.some(c => parseFloat(c.toFixed(4)) === parseFloat(fakeAnswer.toFixed(4)))) {
                 choices.push(fakeAnswer);
             }
             attempts++;
         }
 
+        // إذا فشل التوليد العشوائي (نادرًا)، سنضمن 4 خيارات بالقوة
+        while (choices.length < 4) {
+             let forcedFake = correctAnswer + (choices.length % 2 === 0 ? 1 : -1) * 10 * choices.length;
+             forcedFake = Math.round(forcedFake);
+             if (!choices.includes(forcedFake)) {
+                 choices.push(forcedFake);
+             }
+        }
+        
         // خلط الخيارات
         for (let i = choices.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -1194,6 +1220,7 @@
             `<button class="choice-btn" onclick="checkAnswer(${choice})">${formatResult(choice)}</button>`
         ).join('');
     }
+    // ----------------------------------------------------
     
     function formatResult(number, forceDecimal = false) {
          if (typeof number !== 'number') return number; // للتقريب (n2)
