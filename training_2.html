@@ -495,15 +495,15 @@
 
         if (opType === 'EVAL') {
              details = `تقويم شامل`;
-             thresholdInfo = `(الأسئلة المتبقية: ${(EVALUATION_QUESTIONS_TOTAL - levelQuestionsAnswered).toLocaleString(ARABIC_LOCALE)})`;
+             thresholdInfo = `(الأسئلة المتبقية: ${(EVALUATION_QUESTIONS_TOTAL - levelQuestionsAnswered).toLocaleString(ARABIC_LOCALE, {useGrouping: false})})`
         } else {
-             thresholdInfo = `(المتبقي: **${(totalQuestionsForLevel - levelQuestionsAnswered).toLocaleString(ARABIC_LOCALE)}** سؤال)`;
+             thresholdInfo = `(المتبقي: **${(totalQuestionsForLevel - levelQuestionsAnswered).toLocaleString(ARABIC_LOCALE, {useGrouping: false})}** سؤال)`;
         } 
 
         document.getElementById('progress-display').innerHTML = 
-            `المتدرب الحالي: **${currentStudent}** | ${details}<br>الإجابات الصحيحة: ${levelCorrectAnswers.toLocaleString(ARABIC_LOCALE)} / ${levelQuestionsAnswered.toLocaleString(ARABIC_LOCALE)}<br>
+            `المتدرب الحالي: **${currentStudent}** | ${details}<br>الإجابات الصحيحة: ${levelCorrectAnswers.toLocaleString(ARABIC_LOCALE, {useGrouping: false})} / ${levelQuestionsAnswered.toLocaleString(ARABIC_LOCALE, {useGrouping: false})}<br>
              ${thresholdInfo}<br>
-             النقاط التراكمية: **${(globalScores[currentStudent] || 0).toLocaleString(ARABIC_LOCALE)}**`;
+             النقاط التراكمية: **${(globalScores[currentStudent] || 0).toLocaleString(ARABIC_LOCALE, {useGrouping: false})}**`;
     }
     
     function getNextOperation(currentOp) {
@@ -554,7 +554,7 @@
         const percentage = (levelCorrectAnswers / EVALUATION_QUESTIONS_TOTAL) * 100;
         
         let message = `<h1>✅ انتهى التقويم! نتائج **${currentStudent}** النهائية:</h1>
-                         <h2>النتيجة: **${levelCorrectAnswers.toLocaleString(ARABIC_LOCALE)}/${EVALUATION_QUESTIONS_TOTAL.toLocaleString(ARABIC_LOCALE)}** (${percentage.toFixed(1).toLocaleString(ARABIC_LOCALE)}%)</h2>`;
+                         <h2>النتيجة: **${levelCorrectAnswers.toLocaleString(ARABIC_LOCALE, {useGrouping: false})}/${EVALUATION_QUESTIONS_TOTAL.toLocaleString(ARABIC_LOCALE, {useGrouping: false})}** (${percentage.toFixed(1).toLocaleString(ARABIC_LOCALE, {useGrouping: false})}%)</h2>`;
         
         document.getElementById('feedback').innerHTML = message;
         document.getElementById('expression-display').textContent = 'اضغط على أحد الأزرار للمتابعة...';
@@ -802,7 +802,8 @@
         const maxLength = Math.max(length1, length2);
         
         const padFormattedNumber = (numStr, targetLength) => {
-            const currentLength = numStr.replace(/,/g, '').length;
+            // إزالة فواصل الأعداد الصحيحة قبل حساب الطول للحصول على الطول الفعلي للخانة
+            const currentLength = numStr.replace(/,/g, '').length; 
             const paddingNeeded = targetLength - currentLength;
             
             let paddedString = numStr;
@@ -1043,7 +1044,7 @@
                 correctAnswerValue = Math.round(numberToRound / 1000000) * 1000000;
             } else {
                 const decimalPlaces = getRandomInt(1, 4); // من 1 إلى 4 منازل عشرية
-                roundingPlaceKey = `أقرب جزء من ${Math.pow(10, decimalPlaces).toLocaleString(ARABIC_LOCALE)}`;
+                roundingPlaceKey = `أقرب جزء من ${Math.pow(10, decimalPlaces).toLocaleString(ARABIC_LOCALE, {useGrouping: false})}`;
                 
                 const minDecimals = decimalPlaces + 1;
                 const maxIntDigits = MAX_TOTAL_DIGITS - minDecimals; 
@@ -1256,16 +1257,21 @@
     }
     // ----------------------------------------------------
     
+    // الكود المُعدَّل هنا: لإلغاء فواصل الأعداد الصحيحة (الآلاف)
     function formatResult(number, forceDecimal = false) {
-         if (typeof number !== 'number') return number; // للتقريب (n2)
+         if (typeof number !== 'number') return number; 
          
+         // 1. التعامل مع الأعداد الصحيحة (بدون فواصل آلاف)
          if (!forceDecimal && (number === 0 || Number.isInteger(number))) {
-             return Math.round(number).toLocaleString(ARABIC_LOCALE);
+             return Math.round(number).toLocaleString(ARABIC_LOCALE, {
+                 useGrouping: false // <--- التعديل الأول
+             });
          }
          
+         // 2. التعامل مع الأعداد العشرية (بدون فواصل آلاف في الجزء الصحيح)
          const formatted = number.toLocaleString(ARABIC_LOCALE, {
              maximumFractionDigits: 4,
-             useGrouping: true 
+             useGrouping: false // <--- التعديل الثاني
          });
          
          return formatted.replace(/\s/g, ''); // إزالة مسافات التجميع الإضافية
