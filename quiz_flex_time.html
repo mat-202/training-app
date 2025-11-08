@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Tahoma, Arial, sans-serif;
-            background-color: #f7f9fc; /* خلفية فاتحة */
+            background-color: #f7f9fc; 
             direction: rtl; 
             text-align: right;
             margin: 0;
@@ -29,7 +29,7 @@
         }
 
         h1 {
-            color: #1a73e8; /* أزرق مشابه للشعار */
+            color: #1a73e8; 
             font-size: 28px;
             border-bottom: 2px solid #e0e0e0;
             padding-bottom: 10px;
@@ -38,7 +38,7 @@
         }
         
         .section-box {
-            border: 2px solid #34a853; /* إطار أخضر */
+            border: 2px solid #34a853; 
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
@@ -68,7 +68,7 @@
             margin-left: 10px;
         }
 
-        .form-group input, .form-group select {
+        .form-group input {
             flex-grow: 1;
             padding: 10px;
             border: 1px solid #ccc;
@@ -97,7 +97,7 @@
         }
 
         .select-like-group button.selected {
-            background-color: #fce3a7; /* لون مميز للاختيار */
+            background-color: #fce3a7; 
             border-color: #ffc107;
             font-weight: bold;
             color: #333;
@@ -114,7 +114,7 @@
             font-size: 24px;
             font-weight: bold;
             color: white;
-            background-color: #1a73e8; /* أزرق للبدء */
+            background-color: #1a73e8; 
             cursor: pointer;
             transition: background-color 0.3s;
         }
@@ -123,7 +123,7 @@
             background-color: #0d5dd1;
         }
         
-        /* شاشة التحدي الفعلية (مطابقة للتصميم السابق) */
+        /* شاشة التحدي الفعلية */
         #quiz-display {
             display: none;
             width: 100%;
@@ -131,12 +131,12 @@
         }
         
         #quiz-display h1 {
-             color: #34a853; /* لون أخضر للعنوان */
+             color: #34a853; 
         }
 
         .word-box {
-            background-color: #fff9e6; /* خلفية صفراء فاتحة */
-            border: 4px solid #ffc107; /* إطار أصفر للمستوى الأول */
+            background-color: #fff9e6; 
+            border: 4px solid #ffc107; 
             padding: 70px 30px;
             min-height: 200px;
             display: flex;
@@ -150,11 +150,23 @@
         }
 
         #current-item {
-            font-size: 90px; /* حجم كبير للكلمات */
+            font-size: 90px; 
             font-weight: 900;
             color: #333333;
             margin: 0;
             line-height: 1.5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* تنسيق رقم الكلمة */
+        .item-number {
+            font-size: 0.6em; /* أصغر من الكلمة نفسها */
+            font-weight: normal;
+            color: #888;
+            margin-left: 20px;
+            direction: ltr; /* لضمان ظهور الرقم بشكل صحيح (59_رقم_كلمة) */
         }
         
         /* مؤقت الشريط */
@@ -164,7 +176,7 @@
             left: 0;
             width: 100%;
             height: 15px;
-            background-color: #ffc107; /* أصفر افتراضي */
+            background-color: #ffc107; 
             transform-origin: left;
         }
         
@@ -186,7 +198,7 @@
     <div class="container">
         
         <div id="setup-screen">
-            <h1>منصة التدريب الإحصائي المتقدم (فردي)</h1>
+            <h1>منصة تحدي القراءة الموحد</h1>
             
             <div class="section-box">
                 <h2>التدريب المتقدم</h2>
@@ -196,13 +208,19 @@
                     <input type="text" id="trainee-name" placeholder="اكتب اسم المتدرب">
                 </div>
                 
+                <div class="form-group">
+                    <label for="start-index">البدء من الرقم:</label>
+                    <input type="number" id="start-index" value="1" min="1" max="500" style="width: 100px; text-align: center;">
+                    <span id="max-index-tip" style="color: #888; margin-right: 15px;">(الحد الأقصى: 500)</span>
+                </div>
+                
                 <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-top: 20px;">
                     
                     <div style="flex: 1; min-width: 150px;">
                         <label style="display: block; font-weight: bold; margin-bottom: 5px;">المستوى الأول:</label>
                         <div class="select-like-group" id="level-selection-group">
-                            <button data-level="words" class="selected">الكلمات (500)</button>
-                            <button data-level="sentences">الجمل (100)</button>
+                            <button data-level="words" data-max="500" class="selected">الكلمات (500)</button>
+                            <button data-level="sentences" data-max="100">الجمل (100)</button>
                         </div>
                     </div>
 
@@ -225,13 +243,13 @@
                     </div>
                 </div>
 
-                <p style="margin-top: 30px; text-align: center; font-size: 14px; color: #777;">إعداد الأستاذ عبدالعزيز الحمادي</p>
+                <p style="margin-top: 30px; text-align: center; font-size: 14px; color: #777;">إعداد الأستاذ عبدالعزيز الحجيلي</p>
 
             </div>
             
             <button id="start-button" onclick="validateAndStartQuiz()">اضغط لبدء التدريب</button>
 
-            <p id="error-message" style="color: red; text-align: center; margin-top: 15px; font-weight: bold; display: none;">الرجاء كتابة اسم المتدرب قبل البدء.</p>
+            <p id="error-message" style="color: red; text-align: center; margin-top: 15px; font-weight: bold; display: none;"></p>
         </div>
 
         <div id="quiz-display">
@@ -434,14 +452,15 @@
         // ********** نهاية قائمة الـ 100 جملة **********
 
         // **********************************************
-        // ********** 3. دوال التحكم والتشغيل **********
+        // ********** 3. متغيرات وعناصر التحكم **********
         // **********************************************
 
         let itemsArray;
         let currentItemIndex = 0;
-        let intervalDuration = 5000; // القيمة الافتراضية: 5 ثواني
+        let intervalDuration = 5000; 
         let quizInterval;
-        let selectedLevel = 'words'; // القيمة الافتراضية: كلمات
+        let selectedLevel = 'words'; 
+        let maxItems = 500; // الحد الأقصى الافتراضي
 
         const setupScreen = document.getElementById('setup-screen');
         const quizDisplayDiv = document.getElementById('quiz-display');
@@ -452,8 +471,14 @@
         const wordBox = document.querySelector('.word-box');
         const errorMessage = document.getElementById('error-message');
         const traineeNameInput = document.getElementById('trainee-name');
+        const startIndexInput = document.getElementById('start-index');
+        const maxIndexTip = document.getElementById('max-index-tip');
 
         quizDisplayDiv.style.display = 'none'; 
+
+        // **********************************************
+        // ********** 4. دوال التحكم والتشغيل **********
+        // **********************************************
 
         // 1. وظيفة تحديث المؤقت البصري (شريط التقدم)
         function startTimerBar(seconds) {
@@ -471,24 +496,30 @@
         // 2. وظيفة عرض العنصر التالي
         function displayNextItem() {
             if (itemsArray.length === 0) {
-                currentItemElement.textContent = "عفواً، القائمة فارغة.";
+                currentItemElement.innerHTML = "عفواً، القائمة فارغة.";
                 clearInterval(quizInterval);
                 return;
             }
             
-            // 1. تحديث العنصر المعروض
-            currentItemElement.textContent = itemsArray[currentItemIndex];
+            // حساب رقم الكلمة الحالي للمتسابق (1-based)
+            const itemNumber = currentItemIndex + 1;
+            
+            // 1. تحديث العنصر المعروض مع الرقم (59_رقم_كلمة)
+            const itemContent = itemsArray[currentItemIndex];
+            currentItemElement.innerHTML = `${itemContent} <span class="item-number">_${itemNumber}_رقم</span>`;
             
             // 2. بدء حركة شريط المؤقت (مدة العرض)
             startTimerBar(intervalDuration / 1000);
             
             // 3. الانتقال إلى العنصر التالي (حلقة مستمرة)
-            currentItemIndex = (currentItemIndex + 1) % itemsArray.length;
+            currentItemIndex = (currentItemIndex + 1);
+            if (currentItemIndex >= itemsArray.length) {
+                currentItemIndex = 0; // العودة للبداية إذا انتهت القائمة
+            }
         }
 
         // 3. وظيفة بدء التحدي الفعلي بعد التحقق
         function startQuiz() {
-            // إخفاء شاشة الإعدادات وعرض شاشة التحدي
             setupScreen.style.display = 'none';
             quizDisplayDiv.style.display = 'block';
 
@@ -500,31 +531,47 @@
             itemsArray = (selectedLevel === 'words') ? WORDS : SENTENCES;
             const seconds = intervalDuration / 1000;
             const traineeName = traineeNameInput.value.trim();
+            const startNum = parseInt(startIndexInput.value) || 1;
+            
+            // تعيين البداية: ناقص 1 لأن الفهرسة تبدأ من الصفر
+            currentItemIndex = (startNum > 0 && startNum <= itemsArray.length) ? startNum - 1 : 0;
+
 
             // تحديث العنوان والتنسيقات بناءً على الاختيارات
             const levelText = selectedLevel === 'words' ? 'الكلمات (500 كلمة)' : 'الجمل (100 جملة)';
             quizTitle.innerHTML = `تحدي ${levelText} للمتدرب: **${traineeName}**`;
             timeDisplay.textContent = seconds;
             
-            // ضبط حجم الخط ولون الشريط
+            // ضبط حجم الخط ولون الشريط والخلفية والإطار
             currentItemElement.style.fontSize = (selectedLevel === 'words') ? '90px' : '50px';
             timerBar.style.backgroundColor = (selectedLevel === 'words') ? '#ffc107' : '#34a853';
             wordBox.style.borderColor = (selectedLevel === 'words') ? '#ffc107' : '#34a853';
             wordBox.style.backgroundColor = (selectedLevel === 'words') ? '#fff9e6' : '#e6ffe6';
             
             // بدء العرض
-            currentItemIndex = 0;
             displayNextItem();
             quizInterval = setInterval(displayNextItem, intervalDuration);
         }
 
         // 4. وظيفة التحقق والبدء (مربوطة بزر البدء)
         window.validateAndStartQuiz = function() {
+            errorMessage.style.display = 'none';
+            
+            // التحقق من الاسم
             if (traineeNameInput.value.trim() === "") {
+                errorMessage.textContent = "الرجاء كتابة اسم المتدرب قبل البدء.";
                 errorMessage.style.display = 'block';
                 return;
             }
-            errorMessage.style.display = 'none';
+
+            // التحقق من رقم البدء
+            const startNum = parseInt(startIndexInput.value);
+            if (isNaN(startNum) || startNum < 1 || startNum > maxItems) {
+                errorMessage.textContent = `رقم البدء غير صحيح. يجب أن يكون بين 1 و ${maxItems}.`;
+                errorMessage.style.display = 'block';
+                return;
+            }
+
             startQuiz();
         }
 
@@ -539,7 +586,18 @@
                 btn.addEventListener('click', function() {
                     levelButtons.forEach(b => b.classList.remove('selected'));
                     this.classList.add('selected');
+                    
                     selectedLevel = this.dataset.level;
+                    maxItems = parseInt(this.dataset.max);
+                    
+                    // تحديث الحد الأقصى في حقل "البدء من الرقم"
+                    startIndexInput.max = maxItems;
+                    maxIndexTip.textContent = `(الحد الأقصى: ${maxItems})`;
+                    
+                    // إعادة تعيين القيمة إلى 1 إذا كانت أكبر من الحد الأقصى الجديد
+                    if (parseInt(startIndexInput.value) > maxItems) {
+                        startIndexInput.value = 1;
+                    }
                 });
             });
 
