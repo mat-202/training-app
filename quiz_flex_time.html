@@ -155,21 +155,21 @@
             color: #333333;
             margin: 0;
             line-height: 1.5;
-            /* التعديل هنا: نستخدم فليكس للتوسيط ولكن نزيل الـ space-between */
+            /* التعديل هنا: نستخدم فليكس للتوسيط */
             display: flex; 
             align-items: center;
-            justify-content: center; /* لتوسيط الرقم والكلمة معًا */
+            justify-content: center; /* لتوسيط الكلمة والرقم معًا */
             width: 100%; 
             font-size: 70px; 
-            gap: 15px; /* مسافة بسيطة بين الرقم والكلمة/الفاصلة */
+            gap: 15px; /* مسافة بسيطة بين الكلمة والرقم */
         }
         
-        /* تنسيق الرقم و الفاصل */
-        .item-number-with-separator {
+        /* تنسيق الرقم */
+        .item-number {
             font-weight: 900;
             color: #333;
             font-size: 70px; 
-            direction: ltr; /* للحفاظ على تنسيق 5 / */
+            direction: ltr; /* للحفاظ على شكل الرقم كأرقام عربية (لاتينية) */
             margin: 0;
         }
         
@@ -436,10 +436,11 @@
             const itemNumber = currentItemIndex + 1;
             const itemContent = itemsArray[currentItemIndex];
             
-            // التعديل: الترتيب الآن هو (الرقم / الكلمة) متجاورين وفي الوسط
+            // التعديل الجديد: الترتيب هو (الكلمة الرقم) بدون فاصل
+            // الكلمة أولاً (على اليمين في RTL) ثم الرقم
             currentItemElement.innerHTML = `
-                <span class="item-number-with-separator">${itemNumber} /</span>
                 <span class="item-content">${itemContent}</span>
+                <span class="item-number">${itemNumber}</span>
             `;
             
             startTimerBar(intervalDuration / 1000);
