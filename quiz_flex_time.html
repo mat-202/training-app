@@ -150,36 +150,44 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
+        /* ** التعديلات الرئيسية هنا لتقسيم المستطيل ** */
         #current-item {
             font-weight: 900;
             color: #333333;
             margin: 0;
             line-height: 1.5;
-            /* التعديل هنا: نستخدم فليكس للتوسيط */
             display: flex; 
-            align-items: center;
-            justify-content: center; /* لتوسيط الكلمة والرقم معًا */
+            align-items: stretch; 
+            justify-content: center; 
             width: 100%; 
-            font-size: 70px; 
-            gap: 15px; /* مسافة بسيطة بين الكلمة والرقم */
-        }
-        
-        /* تنسيق الرقم */
-        .item-number {
-            font-weight: 900;
-            color: #333;
-            font-size: 70px; 
-            /* لا حاجة لـ direction: ltr هنا لأننا سنستخدم الأرقام العربية مباشرةً */
-            margin: 0;
-        }
-        
-        /* تنسيق الكلمة نفسها */
-        .item-content {
-            font-size: 70px;
-            margin: 0;
+            height: 100%; 
             padding: 0;
+            /* عكس الترتيب (لجعل الرقم في اليمين) */
+            flex-direction: row-reverse; 
+        }
+
+        .item-segment {
+            flex-grow: 0; /* لا يتمدد ليأخذ كامل المساحة، يعتمد على محتواه */
+            display: flex;
+            align-items: center; 
+            justify-content: center; 
+            font-size: 70px; 
         }
         
+        /* الجزء الأيمن (الرقم): */
+        .item-number {
+            /* إضافة فاصل على اليسار */
+            border-left: 3px solid #ffc107; 
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        
+        /* الجزء الأيسر (الكلمة): */
+        .item-content {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
         /* مؤقت الشريط */
         #timer-bar {
             position: absolute;
@@ -286,7 +294,10 @@
             <h1 id="quiz-title"></h1>
             
             <div id="item-display" class="word-box">
-                <p id="current-item">جاري البدء...</p>
+                <div id="current-item">
+                    <div class="item-segment item-number"></div>
+                    <div class="item-segment item-content">جاري البدء...</div>
+                </div>
                 <div id="timer-bar"></div>
             </div>
             
@@ -436,7 +447,7 @@
         // 2. وظيفة عرض العنصر التالي
         function displayNextItem() {
             if (itemsArray.length === 0) {
-                currentItemElement.innerHTML = "عفواً، القائمة فارغة.";
+                currentItemElement.innerHTML = `<div class="item-segment">عفواً، القائمة فارغة.</div>`;
                 clearInterval(quizInterval);
                 return;
             }
@@ -445,10 +456,10 @@
             const arabicItemNumber = convertToArabicNumbers(itemNumber); // تحويل الرقم إلى عربي
             const itemContent = itemsArray[currentItemIndex];
             
-            // التعديل الجديد: الترتيب هو (الكلمة الرقم) باللغة العربية
+            // التعديل الجديد: الترتيب هو [رقم عربي] ثم [الكلمة] مع عكس اتجاه flex ليعرض الرقم في اليمين
             currentItemElement.innerHTML = `
-                <span class="item-content">${itemContent}</span>
-                <span class="item-number">${arabicItemNumber}</span>
+                <div class="item-segment item-content">${itemContent}</div>
+                <div class="item-segment item-number">${arabicItemNumber}</div>
             `;
             
             startTimerBar(intervalDuration / 1000);
@@ -487,11 +498,18 @@
             timeDisplay.textContent = seconds;
             
             // ضبط حجم الخط ولون الشريط والخلفية والإطار
-            // تم تحديد حجم الخط الكبير الآن على #current-item
             timerBar.style.backgroundColor = (selectedLevel === 'words') ? '#ffc107' : '#34a853';
             wordBox.style.borderColor = (selectedLevel === 'words') ? '#ffc107' : '#34a853';
             wordBox.style.backgroundColor = (selectedLevel === 'words') ? '#fff9e6' : '#e6ffe6';
             
+            // إعادة ضبط الحدود الفاصلة بناءً على نوع التحدي
+            const itemNumberElement = document.querySelector('.item-number');
+            if (selectedLevel === 'words') {
+                 itemNumberElement.style.borderLeft = '3px solid #ffc107'; // فاصل أصفر
+            } else {
+                 itemNumberElement.style.borderLeft = '3px solid #34a853'; // فاصل أخضر
+            }
+
             displayNextItem();
             quizInterval = setInterval(displayNextItem, intervalDuration);
         }
