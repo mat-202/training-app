@@ -155,41 +155,40 @@
             color: #333333;
             margin: 0;
             line-height: 1.5;
-            /* التعديل: لعرض الرقم في أقصى اليمين والكلمة في أقصى اليسار */
-            display: flex;
+            /* التعديل هنا: نستخدم فليكس للتوسيط ولكن نزيل الـ space-between */
+            display: flex; 
             align-items: center;
-            justify-content: space-between; /* هذا هو مفتاح التباعد */
-            width: 100%; /* يجب أن يأخذ العرض الكامل للصندوق */
+            justify-content: center; /* لتوسيط الرقم والكلمة معًا */
+            width: 100%; 
             font-size: 70px; 
+            gap: 15px; /* مسافة بسيطة بين الرقم والكلمة/الفاصلة */
         }
         
-        /* تنسيق رقم الكلمة (الرقم / الكلمة) */
-        .item-number {
-            font-size: 1.2em; 
+        /* تنسيق الرقم و الفاصل */
+        .item-number-with-separator {
             font-weight: 900;
             color: #333;
-            /* إزالة أي هوامش تسبب مشاكل في الترتيب الآن، لأن justify-content: space-between سيتولى المهمة */
-            margin: 0; 
-            direction: ltr; /* للحفاظ على تنسيق 5/ */
-            /* جعل الرقم بنفس حجم الكلمة الكبيرة */
             font-size: 70px; 
-            padding: 0 20px; /* لضمان عدم التصاق الرقم بإطار الصندوق */
+            direction: ltr; /* للحفاظ على تنسيق 5 / */
+            margin: 0;
         }
         
         /* تنسيق الكلمة نفسها */
         .item-content {
-            padding: 0 20px; /* لضمان عدم التصاق الكلمة بإطار الصندوق */
+            font-size: 70px;
+            margin: 0;
+            padding: 0;
         }
         
         /* مؤقت الشريط */
         #timer-bar {
             position: absolute;
             bottom: 0;
-            right: 0; /* تم تغييرها من left إلى right لتبدأ الحركة من اليمين لليسار في RTL */
+            right: 0; 
             width: 100%;
             height: 15px;
             background-color: #ffc107; 
-            transform-origin: right; /* تم تغييرها من left إلى right */
+            transform-origin: right; 
         }
         
         /* زر العودة */
@@ -437,10 +436,9 @@
             const itemNumber = currentItemIndex + 1;
             const itemContent = itemsArray[currentItemIndex];
             
-            // الترتيب الآن: الرقم على اليمين (كمحتوى أول في RTL) والكلمة على اليسار
-            // استخدام div منفصل للكلمة لتطبيق تنسيق space-between
+            // التعديل: الترتيب الآن هو (الرقم / الكلمة) متجاورين وفي الوسط
             currentItemElement.innerHTML = `
-                <span class="item-number" dir="ltr">${itemNumber}/</span>
+                <span class="item-number-with-separator">${itemNumber} /</span>
                 <span class="item-content">${itemContent}</span>
             `;
             
