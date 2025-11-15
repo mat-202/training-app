@@ -924,11 +924,12 @@
 
                     // مهارات مدمجة إضافية
                     // (تم افتراض أن المهارات الإضافية هي الحرف مع الحروف السابقة له في كلمة بسيطة)
-                    const extra_1 = 'ب' + al_harf_1.substring(1); 
-                    const extra_2 = 'و' + al_harf_2.substring(1); 
-                    const extra_3 = 'ك' + al_harf_3.substring(1);
-                    const extra_4 = 'ل' + al_harf_3.substring(1); 
-                    const extra_5 = 'ف' + al_harf_2.substring(1); 
+                    // **تم التصحيح هنا ليتناسب مع اللغة العربية الفصحى (بالْج، وَالْج، كَالْج، فَالْج، لِلْج)
+                    const extra_1 = 'بالْج'; // تصحيح: بالْج (بدلاً من بلج)
+                    const extra_2 = 'وَالْج'; // تصحيح: وَالْج (بدلاً من ولج)
+                    const extra_3 = 'كَالْج'; // تصحيح: كَالْج (بدلاً من كلج)
+                    const extra_4 = 'لِلْج'; // تصحيح: لِلْج (أصلها للج، لكن مع الجر أصبحت لِلْج)
+                    const extra_5 = 'فَالْج'; // تصحيح: فَالْج (بدلاً من فلج) 
                     
                     // حقل فارغ لإكمال الـ 24 خانة (3x8)
                     const combined = [
@@ -941,6 +942,7 @@
                         extra_1, extra_2, extra_3, // مدمج 1
                         extra_4, extra_5, '', // مدمج 2 + فراغ
                     ];
+
                     
                     tempCombinedArray.push(combined.join(' '));
                 });
