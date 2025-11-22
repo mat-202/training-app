@@ -93,9 +93,10 @@
             cursor: not-allowed;
         }
         
-        #view-history-button {
+        /* زر التنزيل الجديد */
+        #download-pdf-button {
             padding: 15px; 
-            background-color: #5bc0de;
+            background-color: #5cb85c; /* لون أخضر جميل */
             color: white;
             border: none;
             border-radius: 8px;
@@ -105,8 +106,8 @@
             margin-top: 10px;
         }
         
-        #view-history-button:hover {
-            background-color: #31b0d5;
+        #download-pdf-button:hover {
+            background-color: #4cae4c;
         }
 
 
@@ -404,7 +405,8 @@
             </div>
             
             <button id="start-button" onclick="validateAndStartQuiz()">اضغط لبدء التدريب</button>
-            <button id="view-history-button" onclick="displayAssessmentHistory()">مراجعة سجل التقييمات المحفوظ</button>
+            
+            <button id="download-pdf-button" onclick="downloadPDF()">تنزيل ملف الحروف المدمجة (PDF)</button>
         </div>
 
         <div id="quiz-display" style="display: none;">
@@ -901,32 +903,19 @@
     // ********** 4. دوال التحكم والتشغيل وحفظ السجل **********
     // **********************************************
     
-    // دوال LocalStorage
-    function getAssessmentHistory() {
-        const history = localStorage.getItem('readingChallengeAssessments');
-        return history ? JSON.parse(history) : [];
-    }
-
-    window.displayAssessmentHistory = function() {
-        const history = getAssessmentHistory();
-        if (history.length === 0) {
-            alert("لا يوجد سجل تقييمات محفوظ بعد.");
-            return;
-        }
-
-        let output = "--- سجل التقييمات المحفوظة ---\n";
-        history.forEach((res, index) => {
-            output += `\n#${convertToArabicNumbers(index + 1)} - المتدرب: ${res.traineeName}\n`;
-            output += `المستوى: ${res.levelText}\n`;
-            output += `تاريخ التقييم: ${new Date(res.timestamp).toLocaleDateString('ar-EG')}\n`;
-            output += `العناصر: ${convertToArabicNumbers(res.totalItems)} | الأخطاء: ${convertToArabicNumbers(res.errors)}\n`;
-            output += `ملاحظات: ${res.notes.substring(0, 50)}${res.notes.length > 50 ? '...' : ''}\n`;
-        });
+    // === التعديل هنا: ربط الزر برابط Google Drive ===
+    window.downloadPDF = function() {
+        const driveUrl = "https://drive.google.com/file/d/1CxCx1MDDwKFernidH2ARP5frXP3gXim6/view?usp=drivesdk";
         
-        console.log(output);
-        alert(`تم عرض سجل ${convertToArabicNumbers(history.length)} تقييمات في وحدة التحكم (Console).`);
+        // فتح الرابط في نافذة جديدة
+        window.open(driveUrl, '_blank');
+        
+        // يمكن إضافة رسالة تنبيه بسيطة لتأكيد العملية
+        // alert("✅ جاري فتح صفحة التنزيل في نافذة جديدة...");
     }
+    // === نهاية التعديل ===
 
+    // تم حذف دوال getAssessmentHistory و displayAssessmentHistory بالكامل
     
     function startTimerBar(seconds) {
         if (!isAutoAdvance) {
@@ -1282,14 +1271,23 @@
         };
         
         // 2. تحميل السجل القديم وإضافة النتيجة الجديدة
-        let history = getAssessmentHistory();
+        let history = []; // تم إزالة وظيفة getAssessmentHistory لذا نبدأ بسجل فارغ
+        
+        // محاولة جلب السجل القديم (للحفاظ على البيانات المحفوظة سابقاً من التغييرات)
+        try {
+            const historyString = localStorage.getItem('readingChallengeAssessments');
+            history = historyString ? JSON.parse(historyString) : [];
+        } catch (e) {
+            console.error("Error loading assessment history:", e);
+        }
+        
         history.push(resultObject);
 
         // 3. حفظ السجل المحدث في LocalStorage
         try {
              localStorage.setItem('readingChallengeAssessments', JSON.stringify(history));
              console.log("تم حفظ التقييم: ", resultObject);
-             alert(`تم حفظ التقييم للمتدرب ${traineeName} بنجاح! راجع سجل وحدة التحكم (Console) لمشاهدة التفاصيل.`);
+             alert(`تم حفظ التقييم للمتدرب ${traineeName} بنجاح! يمكن الوصول إليه عبر تخزين المتصفح المحلي (Local Storage).`);
         } catch (e) {
             alert("خطأ: تعذر حفظ التقييم في المتصفح.");
             console.error("LocalStorage save error:", e);
