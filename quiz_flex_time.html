@@ -123,7 +123,7 @@
             color: #1f3f6c;
         }
         
-        /* 🆕 تنسيق رقم واسم الحرف - تم نقله ليصبح مركزاً وواضحاً */
+        /* تنسيق رقم واسم الحرف - تم نقله ليصبح مركزاً وواضحاً */
         #item-number-top {
             font-size: 1.2em;
             font-weight: bold;
@@ -144,13 +144,13 @@
             position: relative;
         }
         
-        /* شريط الوقت */
+        /* شريط الوقت - 🆕 تم تعديل موضعه من top إلى bottom */
         #timer-bar {
             height: 8px;
             background-color: #1f3f6c;
             width: 100%;
             position: absolute;
-            top: 0;
+            bottom: 0; 
             right: 0;
             z-index: 10;
         }
@@ -173,10 +173,9 @@
 
         .item-content {
             flex-grow: 1;
-            /* 🆕 تعديل لعرض الفقرات */
             line-height: 2; 
-            white-space: pre-wrap; /* يسمح بالانتقال إلى سطر جديد */
-            text-align: justify; /* محاذاة النص */
+            white-space: pre-wrap; 
+            text-align: justify; 
             padding: 30px;
         }
 
@@ -297,11 +296,11 @@
                 <div class="input-group" style="flex: 2;">
                     <label for="level-select">اختر مستوى التحدي:</label>
                     <select id="level-select">
-                        <option value="reading">الحروف المدمجة (28 حرف)</option>
+                        <option value="reading" selected>الحروف المدمجة (28 حرف)</option> 
                         <option value="random_skill">تقييم مهاراة الحروف (672 مهارة)</option>
                         <option value="words">الكلمات (194 كلمة)</option>
                         <option value="sentences">الجمل (120 جملة)</option>
-                        <option value="passages" selected>القطع الهادفة (20 قطعة)</option> 
+                        <option value="passages">القطع الهادفة (20 قطعة)</option> 
                     </select>
                 </div>
 
@@ -335,7 +334,7 @@
 
 <script>
     // **********************************************
-    // ********** 1. قوائم البيانات (مع الإضافة الجديدة) **********
+    // ********** 1. قوائم البيانات **********
     // **********************************************
 
     const SUKUN_PREFIXES = ['يَـ', 'مَـ', 'فِـ']; 
@@ -548,7 +547,6 @@
         "ٱلْجَمَلُ سَفِينَةُ ٱلصَّحْرَاءِ لِصَبْرِهِ ٱلْكَبِيرِ.", "نَحْنُ نَحْتَفِلُ بِعِيدِ ٱلْفِطْرِ كُلَّ سَنَةٍ.", "ٱلْقِرَاءَةُ هِيَ مِفْتَاحُ ٱلْعُلُومِ ٱلْمُخْتَلِفَةِ.", "تَعَلَّمْنَا دَرْسًا جَدِيدًا فِي مَادَّةِ ٱلتَّارِيخِ ٱلْعَرَبِيِّ.", "ٱلْأَمْنُ وَٱلْأَمَانُ نِعْمَةٌ لَا تُقَدَّرُ بِثَمَنٍ."
     ];
 
-    // 🆕 مصفوفة القطع الهادفة (20 قطعة بمتوسط 3 أسطر)
     const PASSAGES_ARRAY = [
         "ٱلْأَمَانَةُ كَنْزٌ عَظِيمٌ. \n عَلَيْنَا أَنْ نُحَافِظَ عَلَى كُلِّ شَيْءٍ يُؤْتَمَنُ لَنَا، \n سَوَاءٌ كَانَ مَالًا أَوْ سِرًّا أَوْ وَعْدًا. ",
         "ٱلصَّدِيقُ ٱلْحَقِيقِيُّ يُشْبِهُ ٱلْمِصْبَاحَ. \n يَضِيءُ لَنَا ٱلطَّرِيقَ فِي ٱلظَّلَامِ، \n وَيُسَاعِدُنَا عِنْدَمَا نَقَعُ فِي ٱلشَّدَائِدِ.",
@@ -573,7 +571,7 @@
     ];
 
     // **********************************************
-    // ********** 2. الدوال المساعدة (مع دالة الخلط) **********
+    // ********** 2. الدوال المساعدة **********
     // **********************************************
     
     // دالة لخلط عناصر المصفوفة بشكل عشوائي (Fisher-Yates shuffle)
@@ -705,11 +703,10 @@
 
     let itemsArray = [];
     let currentItemIndex = 0;
-    // 🆕 تعيين القيمة الافتراضية لقطع القراءة على 10 ثوانٍ
     let intervalDuration = 10000; 
     let quizInterval;
-    // 🆕 تعيين المستوى الافتراضي على القطع
-    let selectedLevel = 'passages'; 
+    // 🆕 تعيين المستوى الافتراضي ليكون "reading"
+    let selectedLevel = 'reading'; 
     
     const setupScreen = document.getElementById('setup-screen');
     const quizDisplayDiv = document.getElementById('quiz-display');
@@ -824,9 +821,9 @@
             } else if (selectedLevel === 'sentences') {
                 color = '#5cb85c';
                 fontSize = '40px';
-            } else if (selectedLevel === 'passages') { // 🆕 مستوى القطع
+            } else if (selectedLevel === 'passages') { 
                  color = '#00bcd4';
-                 fontSize = '35px'; // خط أصغر يناسب الفقرات
+                 fontSize = '35px'; 
             }
 
             wordBox.style.borderColor = color;
@@ -869,10 +866,9 @@
             itemsArray = WORDS_ARRAY;
         } else if (selectedLevel === 'sentences') {
             itemsArray = SENTENCES_ARRAY;
-        } else if (selectedLevel === 'passages') { // 🆕 مستوى القطع
+        } else if (selectedLevel === 'passages') { 
             itemsArray = PASSAGES_ARRAY;
         } else if (selectedLevel === 'random_skill') {
-            // ** التعديل الجديد: تجميع جميع المهارات الفردية، ثم خلطها عشوائياً **
             let allSkills = getAllIndividualSkills();
             itemsArray = shuffleArray(allSkills); 
         } else { // 'reading' (المهارات المدمجة)
@@ -947,7 +943,7 @@
             'words': WORDS_ARRAY.length,
             'sentences': SENTENCES_ARRAY.length,
             'random_skill': TOTAL_INDIVIDUAL_SKILLS,
-            'passages': PASSAGES_ARRAY.length // 🆕 الحد الأقصى للقطع
+            'passages': PASSAGES_ARRAY.length 
         };
         const maxAllowed = MAX_LIMITS[level];
 
@@ -979,7 +975,7 @@
         'words': WORDS_ARRAY.length,
         'sentences': SENTENCES_ARRAY.length,
         'random_skill': TOTAL_INDIVIDUAL_SKILLS,
-        'passages': PASSAGES_ARRAY.length // 🆕 إضافة الحد الأقصى
+        'passages': PASSAGES_ARRAY.length 
     };
 
     // **********************************************
@@ -999,7 +995,7 @@
             } else if (level === 'sentences') {
                 maxHint = `${arabicMax} جملة`;
                 startIndexGroup.style.display = 'flex';
-            } else if (level === 'passages') { // 🆕 مستوى القطع
+            } else if (level === 'passages') { 
                  maxHint = `${arabicMax} قطعة`;
                  startIndexGroup.style.display = 'flex';
             } else if (level === 'random_skill') {
@@ -1042,7 +1038,6 @@
             if (sentenceOption) {
                 sentenceOption.textContent = `الجمل (${arabicSentenceMax} جملة)`;
             }
-             // 🆕 تحديث خيار القطع
              const passageOption = levelSelect.querySelector('option[value="passages"]');
              const arabicPassageMax = convertToArabicNumbers(MAX_LIMITS['passages']);
              if (passageOption) {
