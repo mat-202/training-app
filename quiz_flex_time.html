@@ -123,12 +123,12 @@
             color: #1f3f6c;
         }
         
+        /* 🆕 تنسيق رقم واسم الحرف - تم نقله ليصبح مركزاً وواضحاً */
         #item-number-top {
             font-size: 1.2em;
             font-weight: bold;
             color: #8e24aa;
-            margin-bottom: 15px;
-            display: none;
+            text-align: center;
         }
 
         #item-display {
@@ -313,9 +313,10 @@
             <h2 id="quiz-title"></h2>
             <p class="timer-info">ستتغير النصوص تلقائيًا كل <span id="time-display">5</span> ثوانٍ.</p>
             
+            <div id="item-number-top" style="text-align: center; margin-bottom: 15px;"></div> 
+            
             <div id="item-display" style="min-height: 350px; position: relative;">
                 <div id="timer-bar"></div>
-                <div id="item-number-top"></div>
                 
                 <div id="current-item" class="default-display" style="width: 100%; height: 100%;">
                     <div style="font-size: 30px; color: #555;">... جارٍ التحميل ...</div>
@@ -636,7 +637,7 @@
             shaddah_1, shaddah_2, shaddah_3, 
             al_harf_1, al_harf_2, al_harf_3, 
             extra_1, extra_2, extra_3, 
-            extra_4, extra_5, BASE_CHAR_PURE, 
+            extra_4, extra_5, '', // ⬅️ تم تعديل هذا العنصر ليصبح فارغاً بناءً على طلب المستخدم
         ];
 
         return combined.join(' ');
@@ -742,6 +743,7 @@
                 ''
             ];
 
+            // 🆕 إظهار العنصر في مكانه الجديد بالوسط
             itemNumberTop.style.display = 'block';
             itemNumberTop.innerHTML = `**رقم ${arabicItemNumber} / حرف ${letterName}**`;
 
@@ -753,6 +755,7 @@
 
             let htmlContent = '';
             
+            // دمج صفوف labels (الحركة - المد - التنوين)
             htmlContent += `<div class="grid-cell skill-label" style="grid-row: 7 / span 2;">${SKILL_NAMES[6]}</div>`;
 
             for (let row = 0; row < 6; row++) {
@@ -765,6 +768,7 @@
                 }
             }
             
+            // الصف الأخير (دخول حرف الجر)
             for (let row = 6; row < 8; row++) {
                 for (let col = 0; col < 3; col++) {
                     const index = 18 + ((row - 6) * 3) + col;
@@ -973,18 +977,16 @@
             
             selectedLevel = level;
             
-            // تحديث نصوص الخيارات لتعكس الأرقام الإجمالية (بناءً على الطلب الأخير)
+            // تحديث نصوص الخيارات لتعكس الأرقام الإجمالية 
             const randomSkillOption = levelSelect.querySelector('option[value="random_skill"]');
             const arabicRandomMax = convertToArabicNumbers(MAX_LIMITS['random_skill']);
              if (randomSkillOption) {
-                // تقييم مهاراة الحروف ٦٧٢ مهارة
                 randomSkillOption.textContent = `تقييم مهاراة الحروف (${arabicRandomMax} مهارة)`; 
             }
             
             const readingOption = levelSelect.querySelector('option[value="reading"]');
             const arabicReadingMax = convertToArabicNumbers(MAX_LIMITS['reading']);
             if (readingOption) {
-                // الحروف المدمجة 28
                 readingOption.textContent = `الحروف المدمجة (${arabicReadingMax} حرف)`; 
             }
             
