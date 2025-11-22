@@ -110,8 +110,29 @@
             box-shadow: none;
         }
         
-        /* تم إزالة #view-history-button */
+        /* تنسيق زر تنزيل PDF الجديد */
+        .download-button {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            background-color: #dc3545; /* لون أحمر/خطر لجذب الانتباه للتنزيل */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
 
+        .download-button:hover {
+            background-color: #c82333;
+        }
+        
         #error-message {
             color: #dc3545; /* أحمر للخطر */
             background-color: #f8d7da;
@@ -351,7 +372,14 @@
             
             <button id="start-button" onclick="validateAndStartQuiz()">اضغط لبدء التدريب</button>
             
-            </div>
+            <a href="https://docs.google.com/uc?export=download&id=***رابط-ملف-الحروف-المدمجة-هنا***" 
+               class="download-button" 
+               target="_blank" 
+               download="الحروف_المدمجة_للطباعة.pdf">
+                ⬇️ تنزيل وطباعة ملف الحروف المدمجة (PDF)
+            </a>
+            
+        </div>
 
         <div id="quiz-display" style="display: none;">
             <h2 id="quiz-title"></h2>
