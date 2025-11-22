@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة تحدي اتقان القراءة</title>
     <style>
-        /* الخطوط الأساسية والاطار العام */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f0f2f5; /* لون خلفية فاتح ومريح */
+            background-color: #f4f4f4;
             color: #333;
             margin: 0;
             padding: 20px;
@@ -16,43 +15,29 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* ظل أكثر وضوحًا */
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            color: #1a5276; /* أزرق داكن جذاب */
+        h1, h2, h3 {
+            color: #1f3f6c;
             text-align: center;
-            padding-bottom: 15px;
-            margin-bottom: 30px;
-            font-size: 1.8em;
-            border-bottom: 3px solid #e9ecef; /* فاصل أنيق */
-        }
-
-        h2 {
-            color: #212529;
-            text-align: center;
-            font-size: 1.3em;
-            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         /* --- شاشة الإعدادات --- */
         #setup-screen {
             display: flex;
             flex-direction: column;
-            gap: 25px; /* زيادة التباعد بين المجموعات */
+            gap: 20px;
         }
 
-        .input-row {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        
         .input-group {
             display: flex;
             flex-direction: column;
@@ -60,107 +45,122 @@
             width: 100%;
         }
 
+        .input-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
         .input-group label {
             font-weight: bold;
-            color: #495057; /* لون نص داكن وواضح */
-            font-size: 1em;
-            margin-bottom: 4px;
+            color: #555;
+            font-size: 1.1em;
         }
 
         .input-group input, .input-group select, .input-group textarea {
             padding: 12px;
-            border: 1px solid #ced4da; /* إطار رمادي ناعم */
-            border-radius: 8px; /* حواف أكثر استدارة */
+            border: 1px solid #ccc;
+            border-radius: 6px;
             font-size: 1em;
             width: 100%;
             box-sizing: border-box;
-            background-color: #f8f9fa; /* خلفية حقول خفيفة */
-            transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: #f9f9f9;
         }
         
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
-            border-color: #1a5276; /* إطار أزرق عند التركيز */
-            box-shadow: 0 0 0 0.2rem rgba(26, 82, 118, 0.25);
-            outline: none;
+        .input-group textarea {
+            resize: vertical;
         }
 
-        /* الأزرار الرئيسية */
+
         #start-button {
-            padding: 16px;
-            background-color: #1a5276; /* اللون الأزرق الداكن الأساسي */
+            padding: 15px;
+            background-color: #1f3f6c;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 1.3em;
-            font-weight: bold;
+            font-size: 1.2em;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-            margin-top: 30px;
-            box-shadow: 0 4px 10px rgba(26, 82, 118, 0.3);
+            transition: background-color 0.3s;
+            margin-top: 20px;
         }
 
         #start-button:hover:not(:disabled) {
-            background-color: #14405a;
-            transform: translateY(-2px);
+            background-color: #1a3456;
         }
         
         #start-button:disabled {
-            background-color: #adb5bd;
+            background-color: #cccccc;
             cursor: not-allowed;
-            box-shadow: none;
         }
         
-        /* تنسيق زر تنزيل PDF الجديد */
-        .download-button {
-            display: block;
-            width: 100%;
-            text-align: center;
-            padding: 12px;
-            background-color: #dc3545; /* لون أحمر/خطر لجذب الانتباه للتنزيل */
+        #view-history-button {
+            padding: 15px; 
+            background-color: #5bc0de;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 1em;
-            font-weight: bold;
-            text-decoration: none;
+            font-size: 1.2em;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-top: 15px;
-            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-        }
-
-        .download-button:hover {
-            background-color: #c82333;
+            margin-top: 10px;
         }
         
+        #view-history-button:hover {
+            background-color: #31b0d5;
+        }
+
+
         #error-message {
-            color: #dc3545; /* أحمر للخطر */
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            padding: 12px;
-            border-radius: 6px;
+            color: #d9534f;
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+            padding: 10px;
+            border-radius: 4px;
             margin-top: 15px;
             display: none;
             text-align: center;
-            font-weight: bold;
         }
 
         /* --- شاشة العرض والتقييم --- */
-
         #quiz-display {
             text-align: center;
             position: relative;
         }
+
+        #quiz-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #1f3f6c;
+            line-height: 1.6;
+        }
         
-        /* تنسيق صندوق عرض الكلمة/الجملة */
+        .timer-info {
+            font-size: 1em;
+            color: #777;
+            margin-bottom: 30px;
+        }
+        
+        .timer-info span {
+            font-weight: bold;
+            color: #1f3f6c;
+        }
+        
+        /* تنسيق رقم واسم الحرف - تم نقله ليصبح مركزاً وواضحاً */
+        #item-number-top {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #8e24aa;
+            text-align: center;
+        }
+
         #item-display {
-            min-height: 380px;
+            min-height: 350px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 6px solid #1a5276; /* إطار سميك وداكن */
-            border-radius: 12px;
-            margin-bottom: 25px;
+            border: 5px solid #1f3f6c;
+            border-radius: 10px;
+            margin-bottom: 20px;
             background-color: #fcfcfc;
             overflow: hidden;
             position: relative;
@@ -168,119 +168,152 @@
         
         /* شريط الوقت */
         #timer-bar {
-            height: 10px; /* شريط سميك */
-            background-color: #1a5276;
+            height: 8px;
+            background-color: #1f3f6c;
             width: 100%;
             position: absolute;
             bottom: 0; 
             right: 0;
             z-index: 10;
-            border-radius: 0 0 6px 6px;
+        }
+
+        /* تنسيق عرض المهارات الفردية والجمل والكلمات */
+        #current-item.default-display {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .item-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .item-content {
+            flex-grow: 1;
+            line-height: 2; 
+            white-space: pre-wrap; 
+            text-align: justify; 
+            padding: 30px;
+        }
+
+        .item-number {
+            width: 150px; 
+            min-width: 150px;
+            background-color: #f0f0f0;
+            font-size: 20px;
+        }
+
+        /* تنسيق عرض المهارات المجمعة (القسم الخاص) */
+        #current-item.combined-skills {
+            display: grid;
+            grid-template-columns: 180px repeat(3, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 1px;
+            width: 100%;
+            height: 100%;
+            background-color: #a0c0e0; 
+            font-size: 24px;
         }
         
-        /* زر الانتقال اليدوي */
-        #next-manual-button {
-            padding: 14px 25px;
-            background-color: #28a745; /* أخضر للانتقال */
+        .grid-cell {
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            padding: 5px;
+            border: 1px solid #a0c0e0;
+        }
+
+        .skill-label {
+            background-color: #e0eaf4;
+            color: #1f3f6c;
+            font-weight: normal;
+            font-size: 0.8em;
+            white-space: nowrap;
+            padding: 0 10px;
+            justify-content: flex-start;
+        }
+
+        /* الأزرار العودة */
+        #back-button {
+            padding: 10px 20px;
+            background-color: #f0ad4e;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 30px;
+        }
+
+        #back-button:hover {
+            background-color: #ec971f;
+        }
+
+        /* زر الانتقال اليدوي */
+        #next-manual-button {
+            padding: 10px 20px;
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            border-radius: 6px;
             font-size: 1.1em;
             cursor: pointer;
             transition: background-color 0.3s;
             margin-top: 15px; 
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             width: 100%;
             max-width: 400px;
         }
         
         #next-manual-button:hover {
-            background-color: #1e7e34;
+            background-color: #15a589;
         }
         
-        /* الأزرار العودة */
-        #back-button {
-            padding: 12px 25px;
-            background-color: #6c757d; /* رمادي للإجراءات الثانوية */
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 20px;
-        }
-
-        #back-button:hover {
-            background-color: #5a6268;
-        }
-
-        /* تنسيق رقم واسم الحرف */
-        #item-number-top {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #6f42c1; /* لون بنفسجي مميز */
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        /* تنسيق عرض المهارات المجمعة (القسم الخاص) */
-        #current-item.combined-skills {
-            /* تعديل الألوان لتبدو أكثر تناسقًا مع التصميم الجديد */
-            background-color: #f1f6ff; /* خلفية فاتحة للشبكة */
+        #next-manual-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
         
-        .grid-cell {
-            border: 1px solid #d0d7e5; /* إطار أفتح داخل الشبكة */
-        }
-
-        .skill-label {
-            background-color: #e0eaf4; /* لون خلفية ناعم للتسميات */
-            color: #1a5276; /* لون نص داكن للتسميات */
-        }
-
         /* --- شاشة التقييم --- */
         #assessment-screen {
             max-width: 600px;
             margin: 30px auto;
-            padding: 25px;
-            background-color: #fff3cd; /* لون أصفر فاتح للفت الانتباه (Assessment) */
+            padding: 20px;
+            background-color: #e9f5ff; /* لون فاتح لشاشة المدرب */
             border-radius: 10px;
-            border: 1px solid #ffeeba;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        #assessment-title {
-            color: #856404; /* لون داكن يتناسب مع الخلفية الصفراء */
-        }
-        
-        #result-summary {
-            color: #1a5276;
-            line-height: 1.8;
-            border: 1px dashed #ced4da;
-            padding: 10px;
-            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         #save-assessment-button {
-            background-color: #dc3545; /* أحمر قوي للحفظ النهائي */
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+            padding: 15px; 
+            background-color: #d9534f; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1.2em; 
+            cursor: pointer; 
+            transition: background-color 0.3s; 
+            margin-top: 30px; 
+            width: 100%;
         }
-
-        #save-assessment-button:hover {
-            background-color: #c82333;
-        }
-
 
         /* استجابة العرض */
         @media (max-width: 768px) {
             .container {
-                padding: 20px;
+                padding: 15px;
             }
             
             .input-row {
                 flex-direction: column;
-                gap: 20px;
+                gap: 15px;
             }
 
             .input-group {
@@ -288,13 +321,13 @@
             }
 
             #current-item.combined-skills {
-                grid-template-columns: 100px repeat(3, 1fr);
-                font-size: 16px;
+                grid-template-columns: 120px repeat(3, 1fr);
+                font-size: 18px;
             }
             
             .item-number {
-                width: 80px;
-                min-width: 80px;
+                width: 100px;
+                min-width: 100px;
             }
             
             #assessment-screen {
@@ -325,7 +358,7 @@
                         <option value="manual">يدوي (بالنقر على زر)</option>
                     </select>
                 </div>
-            </div>
+                </div>
 
             <div class="input-row">
                  <div class="input-group" id="duration-group" style="flex: 1;">
@@ -371,14 +404,7 @@
             </div>
             
             <button id="start-button" onclick="validateAndStartQuiz()">اضغط لبدء التدريب</button>
-            
-            <a href="https://docs.google.com/uc?export=download&id=1CxCx1MDDwKFernidH2ARP5frXP3gXim6" 
-               class="download-button" 
-               target="_blank" 
-               download="الحروف_المدمجة_للطباعة.pdf">
-                ⬇️ تنزيل وطباعة ملف الحروف المدمجة (PDF)
-            </a>
-            
+            <button id="view-history-button" onclick="displayAssessmentHistory()">مراجعة سجل التقييمات المحفوظ</button>
         </div>
 
         <div id="quiz-display" style="display: none;">
@@ -417,7 +443,7 @@
                 </div>
             </div>
             
-            <button id="save-assessment-button" onclick="saveAssessment()" style="width: 100%;">
+            <button id="save-assessment-button" onclick="saveAssessment()" style="padding: 15px; background-color: #d9534f; color: white; border: none; border-radius: 8px; font-size: 1.2em; cursor: pointer; transition: background-color 0.3s; margin-top: 30px; width: 100%;">
                 حفظ التقييم والعودة
             </button>
             
@@ -680,7 +706,7 @@
     function buildCombinedSkills(char) {
         const baseSkills = BASE_SKILLS_FOR_RANDOM[char];
         if (!baseSkills) return '';
-        // الكود الداخلي للدالة كما هو في النسخة السابقة 
+        // الكود الداخلي للدالة كما هو في النسخة السابقة (لم يتم تغيير محتواه لأنه يعمل بشكل صحيح)
         const BASE_CHAR_PURE = baseSkills[12];
         const BASE_CHAR_FATHA = baseSkills[0]; 
         const BASE_CHAR_DHAMMA = baseSkills[1];
@@ -836,6 +862,7 @@
     let currentItemIndex = 0;
     let intervalDuration = 10000; 
     let quizInterval;
+    // تم تغيير القيمة الافتراضية هنا لتكون 'reading'
     let selectedLevel = 'reading'; 
     let isAutoAdvance = true; 
     
@@ -858,7 +885,7 @@
     const advanceModeInfo = document.getElementById('advance-mode-info');
     const durationTip = document.getElementById('duration-tip');
     
-    // عناصر لـ LIMIT و Assessment
+    // عناصر جديدة لـ LIMIT و Assessment
     const limitCountInput = document.getElementById('limit-count'); 
     const limitTip = document.getElementById('limit-tip');
     const assessmentScreen = document.getElementById('assessment-screen');
@@ -874,13 +901,32 @@
     // ********** 4. دوال التحكم والتشغيل وحفظ السجل **********
     // **********************************************
     
-    // دوال LocalStorage (تم تركها احتياطًا للاستخدام المستقبلي/التحليل، لكن زر العرض تم حذفه)
+    // دوال LocalStorage
     function getAssessmentHistory() {
         const history = localStorage.getItem('readingChallengeAssessments');
         return history ? JSON.parse(history) : [];
     }
 
-    // دالة محذوفة (displayAssessmentHistory)
+    window.displayAssessmentHistory = function() {
+        const history = getAssessmentHistory();
+        if (history.length === 0) {
+            alert("لا يوجد سجل تقييمات محفوظ بعد.");
+            return;
+        }
+
+        let output = "--- سجل التقييمات المحفوظة ---\n";
+        history.forEach((res, index) => {
+            output += `\n#${convertToArabicNumbers(index + 1)} - المتدرب: ${res.traineeName}\n`;
+            output += `المستوى: ${res.levelText}\n`;
+            output += `تاريخ التقييم: ${new Date(res.timestamp).toLocaleDateString('ar-EG')}\n`;
+            output += `العناصر: ${convertToArabicNumbers(res.totalItems)} | الأخطاء: ${convertToArabicNumbers(res.errors)}\n`;
+            output += `ملاحظات: ${res.notes.substring(0, 50)}${res.notes.length > 50 ? '...' : ''}\n`;
+        });
+        
+        console.log(output);
+        alert(`تم عرض سجل ${convertToArabicNumbers(history.length)} تقييمات في وحدة التحكم (Console).`);
+    }
+
     
     function startTimerBar(seconds) {
         if (!isAutoAdvance) {
@@ -937,7 +983,7 @@
         const arabicItemNumber = convertToArabicNumbers(itemNumber); 
         const itemContent = itemsArray[currentItemIndex];
         
-        let color = '#1a5276'; // لون افتراضي جديد (أزرق داكن)
+        let color = '#1f3f6c';
 
         // عرض خاص لمستوى الحروف المدمجة فقط
         if (selectedLevel === 'reading') {
@@ -962,7 +1008,7 @@
             currentItemElement.classList.add('combined-skills');
             currentItemElement.classList.remove('default-display');
 
-            color = '#6f42c1'; // بنفسجي للمهارات المدمجة
+            color = '#1f3f6c'; 
             wordBox.style.borderColor = color;
 
             let htmlContent = '';
@@ -975,7 +1021,7 @@
                     const index = (row * 3) + col;
                     const char = individualChars[index] || '';
                     const displayChar = char.trim() === '' ? '&nbsp;' : char;
-                    htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2}; border-color: #d0d7e5;">${displayChar}</div>`;
+                    htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2}; border-color: #a0c0e0;">${displayChar}</div>`;
                 }
             }
             
@@ -984,7 +1030,7 @@
                     const index = 18 + ((row - 6) * 3) + col;
                     const char = individualChars[index] || '';
                     const displayChar = char.trim() === '' ? '&nbsp;' : char;
-                    htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2}; border-color: #d0d7e5;">${displayChar}</div>`;
+                    htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2}; border-color: #a0c0e0;">${displayChar}</div>`;
                 }
             }
 
@@ -999,16 +1045,17 @@
 
             // تحديد اللون وحجم الخط لجميع المستويات الأخرى، بما في ذلك المزيج الجديد
             if (selectedLevel === 'words') {
-                color = '#fd7e14'; // برتقالي للكلمات
+                color = '#e8a31a';
             } else if (selectedLevel === 'random_skill') {
-                color = '#e83e8c'; // وردي للمهارات الفردية
+                color = '#8e24aa';
                 fontSize = '40px'; 
             } else if (selectedLevel === 'sentences' || selectedLevel === 'mixed_challenge') { 
-                 color = '#17a2b8'; // أزرق فاتح للجمل والمزيج
+                // نستخدم لون خاص للمزيج وللجمل
+                 color = '#5cb85c'; 
                  fontSize = '40px'; 
                  if(itemContent.length > 50) fontSize = '30px';
             } else if (selectedLevel === 'passages') { 
-                 color = '#28a745'; // أخضر للقطع
+                 color = '#00bcd4';
                  fontSize = '35px'; 
             }
 
@@ -1242,7 +1289,7 @@
         try {
              localStorage.setItem('readingChallengeAssessments', JSON.stringify(history));
              console.log("تم حفظ التقييم: ", resultObject);
-             alert(`تم حفظ التقييم للمتدرب ${traineeName} بنجاح!`);
+             alert(`تم حفظ التقييم للمتدرب ${traineeName} بنجاح! راجع سجل وحدة التحكم (Console) لمشاهدة التفاصيل.`);
         } catch (e) {
             alert("خطأ: تعذر حفظ التقييم في المتصفح.");
             console.error("LocalStorage save error:", e);
