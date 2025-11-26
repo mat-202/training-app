@@ -229,7 +229,7 @@
                     <label for="level-select">اختر مستوى التحدي:</label>
                     <select id="level-select">
                         <option value="reading" selected>الحرف مع المهارات (28 حرف)</option>
-                        <option value="random_skill">تقييم مهاراة الحروف (672 مهارة)</option>
+                        <option value="random_skill">تقييم مهاراة الحروف (644 مهارة)</option>
                         <option value="spelling">تهجي الكلمات (100 كلمة)</option>
                         <option value="words">الكلمات (470 كلمة)</option>
                         <option value="sentences">الجمل (150 جملة)</option>
@@ -418,7 +418,7 @@ const SENTENCES_ARRAY = ["ٱلشَّمْسُ أَشْرَقَتْ.", "ٱلْقَ
         const skills = BASE_SKILLS_FOR_RANDOM[char];
         if (!skills) return '';
         
-        // نأخذ الـ 23 مهارة الأولى فقط (دمج المربع الثاني والثالث من السطر الأخير)
+        // نأخذ الـ 23 مهارة الأولى فقط (دمج المربع الثاني من السطر السابع مع المربع الأول من السطر الثامن)
         const combined = skills.slice(0, 23); 
         return combined.join(' ');
     }
@@ -431,7 +431,7 @@ const SENTENCES_ARRAY = ["ٱلشَّمْسُ أَشْرَقَتْ.", "ٱلْقَ
         baseChars.forEach(char => {
             const skills = BASE_SKILLS_FOR_RANDOM[char];
              if (skills) {
-                // نأخذ الـ 23 مهارة الأولى فقط (دمج المربع الثاني والثالث من السطر الأخير)
+                // نأخذ الـ 23 مهارة الأولى فقط (دمج المربع الثاني من السطر السابع مع المربع الأول من السطر الثامن)
                 allSkills = allSkills.concat(skills.slice(0, 23));
             }
         });
@@ -628,15 +628,19 @@ const SENTENCES_ARRAY = ["ٱلشَّمْسُ أَشْرَقَتْ.", "ٱلْقَ
             for (let row = 0; row < 8; row++) {
                 htmlContent += `<div class="grid-cell skill-label" style="grid-row: ${row + 1};">${SKILL_NAMES[row]}</div>`;
                 for (let col = 0; col < 3; col++) {
-                    // دمج المربع الثاني والثالث من السطر الأخير
-                    if (row === 7 && col === 1) {
-                        // المربع الثاني من السطر الأخير يدمج مع المربع الثالث
-                        const char1 = individualChars[skillIndexCounter] || '';
-                        const char2 = individualChars[skillIndexCounter+1] || '';
-                        const displayChar = (char1 + ' ' + char2).trim() === '' ? '&nbsp;' : char1 + ' ' + char2;
-                        htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2} / ${col + 4}; border-color: #a0c0e0;">${displayChar}</div>`;
-                        skillIndexCounter += 2; // تخطي المربع الثالث
-                        break; // لا نضيف المربع الثالث لأنه تم دمجه
+                    // استبدال المربع الثاني في السطر السابع بالمربع الأول في السطر الثامن
+                    if (row === 6 && col === 1) {
+                        // المربع الثاني في السطر السابع - نستبدله بالمربع الأول من السطر الثامن
+                        const charFromRow8 = individualChars[21] || ''; // المربع الأول من السطر الثامن (index 21)
+                        const displayChar = charFromRow8.trim() === '' ? '&nbsp;' : charFromRow8;
+                        htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2}; border-color: #a0c0e0;">${displayChar}</div>`;
+                        skillIndexCounter++; // نزيد العداد فقط مرة واحدة
+                    } else if (row === 7 && col === 0) {
+                        // المربع الأول في السطر الثامن - نستبدله بالمربع الثاني من السطر السابع
+                        const charFromRow7 = individualChars[19] || ''; // المربع الثاني من السطر السابع (index 19)
+                        const displayChar = charFromRow7.trim() === '' ? '&nbsp;' : charFromRow7;
+                        htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2}; border-color: #a0c0e0;">${displayChar}</div>`;
+                        skillIndexCounter++; // نزيد العداد فقط مرة واحدة
                     } else {
                         const char = individualChars[skillIndexCounter] || '';
                         const displayChar = char.trim() === '' ? '&nbsp;' : char;
