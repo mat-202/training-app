@@ -651,26 +651,17 @@ const SENTENCES_ARRAY = ["ٱلشَّمْسُ أَشْرَقَتْ.", "ٱلْقَ
                 if (row % 2 === 0) {
                     htmlContent += `<div class="grid-cell skill-label" style="grid-row: ${row + 1};">${SKILL_NAMES[row]}</div>`;
                     for (let col = 0; col < 3; col++) {
-                        // استبدال المربع الثاني في السطر السابع بالمربع الأول في السطر الثامن
-                        if (row === 6 && col === 1) {
-                            // المربع الثاني في السطر السابع - نستبدله بالمربع الأول من السطر الثامن
-                            const charFromRow15 = individualChars[10] || ''; // المربع الأول من السطر الثامن (index 10)
-                            const displayChar = charFromRow15.trim() === '' ? '&nbsp;' : charFromRow15;
-                            htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2}; border-color: #a0c0e0;">${displayChar}</div>`;
-                            skillIndexCounter++; // نزيد العداد فقط مرة واحدة
-                        } else if (row === 7 && col === 0) {
-                            // المربع الأول في السطر الثامن - نستبدله بالمربع الثاني من السطر السابع
-                            const charFromRow13
-                                = individualChars[19] || ''; // المربع الثاني من السطر السابع (index 21)
-                            const displayChar = charFromRow13.trim() === '' ? '&nbsp;' : charFromRow13;
-                            htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2}; border-color: #a0c0e0;">${displayChar}</div>`;
-                            skillIndexCounter++; // نزيد العداد فقط مرة واحدة
-                        } else {
-                            const char = individualChars[skillIndexCounter] || '';
-                            const displayChar = char.trim() === '' ? '&nbsp;' : char;
-                            htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2}; border-color: #a0c0e0;">${displayChar}</div>`;
-                            skillIndexCounter++;
+                        let indexToUse = skillIndexCounter;
+                        // استبدال المربع الثاني من السطر 13 بالمربع الأول من السطر 15
+                        if (skillIndexCounter === 19) { // المربع الثاني من السطر 13
+                            indexToUse = 21; // المربع الأول من السطر 15
+                        } else if (skillIndexCounter === 21) { // المربع الأول من السطر 15
+                            indexToUse = 19; // المربع الثاني من السطر 13
                         }
+                        const char = individualChars[indexToUse] || '';
+                        const displayChar = char.trim() === '' ? '&nbsp;' : char;
+                        htmlContent += `<div class="grid-cell" style="grid-row: ${row + 1}; grid-column: ${col + 2}; border-color: #a0c0e0;">${displayChar}</div>`;
+                        skillIndexCounter++;
                     }
                 } else {
                     // الصفوف الزوجية (1, 3, 5, ... 15) فارغة للكتابة
