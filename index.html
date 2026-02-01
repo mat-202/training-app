@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام تقييم المشاركة والسلوك - الإصدار المحسّن</title>
+    <title>نظام تقييم المشاركة والسلوك - الإصدار الثابت</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -42,7 +42,6 @@
             min-height: 85vh;
         }
 
-        /* الهيدر */
         .app-header {
             background: linear-gradient(to right, #2c3e50, #3498db);
             color: white;
@@ -93,7 +92,6 @@
             transform: translateY(-3px);
         }
 
-        /* تبويبات الفصول */
         .class-tabs {
             display: flex;
             background: #f8f9fa;
@@ -128,7 +126,6 @@
             background: white;
         }
 
-        /* محتوى الفصل */
         .class-content {
             padding: 30px 40px;
             display: none;
@@ -144,7 +141,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* لوحة الإحصائيات للفصل */
         .class-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -161,24 +157,10 @@
             transition: transform 0.3s ease;
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-value { font-size: 2.8rem; font-weight: bold; margin: 10px 0; display: block; }
+        .stat-label { font-size: 1rem; color: #7f8c8d; display: block; }
 
-        .stat-value {
-            font-size: 2.8rem;
-            font-weight: bold;
-            margin: 10px 0;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 1rem;
-            color: #7f8c8d;
-            display: block;
-        }
-
-        /* لوحة التحكم */
         .control-panel {
             background: #f8f9fa;
             border-radius: 20px;
@@ -225,12 +207,6 @@
             background: white;
         }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
-        }
-
         .btn-primary {
             background: linear-gradient(to right, #3498db, #2ecc71);
             color: white;
@@ -245,15 +221,8 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.2);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
-        }
-
-        /* قائمة الطلاب */
         .students-list {
             background: white;
             border-radius: 20px;
@@ -272,29 +241,13 @@
             border-bottom: 2px solid #e9ecef;
         }
 
-        .list-body {
-            max-height: 500px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #c1c1c1 #f1f1f1;
-        }
-
         .student-row {
             display: grid;
             grid-template-columns: 2fr 1fr 2fr;
             padding: 20px;
-            border-bottom: 1px solid #f1f1f1;
+            border-bottom: 1px solid #f1c40f40;
             transition: background 0.3s ease;
             align-items: center;
-        }
-
-        .student-row:hover {
-            background: #f8fafc;
-        }
-
-        .student-info {
-            display: flex;
-            flex-direction: column;
         }
 
         .student-name {
@@ -302,30 +255,6 @@
             color: #2d3748;
             font-size: 1.2rem;
             margin-bottom: 8px;
-        }
-
-        .student-stats {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.9rem;
-            color: #4a5568;
-        }
-
-        .stat-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .percentage-display {
-            text-align: center;
         }
 
         .percentage-circle {
@@ -354,19 +283,6 @@
             justify-content: center;
         }
 
-        .student-score {
-            font-size: 1.1rem;
-            margin-top: 10px;
-            font-weight: 600;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
         .btn-action {
             border: none;
             width: 55px;
@@ -380,84 +296,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        .btn-action:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-        }
-
-        .btn-action:active {
-            transform: scale(0.95);
-        }
-
-        .btn-report {
-            background: #718096;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 15px;
-        }
-
-        .btn-report:hover {
-            background: #4a5568;
-            transform: translateY(-2px);
-        }
-
-        /* تعريف الألوان */
-        .color-legend {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 25px 0;
-            flex-wrap: wrap;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            color: #4a5568;
-            background: white;
-            padding: 10px 15px;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-        }
-
-        /* المودال */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
             z-index: 2000;
             overflow-y: auto;
-            padding: 20px;
-            animation: modalFadeIn 0.3s ease;
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         .modal-content {
@@ -467,1209 +315,257 @@
             margin: 30px auto;
             border-radius: 25px;
             overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            animation: modalSlideIn 0.5s ease;
         }
 
-        @keyframes modalSlideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-header {
-            background: linear-gradient(to right, #2c3e50, #3498db);
-            color: white;
-            padding: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-body {
-            padding: 30px;
-        }
-
-        .close-modal {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .close-modal:hover {
-            background: rgba(255,255,255,0.3);
-            transform: rotate(90deg);
-        }
-
-        /* الإشعارات */
         .notification {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: 20px; left: 20px;
             padding: 15px 25px;
             border-radius: 12px;
             color: white;
             font-weight: bold;
             z-index: 10000;
             animation: slideIn 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px);
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(-100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        @keyframes slideIn { from { transform: translateX(-100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(-100px); opacity: 0; }
-        }
-
-        /* زر الإضافة السريعة */
         .quick-add {
             position: fixed;
-            bottom: 30px;
-            left: 30px;
+            bottom: 30px; left: 30px;
             background: #2ecc71;
             color: white;
-            width: 60px;
-            height: 60px;
+            width: 60px; height: 60px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            border: none;
-        }
-
-        .quick-add:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 15px 35px rgba(46, 204, 113, 0.4);
-        }
-
-        /* التجاوب */
-        @media (max-width: 1024px) {
-            .app-container {
-                padding: 10px;
-            }
-            
-            .app-header {
-                padding: 20px;
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .class-tabs {
-                padding: 0;
-            }
-            
-            .class-content {
-                padding: 20px;
-            }
-            
-            .student-row {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .list-header {
-                display: none;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .class-tabs {
-                flex-direction: column;
-            }
-            
-            .input-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .header-title h1 {
-                font-size: 1.8rem;
-            }
-            
-            .btn-action {
-                width: 45px;
-                height: 45px;
-                font-size: 1.1rem;
-            }
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; cursor: pointer;
+            z-index: 1000; border: none;
         }
     </style>
 </head>
 <body>
-    <!-- زر الإضافة السريعة -->
+
     <button class="quick-add" onclick="toggleQuickAdd()">+</button>
 
     <div class="app-container">
         <div class="main-card">
-            <!-- الهيدر -->
             <div class="app-header">
                 <div class="header-title">
                     <h1>🏫 نظام تقييم المشاركة والسلوك</h1>
-                    <p>أداة متكاملة لتقييم أداء الطلاب وتتبع سلوكهم</p>
+                    <p>الأسماء ثابتة أبجدياً لسهولة الرصد</p>
                 </div>
                 <div class="header-actions">
-                    <button class="header-btn" onclick="exportAllData()">
-                        📊 تصدير البيانات
-                    </button>
-                    <button class="header-btn" onclick="showSummary()">
-                        📈 عرض الملخص
-                    </button>
-                    <button class="header-btn" onclick="showSettings()">
-                        ⚙️ الإعدادات
-                    </button>
+                    <button class="header-btn" onclick="exportAllData()">📊 تصدير</button>
+                    <button class="header-btn" onclick="showSummary()">📈 الملخص</button>
+                    <button class="header-btn" onclick="resetSystem()" style="background: rgba(231, 76, 60, 0.3);">🗑️ حذف الكل</button>
                 </div>
             </div>
 
-            <!-- تبويبات الفصول -->
             <div class="class-tabs">
-                <div class="class-tab active" onclick="showClass('class1')">
-                    📚 الصف الأول
-                    <span class="student-count" id="tab-count-1">0</span>
-                </div>
-                <div class="class-tab" onclick="showClass('class2')">
-                    📚 الصف الثاني
-                    <span class="student-count" id="tab-count-2">0</span>
-                </div>
-                <div class="class-tab" onclick="showClass('class3')">
-                    📚 الصف الثالث
-                    <span class="student-count" id="tab-count-3">0</span>
-                </div>
+                <div class="class-tab active" onclick="showClass('class1')">📚 الصف الأول <span id="tab-count-1">0</span></div>
+                <div class="class-tab" onclick="showClass('class2')">📚 الصف الثاني <span id="tab-count-2">0</span></div>
+                <div class="class-tab" onclick="showClass('class3')">📚 الصف الثالث <span id="tab-count-3">0</span></div>
             </div>
 
-            <!-- تعريف الألوان -->
-            <div class="color-legend">
-                <div class="legend-item">
-                    <div class="legend-color" style="background: var(--participation);"></div>
-                    <span>+٢ مشاركة</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: var(--good-behavior);"></div>
-                    <span>+١ سلوك حسن</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: var(--absent);"></div>
-                    <span>٠ غياب</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: var(--talking);"></div>
-                    <span>-١ يتكلم</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: var(--bad-behavior);"></div>
-                    <span>-٢ سلوك سيء</span>
-                </div>
-            </div>
-
-            <!-- محتوى الفصول -->
-            <div id="class1-content" class="class-content active">
-                <!-- سيتم ملؤها ديناميكياً -->
-            </div>
-
-            <div id="class2-content" class="class-content">
-                <!-- سيتم ملؤها ديناميكياً -->
-            </div>
-
-            <div id="class3-content" class="class-content">
-                <!-- سيتم ملؤها ديناميكياً -->
-            </div>
+            <div id="class1-content" class="class-content active"></div>
+            <div id="class2-content" class="class-content"></div>
+            <div id="class3-content" class="class-content"></div>
         </div>
     </div>
 
-    <!-- مودال التقرير -->
-    <div id="reportModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="reportTitle" style="margin: 0; font-size: 1.8rem;">تقرير الطالب</h2>
-                <button class="close-modal" onclick="closeReportModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div id="reportContent">
-                    <!-- سيتم ملؤها ديناميكياً -->
-                </div>
-            </div>
+    <div id="reportModal" class="modal"><div class="modal-content" id="reportContentWrapper">
+        <div class="modal-header" style="background:#2c3e50; color:white; padding:20px; display:flex; justify-content:space-between;">
+            <h2 id="reportTitle">تقرير الطالب</h2>
+            <button onclick="closeReportModal()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">✕</button>
         </div>
-    </div>
+        <div class="modal-body" id="reportContent" style="padding:20px;"></div>
+    </div></div>
 
-    <!-- مودال الإضافة السريعة -->
-    <div id="quickAddModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 1.8rem;">➕ إضافة طالب سريعة</h2>
-                <button class="close-modal" onclick="closeQuickAddModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div class="input-group">
-                    <label>اختر الصف:</label>
-                    <select id="quickClassSelect">
-                        <option value="class1">الصف الأول</option>
-                        <option value="class2">الصف الثاني</option>
-                        <option value="class3">الصف الثالث</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>اسم الطالب:</label>
-                    <input type="text" id="quickStudentName" placeholder="أدخل اسم الطالب">
-                </div>
-                <button class="btn-primary" onclick="addQuickStudent()" style="margin-top: 20px;">
-                    ➕ إضافة الطالب
-                </button>
-            </div>
-        </div>
-    </div>
+    <div id="quickAddModal" class="modal"><div class="modal-content" style="max-width:400px; padding:20px;">
+        <h2>➕ إضافة طالب</h2>
+        <select id="quickClassSelect" style="width:100%; margin-bottom:10px;">
+            <option value="class1">الصف الأول</option>
+            <option value="class2">الصف الثاني</option>
+            <option value="class3">الصف الثالث</option>
+        </select>
+        <input type="text" id="quickStudentName" placeholder="اسم الطالب" style="width:100%; margin-bottom:10px;">
+        <button class="btn-primary" onclick="addQuickStudent()" style="width:100%;">إضافة</button>
+    </div></div>
 
-    <!-- مودال الملخص -->
-    <div id="summaryModal" class="modal">
-        <div class="modal-content" style="max-width: 1200px;">
-            <div class="modal-header">
-                <h2 style="margin: 0; font-size: 1.8rem;">📊 الملخص العام للنظام</h2>
-                <button class="close-modal" onclick="closeSummaryModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div id="summaryContent">
-                    <!-- سيتم ملؤها ديناميكياً -->
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="summaryModal" class="modal"><div class="modal-content" style="padding:20px;">
+        <div style="display:flex; justify-content:space-between;"><h2>📊 ملخص النظام</h2><button onclick="closeSummaryModal()">✕</button></div>
+        <div id="summaryContent"></div>
+    </div></div>
 
 <script>
-    // تعريف أنواع التصرفات
     const ACTION_TYPES = {
-        PARTICIPATION: {
-            value: 2,
-            color: '#2980b9',
-            name: 'مشاركة',
-            arabicName: 'مشاركة',
-            icon: '💬'
-        },
-        GOOD_BEHAVIOR: {
-            value: 1,
-            color: '#27ae60',
-            name: 'سلوك حسن',
-            arabicName: 'سلوك حسن',
-            icon: '👍'
-        },
-        ABSENT: {
-            value: 0,
-            color: '#f1c40f',
-            name: 'غياب',
-            arabicName: 'غياب',
-            icon: '📝'
-        },
-        TALKING: {
-            value: -1,
-            color: '#e74c3c',
-            name: 'يتكلم',
-            arabicName: 'يتكلم',
-            icon: '🗣️'
-        },
-        BAD_BEHAVIOR: {
-            value: -2,
-            color: '#8e44ad',
-            name: 'سلوك سيء',
-            arabicName: 'سلوك سيء',
-            icon: '👎'
-        }
+        PARTICIPATION: { value: 2, color: '#2980b9', name: 'مشاركة', arabicName: 'مشاركة' },
+        GOOD_BEHAVIOR: { value: 1, color: '#27ae60', name: 'سلوك حسن', arabicName: 'سلوك حسن' },
+        ABSENT: { value: 0, color: '#f1c40f', name: 'غياب', arabicName: 'غياب' },
+        TALKING: { value: -1, color: '#e74c3c', name: 'يتكلم', arabicName: 'يتكلم' },
+        BAD_BEHAVIOR: { value: -2, color: '#8e44ad', name: 'سلوك سيء', arabicName: 'سلوك سيء' }
     };
 
-    // قاعدة البيانات
-    let db = JSON.parse(localStorage.getItem('behaviorDB')) || { 
-        class1: {}, 
-        class2: {}, 
-        class3: {},
-        stats: {
-            totalActions: 0,
-            lastUpdate: null
-        }
-    };
+    let db = JSON.parse(localStorage.getItem('behaviorDB')) || { class1: {}, class2: {}, class3: {}, stats: { totalActions: 0, lastUpdate: null } };
 
-    // الفصل الحالي المعروض
-    let currentClass = 'class1';
-
-    // تهيئة النظام
     function initSystem() {
-        if (!db.stats) {
-            db.stats = {
-                totalActions: 0,
-                lastUpdate: new Date().toISOString()
-            };
-        }
-        saveToStorage();
+        if (!db.stats) db.stats = { totalActions: 0, lastUpdate: new Date().toISOString() };
         renderAllClasses();
     }
 
-    // حفظ البيانات
-    function saveToStorage() {
-        localStorage.setItem('behaviorDB', JSON.stringify(db));
-    }
+    function saveToStorage() { localStorage.setItem('behaviorDB', JSON.stringify(db)); }
 
-    // عرض فصل معين
     function showClass(className) {
-        // تحديث التبويب النشط
-        document.querySelectorAll('.class-tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        
-        document.querySelectorAll('.class-content').forEach(content => {
-            content.classList.remove('active');
-        });
-
-        // إضافة النشط للتبويب والمحتوى المحدد
+        document.querySelectorAll('.class-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.class-content').forEach(c => c.classList.remove('active'));
         event.currentTarget.classList.add('active');
         document.getElementById(`${className}-content`).classList.add('active');
-        currentClass = className;
-
-        // تحديث عرض الفصل
         renderClass(className);
     }
 
-    // حساب النسبة المئوية
     function calculatePercentage(student) {
         if (student.actions.length === 0) return 50;
-        
         const totalPossible = student.actions.length * 2;
         const totalEarned = student.totalScore + (student.actions.length * 2);
-        
         return Math.max(0, Math.min(100, Math.round((totalEarned / (totalPossible * 2)) * 100)));
     }
 
-    // إضافة تصرف للطالب
     function addAction(cls, name, actionType) {
-        if (!db[cls][name]) return;
+        const student = db[cls][name];
+        const action = { type: actionType.name, value: actionType.value, arabicName: actionType.arabicName, color: actionType.color, timestamp: new Date().toISOString(), date: new Date().toLocaleDateString('ar-SA'), time: new Date().toLocaleTimeString('ar-SA') };
+        student.actions.push(action);
+        student.totalScore += actionType.value;
+        student.lastAction = new Date().toISOString();
         
-        const action = {
-            type: actionType.name,
-            value: actionType.value,
-            arabicName: actionType.arabicName,
-            color: actionType.color,
-            timestamp: new Date().toISOString(),
-            date: new Date().toLocaleDateString('ar-SA'),
-            time: new Date().toLocaleTimeString('ar-SA')
-        };
-        
-        db[cls][name].actions.push(action);
-        db[cls][name].totalScore += actionType.value;
-        db[cls][name].lastAction = new Date().toISOString();
-        
-        // تحديث الإحصائيات
-        switch(actionType.name) {
-            case 'مشاركة': db[cls][name].stats.participation++; break;
-            case 'سلوك حسن': db[cls][name].stats.goodBehavior++; break;
-            case 'غياب': db[cls][name].stats.absent++; break;
-            case 'يتكلم': db[cls][name].stats.talking++; break;
-            case 'سلوك سيء': db[cls][name].stats.badBehavior++; break;
-        }
-        
+        if(actionType.name === 'مشاركة') student.stats.participation++;
+        else if(actionType.name === 'سلوك حسن') student.stats.goodBehavior++;
+        else if(actionType.name === 'غياب') student.stats.absent++;
+        else if(actionType.name === 'يتكلم') student.stats.talking++;
+        else if(actionType.name === 'سلوك سيء') student.stats.badBehavior++;
+
         db.stats.totalActions++;
         db.stats.lastUpdate = new Date().toISOString();
-        
         saveToStorage();
         renderClass(cls);
-        
-        // إشعار
-        showNotification(`${actionType.arabicName} تم تسجيل ${name} لـ`, actionType.color);
+        showNotification(`تم تسجيل ${actionType.arabicName} لـ ${name}`, actionType.color);
     }
 
-    // عرض الفصل
     function renderClass(className) {
         const container = document.getElementById(`${className}-content`);
         const students = db[className];
-        const studentCount = Object.keys(students).length;
+        const studentNames = Object.keys(students);
         
-        // تحديث العداد في التبويب
-        document.getElementById(`tab-count-${className.slice(-1)}`).textContent = studentCount;
+        document.getElementById(`tab-count-${className.slice(-1)}`).textContent = studentNames.length;
 
-        if (studentCount === 0) {
-            container.innerHTML = `
-                <div class="control-panel">
-                    <h3 class="panel-title">📝 إضافة طلاب للصف</h3>
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>أسماء الطلاب (سطر لكل اسم):</label>
-                            <textarea id="nameList" rows="5" placeholder="أدخل أسماء الطلاب..."></textarea>
-                        </div>
-                        <div class="input-group">
-                            <label>أو رفع ملف إكسل:</label>
-                            <input type="file" id="excelFile" accept=".xlsx, .xls">
-                        </div>
-                    </div>
-                    <button class="btn-primary" onclick="addStudentsFromText('${className}')">
-                        ➕ إضافة الطلاب
-                    </button>
-                </div>
-                <div style="text-align: center; padding: 60px 20px; color: #a0aec0;">
-                    <div style="font-size: 5rem; margin-bottom: 20px;">👨‍🎓</div>
-                    <h3 style="margin-bottom: 10px;">لا يوجد طلاب في هذا الصف</h3>
-                    <p>استخدم النموذج أعلاه لإضافة طلاب</p>
-                </div>
-            `;
-            
-            // إعادة إضافة مستمع الحدث لملف الإكسل
-            document.getElementById('excelFile').addEventListener('change', function(e) {
-                handleExcelUpload(e, className);
-            });
-            
+        if (studentNames.length === 0) {
+            container.innerHTML = `<div class="control-panel"><textarea id="list-${className}" placeholder="أسماء الطلاب (اسم في كل سطر)"></textarea><button class="btn-primary" onclick="addStudentsFromText('${className}')">إضافة الطلاب</button></div>`;
             return;
         }
 
-        // حساب إحصائيات الفصل
-        let classStats = {
-            totalStudents: studentCount,
-            totalScore: 0,
-            totalActions: 0,
-            participation: 0,
-            goodBehavior: 0,
-            absent: 0,
-            talking: 0,
-            badBehavior: 0
-        };
+        // التعديل الجوهري: ترتيب أبجدي ثابت للأسماء
+        const sortedNames = studentNames.sort((a, b) => a.localeCompare(b, 'ar'));
 
-        Object.values(students).forEach(student => {
-            classStats.totalScore += student.totalScore;
-            classStats.totalActions += student.actions.length;
-            classStats.participation += student.stats.participation;
-            classStats.goodBehavior += student.stats.goodBehavior;
-            classStats.absent += student.stats.absent;
-            classStats.talking += student.stats.talking;
-            classStats.badBehavior += student.stats.badBehavior;
-        });
-
-        const avgScore = (classStats.totalScore / studentCount).toFixed(1);
-        const avgPercentage = classStats.totalActions > 0 ? 
-            Math.round((classStats.totalScore + (classStats.totalActions * 2)) / (classStats.totalActions * 4) * 100) : 0;
-
-        // إنشاء محتوى الفصل
-        let content = `
-            <div class="class-stats">
-                <div class="stat-card" style="border-top-color: #3498db;">
-                    <span class="stat-label">عدد الطلاب</span>
-                    <span class="stat-value">${classStats.totalStudents}</span>
-                </div>
-                <div class="stat-card" style="border-top-color: #2ecc71;">
-                    <span class="stat-label">متوسط النقاط</span>
-                    <span class="stat-value" style="color: ${avgScore >= 0 ? '#27ae60' : '#e74c3c'}">
-                        ${avgScore >= 0 ? '+' : ''}${avgScore}
-                    </span>
-                </div>
-                <div class="stat-card" style="border-top-color: #9b59b6;">
-                    <span class="stat-label">إجمالي التصرفات</span>
-                    <span class="stat-value">${classStats.totalActions}</span>
-                </div>
-                <div class="stat-card" style="border-top-color: #f1c40f;">
-                    <span class="stat-label">متوسط النسبة</span>
-                    <span class="stat-value">${avgPercentage}%</span>
-                </div>
-            </div>
-
-            <div class="control-panel">
-                <h3 class="panel-title">📝 إضافة طلاب جدد</h3>
-                <div class="input-row">
-                    <div class="input-group">
-                        <label>أسماء الطلاب (سطر لكل اسم):</label>
-                        <textarea id="nameList" rows="3" placeholder="أدخل أسماء الطلاب..."></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label>أو رفع ملف إكسل:</label>
-                        <input type="file" id="excelFile" accept=".xlsx, .xls">
-                    </div>
-                </div>
-                <button class="btn-primary" onclick="addStudentsFromText('${className}')">
-                    ➕ إضافة الطلاب
-                </button>
-            </div>
-
-            <div class="students-list">
-                <div class="list-header">
-                    <div>معلومات الطالب</div>
-                    <div>التقييم</div>
-                    <div>الإجراءات</div>
-                </div>
-                <div class="list-body">
-        `;
-
-        // ترتيب الطلاب حسب النقاط
-        const sortedStudents = Object.entries(students).sort((a, b) => {
-            return b[1].totalScore - a[1].totalScore;
-        });
-
-        sortedStudents.forEach(([name, data], index) => {
-            const percentage = calculatePercentage(data);
-            const stats = data.stats;
-            
-            content += `
+        let html = `<div class="students-list"><div class="list-header"><div>الطالب</div><div>المستوى</div><div>الإجراءات</div></div>`;
+        
+        sortedNames.forEach(name => {
+            const data = students[name];
+            const perc = calculatePercentage(data);
+            html += `
                 <div class="student-row">
                     <div class="student-info">
-                        <div class="student-name">
-                            <span style="color: #718096; margin-left: 10px;">#${index + 1}</span>
-                            ${name}
-                        </div>
-                        <div class="student-stats">
-                            <div class="stat-item">
-                                <div class="stat-dot" style="background: ${ACTION_TYPES.PARTICIPATION.color}"></div>
-                                <span>${stats.participation}</span>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-dot" style="background: ${ACTION_TYPES.GOOD_BEHAVIOR.color}"></div>
-                                <span>${stats.goodBehavior}</span>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-dot" style="background: ${ACTION_TYPES.ABSENT.color}"></div>
-                                <span>${stats.absent}</span>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-dot" style="background: ${ACTION_TYPES.TALKING.color}"></div>
-                                <span>${stats.talking}</span>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-dot" style="background: ${ACTION_TYPES.BAD_BEHAVIOR.color}"></div>
-                                <span>${stats.badBehavior}</span>
-                            </div>
-                        </div>
-                        <button class="btn-report" onclick="showStudentReport('${className}', '${name}')">
-                            📄 تقرير مفصل
-                        </button>
+                        <div class="student-name">${name}</div>
+                        <button class="header-btn" style="padding:5px; font-size:0.8rem; background:#7f8c8d" onclick="showStudentReport('${className}','${name}')">📄 تقرير</button>
                     </div>
                     <div class="percentage-display">
-                        <div class="percentage-circle" style="--percentage: ${percentage}%;" data-percentage="${percentage}"></div>
-                        <div class="student-score" style="color: ${data.totalScore >= 0 ? '#27ae60' : '#e74c3c'}">
-                            ${data.totalScore > 0 ? '+' : ''}${data.totalScore} نقطة
-                        </div>
+                        <div class="percentage-circle" style="--percentage: ${perc}%" data-percentage="${perc}"></div>
+                        <div style="font-weight:bold; color:${data.totalScore>=0?'#27ae60':'#e74c3c'}">${data.totalScore} نقطة</div>
                     </div>
-                    <div class="action-buttons">
-                        <button class="btn-action" style="background: ${ACTION_TYPES.PARTICIPATION.color}"
-                                onclick="addAction('${className}', '${name}', ACTION_TYPES.PARTICIPATION)"
-                                title="مشاركة +٢">
-                            +٢
-                        </button>
-                        <button class="btn-action" style="background: ${ACTION_TYPES.GOOD_BEHAVIOR.color}"
-                                onclick="addAction('${className}', '${name}', ACTION_TYPES.GOOD_BEHAVIOR)"
-                                title="سلوك حسن +١">
-                            +١
-                        </button>
-                        <button class="btn-action" style="background: ${ACTION_TYPES.ABSENT.color}"
-                                onclick="addAction('${className}', '${name}', ACTION_TYPES.ABSENT)"
-                                title="غياب ٠">
-                            ٠
-                        </button>
-                        <button class="btn-action" style="background: ${ACTION_TYPES.TALKING.color}"
-                                onclick="addAction('${className}', '${name}', ACTION_TYPES.TALKING)"
-                                title="يتكلم -١">
-                            -١
-                        </button>
-                        <button class="btn-action" style="background: ${ACTION_TYPES.BAD_BEHAVIOR.color}"
-                                onclick="addAction('${className}', '${name}', ACTION_TYPES.BAD_BEHAVIOR)"
-                                title="سلوك سيء -٢">
-                            -٢
-                        </button>
+                    <div class="action-buttons" style="display:flex; gap:5px;">
+                        <button class="btn-action" style="background:${ACTION_TYPES.PARTICIPATION.color}" onclick="addAction('${className}','${name}',ACTION_TYPES.PARTICIPATION)">+2</button>
+                        <button class="btn-action" style="background:${ACTION_TYPES.GOOD_BEHAVIOR.color}" onclick="addAction('${className}','${name}',ACTION_TYPES.GOOD_BEHAVIOR)">+1</button>
+                        <button class="btn-action" style="background:${ACTION_TYPES.ABSENT.color}" onclick="addAction('${className}','${name}',ACTION_TYPES.ABSENT)">0</button>
+                        <button class="btn-action" style="background:${ACTION_TYPES.TALKING.color}" onclick="addAction('${className}','${name}',ACTION_TYPES.TALKING)">-1</button>
+                        <button class="btn-action" style="background:${ACTION_TYPES.BAD_BEHAVIOR.color}" onclick="addAction('${className}','${name}',ACTION_TYPES.BAD_BEHAVIOR)">-2</button>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
-
-        content += `
-                </div>
-            </div>
-        `;
-
-        container.innerHTML = content;
-        
-        // إعادة إضافة مستمع الحدث لملف الإكسل
-        document.getElementById('excelFile').addEventListener('change', function(e) {
-            handleExcelUpload(e, className);
-        });
+        html += `</div><div class="control-panel"><textarea id="list-${className}" placeholder="إضافة المزيد من الطلاب..."></textarea><button class="btn-primary" onclick="addStudentsFromText('${className}')">إضافة</button></div>`;
+        container.innerHTML = html;
     }
 
-    // عرض جميع الفصول
-    function renderAllClasses() {
-        ['class1', 'class2', 'class3'].forEach(cls => {
-            renderClass(cls);
-        });
-    }
-
-    // إضافة طلاب من النص
     function addStudentsFromText(className) {
-        const textarea = document.querySelector(`#${className}-content textarea`);
-        if (!textarea) return;
-        
-        const text = textarea.value;
-        const names = text.split('\n').map(n => n.trim()).filter(n => n !== "");
-        
-        names.forEach(name => { 
-            if (!db[className][name]) {
-                db[className][name] = { 
-                    totalScore: 0,
-                    actions: [],
-                    stats: {
-                        participation: 0,
-                        goodBehavior: 0,
-                        absent: 0,
-                        talking: 0,
-                        badBehavior: 0
-                    },
-                    lastAction: null,
-                    createdAt: new Date().toISOString()
-                };
+        const txt = document.getElementById(`list-${className}`).value;
+        txt.split('\n').forEach(n => {
+            const name = n.trim();
+            if(name && !db[className][name]) {
+                db[className][name] = { totalScore: 0, actions: [], stats: { participation:0, goodBehavior:0, absent:0, talking:0, badBehavior:0 }, lastAction: null };
             }
         });
-        
-        if (textarea) textarea.value = '';
         saveToStorage();
         renderClass(className);
-        
-        if (names.length > 0) {
-            showNotification(`تمت إضافة ${names.length} طالب للصف`, '#2ecc71');
-        }
     }
 
-    // معالجة ملف الإكسل
-    function handleExcelUpload(event, className) {
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-                
-                let addedCount = 0;
-                rows.forEach(row => {
-                    if (row[0]) {
-                        const name = row[0].toString().trim();
-                        if (name && !db[className][name]) {
-                            db[className][name] = {
-                                totalScore: 0,
-                                actions: [],
-                                stats: {
-                                    participation: 0,
-                                    goodBehavior: 0,
-                                    absent: 0,
-                                    talking: 0,
-                                    badBehavior: 0
-                                },
-                                lastAction: null,
-                                createdAt: new Date().toISOString()
-                            };
-                            addedCount++;
-                        }
-                    }
-                });
-                
-                saveToStorage();
-                renderClass(className);
-                showNotification(`تمت إضافة ${addedCount} طالب من ملف الإكسل`, '#3498db');
-                event.target.value = '';
-            } catch (error) {
-                showNotification('خطأ في قراءة ملف الإكسل', '#e74c3c');
-                console.error(error);
-            }
-        };
-        reader.readAsArrayBuffer(file);
+    function renderAllClasses() { renderClass('class1'); renderClass('class2'); renderClass('class3'); }
+
+    function showNotification(msg, color) {
+        const n = document.createElement('div');
+        n.className = 'notification'; n.style.background = color; n.textContent = msg;
+        document.body.appendChild(n);
+        setTimeout(() => n.remove(), 3000);
     }
 
-    // إظهار/إخفاء الإضافة السريعة
-    function toggleQuickAdd() {
-        document.getElementById('quickAddModal').style.display = 'block';
-    }
-
-    function closeQuickAddModal() {
-        document.getElementById('quickAddModal').style.display = 'none';
-    }
-
-    // إضافة طالب سريع
+    function toggleQuickAdd() { document.getElementById('quickAddModal').style.display = 'block'; }
     function addQuickStudent() {
-        const className = document.getElementById('quickClassSelect').value;
-        const name = document.getElementById('quickStudentName').value.trim();
-        
-        if (!name) {
-            showNotification('يرجى إدخال اسم الطالب', '#e74c3c');
-            return;
-        }
-        
-        if (!db[className][name]) {
-            db[className][name] = {
-                totalScore: 0,
-                actions: [],
-                stats: {
-                    participation: 0,
-                    goodBehavior: 0,
-                    absent: 0,
-                    talking: 0,
-                    badBehavior: 0
-                },
-                lastAction: null,
-                createdAt: new Date().toISOString()
-            };
-            
-            saveToStorage();
-            renderClass(className);
-            
-            // عرض الفصل المضاف إليه
-            showClass(className);
-            
-            // إعادة تعيين الحقول
-            document.getElementById('quickStudentName').value = '';
-            
-            // إغلاق المودال
-            closeQuickAddModal();
-            
-            showNotification(`تمت إضافة الطالب ${name}`, '#2ecc71');
-        } else {
-            showNotification('الطالب موجود بالفعل', '#f1c40f');
+        const c = document.getElementById('quickClassSelect').value;
+        const n = document.getElementById('quickStudentName').value.trim();
+        if(n) {
+            db[c][n] = { totalScore: 0, actions: [], stats: { participation:0, goodBehavior:0, absent:0, talking:0, badBehavior:0 }, lastAction: null };
+            saveToStorage(); renderClass(c);
+            document.getElementById('quickAddModal').style.display = 'none';
         }
     }
 
-    // عرض تقرير الطالب
-    function showStudentReport(className, name) {
-        const student = db[className][name];
-        if (!student) return;
-        
-        const classNames = {
-            'class1': 'الصف الأول',
-            'class2': 'الصف الثاني',
-            'class3': 'الصف الثالث'
-        };
-        
-        const percentage = calculatePercentage(student);
-        
-        let reportHTML = `
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                <div>
-                    <h3 style="margin-top: 0; color: #2d3748;">معلومات الطالب</h3>
-                    <div style="background: #f8fafc; padding: 25px; border-radius: 15px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                            <div>
-                                <div style="font-size: 0.9rem; color: #718096;">الاسم</div>
-                                <div style="font-size: 1.8rem; font-weight: bold; color: #2c3e50;">${name}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.9rem; color: #718096;">الصف</div>
-                                <div style="font-size: 1.8rem; font-weight: bold; color: #2c3e50;">${classNames[className]}</div>
-                            </div>
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                            <div style="text-align: center; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
-                                <div style="font-size: 0.9rem; color: #718096;">إجمالي النقاط</div>
-                                <div style="font-size: 2.2rem; font-weight: bold; color: ${student.totalScore >= 0 ? '#27ae60' : '#e74c3c'}">
-                                    ${student.totalScore > 0 ? '+' : ''}${student.totalScore}
-                                </div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
-                                <div style="font-size: 0.9rem; color: #718096;">إجمالي التصرفات</div>
-                                <div style="font-size: 2.2rem; font-weight: bold; color: #3498db;">${student.actions.length}</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
-                                <div style="font-size: 0.9rem; color: #718096;">التقييم النهائي</div>
-                                <div style="font-size: 2.2rem; font-weight: bold; color: #9b59b6;">${percentage}%</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.05);">
-                                <div style="font-size: 0.9rem; color: #718096;">آخر تحديث</div>
-                                <div style="font-size: 1.2rem; font-weight: bold; color: #e67e22;">
-                                    ${student.lastAction ? new Date(student.lastAction).toLocaleDateString('ar-SA') : 'لا يوجد'}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <h3 style="margin-top: 30px; color: #2d3748;">التوزيع حسب النوع</h3>
-                    <div id="chartContainer" style="height: 200px; display: flex; align-items: flex-end; gap: 10px; margin-top: 20px;">
-                        <!-- سيتم ملؤها ديناميكياً -->
-                    </div>
-                </div>
-                
-                <div>
-                    <h3 style="margin-top: 0; color: #2d3748;">سجل التصرفات</h3>
-                    <div style="max-height: 400px; overflow-y: auto; border: 2px solid #edf2f7; border-radius: 12px; padding: 15px;">
-        `;
-        
-        if (student.actions.length === 0) {
-            reportHTML += `
-                <div style="text-align: center; padding: 40px; color: #a0aec0;">
-                    <div style="font-size: 3rem; margin-bottom: 20px;">📝</div>
-                    <p>لا توجد تصرفات مسجلة بعد</p>
-                </div>
-            `;
-        } else {
-            const recentActions = [...student.actions].reverse().slice(0, 15);
-            
-            recentActions.forEach(action => {
-                reportHTML += `
-                    <div style="padding: 12px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: bold; margin-bottom: 5px;">${action.arabicName}</div>
-                            <div style="font-size: 0.85rem; color: #718096;">
-                                ${action.date} - ${action.time}
-                            </div>
-                        </div>
-                        <div>
-                            <span style="background: ${action.color}; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold;">
-                                ${action.value > 0 ? '+' : ''}${action.value}
-                            </span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-        
-        reportHTML += `
-                    </div>
-                    <div style="margin-top: 20px; display: flex; gap: 10px;">
-                        <button onclick="exportStudentReport('${className}', '${name}')" 
-                                style="background: #2ecc71; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1;">
-                            📥 تصدير التقرير
-                        </button>
-                        <button onclick="resetStudent('${className}', '${name}')" 
-                                style="background: #e74c3c; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1;">
-                            🔄 إعادة تعيين
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('reportTitle').textContent = `تقرير الطالب: ${name}`;
-        document.getElementById('reportContent').innerHTML = reportHTML;
+    function resetSystem() { if(confirm("حذف كل البيانات؟")) { localStorage.clear(); location.reload(); } }
+
+    // وظائف المودالات والتقارير المبسطة
+    function closeReportModal() { document.getElementById('reportModal').style.display = 'none'; }
+    function showStudentReport(c, n) {
+        const s = db[c][n];
+        let h = `<h3>السجل الأخير لـ ${n}:</h3><ul style="list-style:none; padding:0;">`;
+        s.actions.slice(-10).reverse().forEach(a => {
+            h += `<li style="border-bottom:1px solid #eee; padding:10px;">${a.date} | ${a.arabicName} (${a.value})</li>`;
+        });
+        h += `</ul>`;
+        document.getElementById('reportContent').innerHTML = h;
         document.getElementById('reportModal').style.display = 'block';
-        
-        // رسم المخطط البياني
-        setTimeout(() => drawChart(student.stats), 100);
     }
 
-    // رسم المخطط البياني
-    function drawChart(stats) {
-        const container = document.getElementById('chartContainer');
-        if (!container) return;
-        
-        const chartData = [
-            { label: 'مشاركة', value: stats.participation, color: ACTION_TYPES.PARTICIPATION.color },
-            { label: 'سلوك حسن', value: stats.goodBehavior, color: ACTION_TYPES.GOOD_BEHAVIOR.color },
-            { label: 'غياب', value: stats.absent, color: ACTION_TYPES.ABSENT.color },
-            { label: 'يتكلم', value: stats.talking, color: ACTION_TYPES.TALKING.color },
-            { label: 'سلوك سيء', value: stats.badBehavior, color: ACTION_TYPES.BAD_BEHAVIOR.color }
-        ];
-        
-        const maxValue = Math.max(...chartData.map(d => d.value));
-        
-        let chartHTML = '';
-        chartData.forEach(data => {
-            const height = maxValue > 0 ? (data.value / maxValue) * 100 : 0;
-            chartHTML += `
-                <div style="flex: 1; text-align: center;">
-                    <div style="height: 150px; position: relative; display: flex; align-items: flex-end;">
-                        <div style="background: ${data.color}; width: 100%; height: ${height}%; border-radius: 8px 8px 0 0; transition: height 1s ease;"></div>
-                    </div>
-                    <div style="margin-top: 10px; font-weight: bold; color: #4a5568;">${data.label}</div>
-                    <div style="font-size: 1.2rem; font-weight: bold; margin-top: 5px;">${data.value}</div>
-                </div>
-            `;
-        });
-        
-        container.innerHTML = chartHTML;
-    }
-
-    // إغلاق مودال التقرير
-    function closeReportModal() {
-        document.getElementById('reportModal').style.display = 'none';
-    }
-
-    // إعادة تعيين طالب
-    function resetStudent(className, name) {
-        if (confirm(`هل أنت متأكد من إعادة تعيين جميع بيانات الطالب ${name}؟`)) {
-            if (db[className][name]) {
-                db[className][name] = {
-                    totalScore: 0,
-                    actions: [],
-                    stats: {
-                        participation: 0,
-                        goodBehavior: 0,
-                        absent: 0,
-                        talking: 0,
-                        badBehavior: 0
-                    },
-                    lastAction: null,
-                    createdAt: new Date().toISOString()
-                };
-                
-                saveToStorage();
-                renderClass(className);
-                closeReportModal();
-                showNotification('تم إعادة تعيين بيانات الطالب', '#f1c40f');
-            }
-        }
-    }
-
-    // تصدير تقرير الطالب
-    function exportStudentReport(className, name) {
-        const student = db[className][name];
-        if (!student) return;
-        
-        const classNames = {
-            'class1': 'الصف الأول',
-            'class2': 'الصف الثاني',
-            'class3': 'الصف الثالث'
-        };
-        
-        let reportData = [];
-        reportData.push(['تقرير الطالب', name]);
-        reportData.push(['الصف', classNames[className]]);
-        reportData.push(['إجمالي النقاط', student.totalScore]);
-        reportData.push(['عدد التصرفات', student.actions.length]);
-        reportData.push(['تاريخ الإنشاء', new Date().toLocaleDateString('ar-SA')]);
-        reportData.push([]);
-        reportData.push(['نوع التصرف', 'العدد']);
-        reportData.push(['مشاركة', student.stats.participation]);
-        reportData.push(['سلوك حسن', student.stats.goodBehavior]);
-        reportData.push(['غياب', student.stats.absent]);
-        reportData.push(['يتكلم', student.stats.talking]);
-        reportData.push(['سلوك سيء', student.stats.badBehavior]);
-        reportData.push([]);
-        reportData.push(['التاريخ', 'الوقت', 'التصرف', 'النقاط']);
-        
-        student.actions.forEach(action => {
-            reportData.push([
-                action.date,
-                action.time,
-                action.arabicName,
-                action.value > 0 ? '+' + action.value : action.value
-            ]);
-        });
-        
-        const ws = XLSX.utils.aoa_to_sheet(reportData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'تقرير الطالب');
-        XLSX.writeFile(wb, `تقرير_${name}_${new Date().toISOString().slice(0,10)}.xlsx`);
-        
-        showNotification('تم تصدير التقرير بنجاح', '#2ecc71');
-    }
-
-    // تصدير جميع البيانات
-    function exportAllData() {
-        let allData = [];
-        allData.push(['الصف', 'اسم الطالب', 'المشاركات', 'سلوك حسن', 'غياب', 'يتكلم', 'سلوك سيء', 'إجمالي النقاط', 'آخر تحديث']);
-        
-        const classNames = {
-            'class1': 'الصف الأول',
-            'class2': 'الصف الثاني',
-            'class3': 'الصف الثالث'
-        };
-        
-        ['class1', 'class2', 'class3'].forEach(className => {
-            Object.entries(db[className]).forEach(([name, student]) => {
-                allData.push([
-                    classNames[className],
-                    name,
-                    student.stats.participation,
-                    student.stats.goodBehavior,
-                    student.stats.absent,
-                    student.stats.talking,
-                    student.stats.badBehavior,
-                    student.totalScore,
-                    student.lastAction ? new Date(student.lastAction).toLocaleDateString('ar-SA') : '-'
-                ]);
-            });
-        });
-        
-        const ws = XLSX.utils.aoa_to_sheet(allData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'بيانات النظام');
-        XLSX.writeFile(wb, `بيانات_النظام_${new Date().toISOString().slice(0,10)}.xlsx`);
-        
-        showNotification('تم تصدير جميع البيانات بنجاح', '#2ecc71');
-    }
-
-    // عرض الملخص
     function showSummary() {
-        let summaryHTML = `
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
-        `;
-        
-        const classNames = {
-            'class1': 'الصف الأول',
-            'class2': 'الصف الثاني',
-            'class3': 'الصف الثالث'
-        };
-        
-        let totalStats = {
-            students: 0,
-            score: 0,
-            actions: 0,
-            participation: 0,
-            goodBehavior: 0,
-            absent: 0,
-            talking: 0,
-            badBehavior: 0
-        };
-        
-        ['class1', 'class2', 'class3'].forEach(className => {
-            const students = db[className];
-            const studentCount = Object.keys(students).length;
-            totalStats.students += studentCount;
-            
-            if (studentCount === 0) {
-                summaryHTML += `
-                    <div style="background: #f8fafc; padding: 25px; border-radius: 15px; border-left: 5px solid #a0aec0;">
-                        <h3 style="margin-top: 0; color: #2d3748;">${classNames[className]}</h3>
-                        <p style="color: #718096;">لا يوجد طلاب</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let classScore = 0;
-            let classActions = 0;
-            let topStudent = { name: '', score: -Infinity };
-            
-            Object.entries(students).forEach(([name, student]) => {
-                classScore += student.totalScore;
-                classActions += student.actions.length;
-                
-                totalStats.score += student.totalScore;
-                totalStats.actions += student.actions.length;
-                totalStats.participation += student.stats.participation;
-                totalStats.goodBehavior += student.stats.goodBehavior;
-                totalStats.absent += student.stats.absent;
-                totalStats.talking += student.stats.talking;
-                totalStats.badBehavior += student.stats.badBehavior;
-                
-                if (student.totalScore > topStudent.score) {
-                    topStudent = { name, score: student.totalScore };
-                }
-            });
-            
-            const avgScore = (classScore / studentCount).toFixed(1);
-            
-            summaryHTML += `
-                <div style="background: #f8fafc; padding: 25px; border-radius: 15px; border-left: 5px solid #3498db;">
-                    <h3 style="margin-top: 0; color: #2d3748;">${classNames[className]}</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                        <div>
-                            <div style="font-size: 0.9rem; color: #718096;">عدد الطلاب</div>
-                            <div style="font-size: 1.8rem; font-weight: bold; color: #2c3e50;">${studentCount}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.9rem; color: #718096;">متوسط النقاط</div>
-                            <div style="font-size: 1.8rem; font-weight: bold; color: ${avgScore >= 0 ? '#27ae60' : '#e74c3c'}">
-                                ${avgScore >= 0 ? '+' : ''}${avgScore}
-                            </div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.9rem; color: #718096;">إجمالي التصرفات</div>
-                            <div style="font-size: 1.8rem; font-weight: bold; color: #3498db;">${classActions}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.9rem; color: #718096;">الأعلى نقاطاً</div>
-                            <div style="font-size: 1.1rem; font-weight: bold; color: #9b59b6;">${topStudent.name}</div>
-                            <div style="font-size: 0.9rem; color: #718096;">${topStudent.score} نقطة</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+        let h = "<ul>";
+        ['class1','class2','class3'].forEach(c => {
+            h += `<li>${c}: ${Object.keys(db[c]).length} طالب</li>`;
         });
-        
-        // إضافة إحصائيات عامة
-        const avgTotalScore = totalStats.students > 0 ? (totalStats.score / totalStats.students).toFixed(1) : 0;
-        
-        summaryHTML += `
-            </div>
-            <div style="margin-top: 40px; padding: 30px; background: linear-gradient(to right, #2c3e50, #4a6491); color: white; border-radius: 20px;">
-                <h2 style="margin-top: 0; color: white;">📊 الإحصائيات العامة</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                    <div>
-                        <div style="font-size: 0.9rem; opacity: 0.9;">إجمالي الطلاب</div>
-                        <div style="font-size: 2.5rem; font-weight: bold;">${totalStats.students}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.9rem; opacity: 0.9;">إجمالي التصرفات</div>
-                        <div style="font-size: 2.5rem; font-weight: bold;">${totalStats.actions}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.9rem; opacity: 0.9;">متوسط النقاط</div>
-                        <div style="font-size: 2.5rem; font-weight: bold; color: ${avgTotalScore >= 0 ? '#2ecc71' : '#e74c3c'}">
-                            ${avgTotalScore >= 0 ? '+' : ''}${avgTotalScore}
-                        </div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.9rem; opacity: 0.9;">آخر تحديث</div>
-                        <div style="font-size: 1.5rem; font-weight: bold;">
-                            ${db.stats.lastUpdate ? new Date(db.stats.lastUpdate).toLocaleDateString('ar-SA') : '-'}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('summaryContent').innerHTML = summaryHTML;
+        h += "</ul>";
+        document.getElementById('summaryContent').innerHTML = h;
         document.getElementById('summaryModal').style.display = 'block';
     }
+    function closeSummaryModal() { document.getElementById('summaryModal').style.display = 'none'; }
 
-    // إغلاق مودال الملخص
-    function closeSummaryModal() {
-        document.getElementById('summaryModal').style.display = 'none';
-    }
-
-    // إظهار الإعدادات (مكانك)
-    function showSettings() {
-        showNotification('قريباً: لوحة الإعدادات', '#3498db');
-    }
-
-    // إظهار الإشعارات
-    function showNotification(message, color) {
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.style.background = color;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
-
-    // إعادة تعيين النظام
-    function resetSystem() {
-        if (confirm("⚠️ هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه.")) {
-            localStorage.clear();
-            location.reload();
-        }
-    }
-
-    // بدء التطبيق
-    document.addEventListener('DOMContentLoaded', function() {
-        initSystem();
-        
-        // إضافة حدث للإعدادات (زر جديد)
-        document.querySelector('.header-actions').innerHTML += `
-            <button class="header-btn" onclick="resetSystem()" style="background: rgba(231, 76, 60, 0.2);">
-                🗑️ حذف الكل
-            </button>
-        `;
-    });
-
-    // منع إغلاق المودال عند النقر عليه
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
-            }
+    function exportAllData() {
+        let csv = "الصف,الطالب,النقاط\n";
+        ['class1','class2','class3'].forEach(c => {
+            Object.keys(db[c]).forEach(n => {
+                csv += `${c},${n},${db[c][n].totalScore}\n`;
+            });
         });
-    });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "students_report.csv";
+        link.click();
+    }
+
+    window.onload = initSystem;
 </script>
 </body>
 </html>
