@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مبادرة الأستاذة غادة الحربي - لعبة من أنا؟</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #d4af37; /* لون ذهبي ملكي */
+            --bg-color: #f4f7f6;
+            --text-color: #34495e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* حاوية الشاشة الاحترافية */
+        .screen-board {
+            background-color: white;
+            width: 90%;
+            max-width: 650px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            border: 4px solid var(--primary-color);
+            position: relative;
+        }
+
+        /* هيدر المبادرة */
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--accent-color);
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            font-weight: 300;
+        }
+
+        .header h1 {
+            margin: 5px 0 0;
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        /* محتوى اللعبة */
+        .content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .riddle-card {
+            background: #fff;
+            border-right: 8px solid var(--accent-color);
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* منطقة الإجابات */
+        .answer-area {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            background: #f9f9f9;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .answer-area.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .badge-word { background: #d4af37; color: white; }
+        .badge-syn { background: #27ae60; color: white; }
+        .badge-ant { background: #e74c3c; color: white; }
+
+        /* الأزرار */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .reveal-btn { background-color: var(--primary-color); color: white; }
+        .next-btn { background-color: var(--accent-color); color: var(--primary-color); }
+        
+        button:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="screen-board">
+    <div class="header">
+        <h2>مبادرة لغوية من تقديم</h2>
+        <h1>الأستاذة غادة الحربي</h1>
+    </div>
+
+    <div class="content">
+        <div class="riddle-card" id="riddleText">
+            جاري تحميل اللغز...
+        </div>
+
+        <div class="answer-area" id="answerArea">
+            <div class="badge badge-word" id="mainWord"></div>
+            <div class="result-row">
+                <div><span>المترادف: </span><span class="badge badge-syn" id="synonym"></span></div>
+                <div><span>الضد: </span><span class="badge badge-ant" id="antonym"></span></div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="reveal-btn" onclick="reveal()">كشف الإجابة 🔍</button>
+            <button class="next-btn" onclick="next()">اللغز التالي ✨</button>
+        </div>
+
+        <footer>لغة الضاد.. فخر واعتزاز</footer>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { q: "أنا بيت الأسد القوي، أختبئ بين الأشجار الكثيفة.. فمن أنا؟", a: "عرين", s: "مأوى / مسكن", ant: "خلاء" },
+        { q: "أنا صفة للشخص الذي يساعد الجميع دون مقابل.. فمن أنا؟", a: "كريم", s: "سخي / معطاء", ant: "بخيل" },
+        { q: "أنا الصعود إلى القمة، وعكس الهبوط.. فمن أنا؟", a: "علو", s: "ارتفاع / سمو", ant: "انخفاض" },
+        { q: "أنا النور الذي يضيء الدرب بعد عتمة الليل.. فمن أنا؟", a: "الفجر", s: "الصباح / الضياء", ant: "الغسق" }
+    ];
+
+    let index = 0;
+
+    function display() {
+        document.getElementById('riddleText').innerText = data[index].q;
+        document.getElementById('answerArea').classList.remove('visible');
+    }
+
+    function reveal() {
+        document.getElementById('mainWord').innerText = "أنا: " + data[index].a;
+        document.getElementById('synonym').innerText = data[index].s;
+        document.getElementById('antonym').innerText = data[index].ant;
+        document.getElementById('answerArea').classList.add('visible');
+    }
+
+    function next() {
+        index = (index + 1) % data.length;
+        display();
+    }
+
+    window.onload = display;
+</script>
+
+</body>
+</html>
