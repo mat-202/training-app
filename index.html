@@ -2,275 +2,2836 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام متابعة الطلاب - الإصدار المطور</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>منصة متابعة الطلاب - الإخفاء الذكي</title>
+    
+    <!-- Chart.js للرسوم البيانية -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- XLSX لتصدير Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
     <style>
+        /* ================ متغيرات الألوان ================ */
         :root {
-            --participation: #2980b9; --good: #27ae60; --absent: #f1c40f;
-            --talking: #e74c3c; --bad: #8e44ad; --book: #d35400; --writing: #7f8c8d;
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --whatsapp: #25D366;
+            --whatsapp-dark: #128C7E;
+            --exam1: #9c27b0;
+            --exam2: #ff9800;
+            
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-light: #e2e8f0;
+            
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.04);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.06);
+            
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 20px;
+            --radius-full: 999px;
         }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; min-height: 100vh; }
-        .app-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .main-card { background: white; border-radius: 25px; box-shadow: 0 25px 60px rgba(0,0,0,0.2); overflow: hidden; }
-        .app-header { background: #2c3e50; color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
-        .class-tabs { display: flex; background: #f8f9fa; cursor: pointer; }
-        .class-tab { flex: 1; text-align: center; padding: 15px; font-weight: bold; color: #7f8c8d; border-bottom: 4px solid transparent; }
-        .class-tab.active { color: #2c3e50; border-bottom-color: #2c3e50; background: white; }
-        .class-content { padding: 20px; display: none; }
-        .class-content.active { display: block; }
-        .student-row { display: grid; grid-template-columns: 1.5fr 1fr 3fr; padding: 15px; border-bottom: 1px solid #eee; align-items: center; }
-        .percentage-circle {
-            width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; position: relative; margin: 0 auto;
-            background: conic-gradient(#4caf50 0% var(--percentage), #f0f0f0 var(--percentage) 100%);
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .percentage-circle::before { content: attr(data-percentage) '%'; position: absolute; width: 55px; height: 55px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
-        .btn-action { border: none; padding: 10px; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 0.8rem; transition: 0.2s; min-width: 60px; }
-        .btn-action:hover { transform: translateY(-2px); opacity: 0.9; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; }
-        .modal-content { background: white; width: 90%; max-width: 500px; margin: 50px auto; border-radius: 20px; padding: 20px; }
-        .history-item { 
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: #f1f5f9;
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* ================ الهيدر الرئيسي ================ */
+        .header {
+            background: var(--bg-white);
+            padding: 0.8rem 1.5rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .logo-text h1 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .logo-text span {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .teacher-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--bg-light);
+            padding: 0.5rem 1.2rem;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border-light);
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-item i {
+            color: var(--primary);
+            width: 16px;
+        }
+
+        .info-item span {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* ================ شريط الفصول ================ */
+        .classes-bar {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            margin: 1rem auto;
+            max-width: 1400px;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .classes-bar.hidden {
+            display: none;
+        }
+
+        .classes-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+
+        .classes-header h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .classes-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: var(--radius-full);
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .classes-scroll {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.3rem;
+        }
+
+        .class-chip {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: var(--radius-full);
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .class-chip.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .class-chip .badge {
+            background: rgba(0,0,0,0.1);
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            margin-right: 0.3rem;
+        }
+
+        .class-chip.active .badge {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ================ زر الإخفاء الذكي ================ */
+        .smart-hide-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(67,97,238,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .smart-hide-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(67,97,238,0.4);
+        }
+
+        .smart-hide-btn.active {
+            background: var(--success);
+        }
+
+        /* ================ الحاوية الرئيسية ================ */
+        .main-container {
+            max-width: 1400px;
+            margin: 1rem auto;
+            padding: 0 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        /* ================ العناصر القابلة للإخفاء ================ */
+        .hideable {
+            transition: all 0.3s ease;
+        }
+
+        .hideable.hidden {
+            display: none;
+        }
+
+        /* ================ بطاقات التحكم ================ */
+        .control-cards {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.2rem;
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stats-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .stats-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stats-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .stats-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .actions-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 0.8rem 1.2rem;
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-whatsapp {
+            background: var(--whatsapp);
+            color: white;
+            border: none;
+        }
+
+        .btn-exam1 {
+            background: var(--exam1);
+            color: white;
+            border: none;
+        }
+
+        .btn-exam2 {
+            background: var(--exam2);
+            color: white;
+            border: none;
+        }
+
+        .btn-edit {
+            background: var(--warning);
+            color: white;
+            border: none;
+        }
+
+        /* ================ قسم تعديل الأزرار ================ */
+        .edit-buttons-section {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border-light);
+        }
+
+        .edit-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .edit-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .button-count-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .button-count-control input {
+            width: 60px;
+            padding: 0.3rem;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.8rem;
+            margin: 1rem 0;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .button-editor {
+            background: var(--bg-light);
+            padding: 0.8rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+        }
+
+        .button-editor label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.2rem;
+        }
+
+        .button-editor input, .button-editor select {
+            width: 100%;
+            padding: 0.4rem;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .button-editor .color-preview {
+            width: 100%;
+            height: 25px;
+            border-radius: var(--radius-sm);
+            margin-top: 0.3rem;
+        }
+
+        /* ================ قسم الإضافة ================ */
+        .add-section {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-light);
+            display: none;
+            overflow: hidden;
+        }
+
+        .add-section.visible {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .add-header {
+            padding: 1rem;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .add-header h3 {
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-close:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .add-tabs {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .add-tab {
+            padding: 0.4rem 1.2rem;
+            border: none;
+            border-radius: var(--radius-full);
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .add-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .add-pane {
+            padding: 1rem;
+            display: none;
+        }
+
+        .add-pane.active {
+            display: block;
+        }
+
+        .bulk-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            resize: vertical;
+            margin: 0.8rem 0;
+        }
+
+        .example-box {
+            background: var(--bg-light);
+            padding: 0.8rem;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0.8rem 0;
+            border-right: 3px solid var(--primary);
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: var(--bg-light);
+        }
+
+        .file-upload-area i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ================ قسم إضافة الاختبارات ================ */
+        .exam-section {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border-light);
+        }
+
+        .exam-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .exam-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+        }
+
+        .exam-title i {
+            color: var(--exam1);
+        }
+
+        .exam-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            padding: 0.3rem;
+            border-radius: var(--radius-full);
+            margin-bottom: 1rem;
+        }
+
+        .exam-tab {
+            padding: 0.4rem 1.2rem;
+            border: none;
+            border-radius: var(--radius-full);
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .exam-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .exam-pane {
+            display: none;
+        }
+
+        .exam-pane.active {
+            display: block;
+        }
+
+        .exam-inputs {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .exam-input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .exam-input label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.2rem;
+        }
+
+        .exam-input input, .exam-input select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+        }
+
+        /* ================ قائمة الطلاب (جميع الطلاب) ================ */
+        .students-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 1rem 0 0.8rem;
+        }
+
+        .students-header h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .students-count {
+            background: var(--bg-light);
+            padding: 0.2rem 0.8rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+        }
+
+        .students-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .student-row {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 0.6rem 1rem;
+            display: grid;
+            grid-template-columns: 250px 1fr 100px;
+            align-items: center;
+            gap: 0.8rem;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+
+        .student-row:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .student-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .student-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .grade-badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            font-weight: 700;
+        }
+
+        .phone-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-full);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            font-size: 0.6rem;
+            cursor: pointer;
+        }
+
+        .student-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-top: 0.1rem;
+        }
+
+        .exam-badge {
+            background: #f3e5f5;
+            color: #9c27b0;
+            padding: 0.1rem 0.4rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .stats-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+        }
+
+        .positive-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .negative-badge {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* ================ أزرار التقييم ================ */
+        .evaluation-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+
+        .eval-btn {
+            padding: 0.3rem 0.5rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            min-width: 40px;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .eval-btn i {
+            font-size: 0.6rem;
+        }
+
+        .eval-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ================ أزرار التحكم ================ */
+        .student-actions {
+            display: flex;
+            gap: 0.2rem;
+            justify-content: flex-end;
+        }
+
+        .action-icon {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .action-icon.whatsapp {
+            background: var(--whatsapp);
+            color: white;
+        }
+
+        .action-icon:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ================ قسم الرسائل ================ */
+        .message-section {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-light);
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .message-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .message-type-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-light);
+            padding: 0.3rem;
+            border-radius: var(--radius-full);
+            margin-bottom: 1rem;
+        }
+
+        .message-type-tab {
+            padding: 0.4rem 1.2rem;
+            border: none;
+            border-radius: var(--radius-full);
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .message-type-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .student-select {
+            padding: 0.6rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-full);
+            width: 250px;
+            margin-bottom: 1rem;
+        }
+
+        .message-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            resize: vertical;
+            margin: 1rem 0;
+        }
+
+        .variables-bar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .var-btn {
+            padding: 0.4rem 1rem;
+            background: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .var-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .detailed-report-preview {
+            background: #f8fafc;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border-light);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .report-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: var(--radius-md);
             border-right: 4px solid;
-            transition: transform 0.2s;
         }
-        .history-item:hover { transform: translateX(-5px); }
-        .control-panel { background: #f8f9fa; padding: 15px; border-radius: 15px; margin-top: 20px; border: 2px dashed #ccc; }
-        textarea { width: 100%; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
-        .time-badge { background: #2c3e50; color: white; padding: 3px 8px; border-radius: 15px; font-size: 0.8rem; display: inline-block; margin-left: 5px; }
-        .date-badge { background: #3498db; color: white; padding: 3px 8px; border-radius: 15px; font-size: 0.8rem; display: inline-block; }
+
+        .timeline-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            min-width: 60px;
+        }
+
+        .timeline-desc {
+            flex: 1;
+            font-size: 0.8rem;
+        }
+
+        .timeline-value {
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        /* ================ شريط التقدم ================ */
+        .progress-container {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border-light);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border-light);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--whatsapp);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* ================ كشف متابعة الفصل ================ */
+        .tracking-sheet {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-light);
+            overflow-x: auto;
+        }
+
+        .tracking-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .tracking-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .tracking-title h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .tracking-badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+        }
+
+        .tracking-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        .tracking-table th {
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            border: 1px solid var(--primary-dark);
+        }
+
+        .tracking-table td {
+            padding: 0.8rem;
+            border: 1px solid var(--border-light);
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .tracking-table tr:hover {
+            background: var(--bg-light);
+        }
+
+        .student-name-cell {
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .exam1-grade {
+            background: #f3e5f5;
+            font-weight: 700;
+            color: var(--exam1);
+        }
+
+        .exam2-grade {
+            background: #fff3e0;
+            font-weight: 700;
+            color: var(--exam2);
+        }
+
+        .total-grade {
+            background: #e8f5e9;
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
+        .week-grade {
+            font-weight: 600;
+        }
+
+        .week-grade.positive {
+            color: #2ecc71;
+        }
+
+        .week-grade.negative {
+            color: #f72585;
+        }
+
+        /* ================ مودال إضافة فصل ================ */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .modal-content {
+            background: var(--bg-white);
+            border-radius: var(--radius-xl);
+            max-width: 400px;
+            margin: 4rem auto;
+            padding: 1.5rem;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ================ الإشعارات ================ */
+        .notification {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.6rem 1.5rem;
+            border-radius: var(--radius-full);
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            animation: notifySlide 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        @keyframes notifySlide {
+            from { top: -50px; opacity: 0; }
+            to { top: 1rem; opacity: 1; }
+        }
+
+        /* ================ التجاوب ================ */
+        @media (max-width: 900px) {
+            .student-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .control-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .exam-inputs {
+                flex-direction: column;
+            }
+            
+            .message-actions {
+                flex-direction: column;
+            }
+            
+            .buttons-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
 <body>
-
-<div class="app-container">
-    <div class="main-card">
-        <div class="app-header">
-            <div><h1>📊 متابعة الطلاب</h1><p>ترتيب أبجدي | نسبة دقيقة حسب الضغطات</p></div>
-            <button onclick="resetSystem()" style="background:#e74c3c; color:white; border:none; padding:10px; border-radius:10px; cursor:pointer;">مسح الكل</button>
+    <!-- ================ الهيدر الرئيسي ================ -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>منصة متابعة الطلاب</h1>
+                    <span>نظام متكامل مع إخفاء ذكي</span>
+                </div>
+            </div>
+            
+            <div class="teacher-info">
+                <div class="info-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span id="teacherName">أحمد محمد</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-book"></i>
+                    <span id="subject">الرياضيات</span>
+                </div>
+            </div>
         </div>
-        <div class="class-tabs">
-            <div class="class-tab active" onclick="switchClass('class1')">الأول (<span id="count-class1">0</span>)</div>
-            <div class="class-tab" onclick="switchClass('class2')">الثاني (<span id="count-class2">0</span>)</div>
-            <div class="class-tab" onclick="switchClass('class3')">الثالث (<span id="count-class3">0</span>)</div>
+    </header>
+
+    <!-- ================ زر الإخفاء الذكي ================ -->
+    <button class="smart-hide-btn" id="smartHideBtn" onclick="toggleSmartHide()">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <!-- ================ شريط الفصول (قابل للإخفاء) ================ -->
+    <div id="classesBar" class="classes-bar hideable">
+        <div class="classes-header">
+            <h3>
+                <i class="fas fa-layer-group" style="color: var(--primary);"></i>
+                الفصول الدراسية
+            </h3>
+            <div class="classes-actions">
+                <button class="btn-icon" onclick="showAddClassModal()" title="إضافة فصل جديد">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
         </div>
-        <div id="class1-content" class="class-content active"></div>
-        <div id="class2-content" class="class-content"></div>
-        <div id="class3-content" class="class-content"></div>
+        <div class="classes-scroll" id="classesContainer">
+            <!-- يتم تعبئتها ديناميكياً -->
+        </div>
     </div>
-</div>
 
-<div id="reportModal" class="modal">
-    <div class="modal-content">
-        <h2 id="reportName">السجل</h2>
-        <div id="reportDetails"></div>
-        <button onclick="closeModal()" style="width:100%; padding:10px; margin-top:10px; border-radius:10px; border:none; background:#2c3e50; color:white; cursor:pointer;">إغلاق</button>
-    </div>
-</div>
+    <!-- ================ الحاوية الرئيسية ================ -->
+    <main class="main-container">
+        <!-- ================ بطاقات التحكم (قابلة للإخفاء) ================ -->
+        <div id="controlCards" class="control-cards hideable">
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="stats-details">
+                    <span class="stats-label">عدد الطلاب</span>
+                    <span class="stats-number" id="totalStudents">0</span>
+                </div>
+                <div class="stats-details" style="margin-right: 1rem;">
+                    <span class="stats-label">المتوسط</span>
+                    <span class="stats-number" id="avgGrade">0/60</span>
+                </div>
+            </div>
+            
+            <div class="actions-card">
+                <button class="btn" onclick="toggleAddSection()">
+                    <i class="fas fa-plus-circle"></i>
+                    إضافة طلاب
+                </button>
+                <button class="btn btn-edit" onclick="toggleEditButtons()">
+                    <i class="fas fa-sliders-h"></i>
+                    تعديل الأزرار
+                </button>
+                <button class="btn btn-exam1" onclick="showExamSection('exam1')">
+                    <i class="fas fa-pencil-alt"></i>
+                    اختبار أول
+                </button>
+                <button class="btn btn-exam2" onclick="showExamSection('exam2')">
+                    <i class="fas fa-pencil-alt"></i>
+                    اختبار ثاني
+                </button>
+                <button class="btn btn-whatsapp" onclick="openWhatsAppPanel()">
+                    <i class="fab fa-whatsapp"></i>
+                    رسائل واتساب
+                </button>
+                <button class="btn btn-primary" onclick="showTrackingSheet()">
+                    <i class="fas fa-table"></i>
+                    كشف المتابعة
+                </button>
+            </div>
+        </div>
 
-<script>
-    const ACTIONS = {
-        P: { name: 'مشاركة', val: 2, color: '#2980b9' },
-        G: { name: 'سلوك حسن', val: 1, color: '#27ae60' },
-        A: { name: 'غياب', val: 0, color: '#f1c40f' },
-        T: { name:' التحدث ', val: -1, color: '#e74c3c' },
-        B: { name: 'سلوك سيء', val: -2, color: '#8e44ad' },
-        BK: { name: 'بدون كتاب', val: -1, color: '#d35400' },
-        W: { name: 'لم يكتب', val: -1, color: '#7f8c8d' }
-    };
+        <!-- ================ قسم تعديل الأزرار (قابل للإخفاء) ================ -->
+        <div id="editButtonsSection" class="edit-buttons-section hideable" style="display: none;">
+            <div class="edit-header">
+                <h3>
+                    <i class="fas fa-sliders-h" style="color: var(--warning);"></i>
+                    تخصيص أزرار التقييم
+                </h3>
+                <div class="button-count-control">
+                    <span>عدد الأزرار:</span>
+                    <input type="number" id="buttonCount" min="1" max="20" value="10" onchange="updateButtonCount()">
+                    <button class="btn btn-primary" onclick="saveButtons()">حفظ</button>
+                    <button class="btn" onclick="toggleEditButtons()">إغلاق</button>
+                </div>
+            </div>
+            
+            <div class="buttons-grid" id="buttonsEditor">
+                <!-- سيتم تعبئتها ديناميكياً -->
+            </div>
+        </div>
 
-    let db = JSON.parse(localStorage.getItem('eduDB_v3')) || { class1: {}, class2: {}, class3: {} };
-    let currentClass = 'class1';
+        <!-- ================ قسم الإضافة (قابل للإخفاء) ================ -->
+        <div id="addSection" class="add-section hideable">
+            <div class="add-header">
+                <h3>
+                    <i class="fas fa-user-plus"></i>
+                    إضافة طلاب + أرقام جوال دفعة واحدة
+                </h3>
+                <button class="add-close" onclick="toggleAddSection()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="add-tabs">
+                <button class="add-tab active" onclick="showAddTab('text')">لصق النص</button>
+                <button class="add-tab" onclick="showAddTab('excel')">رفع Excel</button>
+            </div>
+            
+            <!-- تبويب لصق النص -->
+            <div id="addTextPane" class="add-pane active">
+                <select id="bulkClassSelect" style="width: 100%; padding: 0.5rem; border: 2px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 1rem;">
+                    <!-- يتم تعبئتها ديناميكياً -->
+                </select>
+                
+                <div class="example-box">
+                    <i class="fas fa-info-circle" style="color: var(--primary);"></i>
+                    الصق الأسماء والأرقام بالصيغ التالية:<br>
+                    <strong>أحمد محمد - 501234567</strong><br>
+                    <strong>سارة علي,551234567</strong><br>
+                    <strong>محمد خالد 598765432</strong>
+                </div>
+                
+                <textarea id="bulkNamesWithPhones" class="bulk-textarea" 
+                    placeholder="أحمد محمد - 501234567
+سارة علي,551234567
+محمد خالد 598765432
+فاطمة حسن 512345678"></textarea>
+                
+                <button class="btn btn-primary" onclick="addBulkNamesWithPhones()" style="width: 100%;">
+                    <i class="fas fa-user-plus"></i>
+                    إضافة دفعة واحدة
+                </button>
+            </div>
+            
+            <!-- تبويب رفع Excel -->
+            <div id="addExcelPane" class="add-pane">
+                <select id="excelClassSelect" style="width: 100%; padding: 0.5rem; border: 2px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 1rem;">
+                    <!-- يتم تعبئتها ديناميكياً -->
+                </select>
+                
+                <div class="example-box">
+                    <i class="fas fa-info-circle" style="color: var(--success);"></i>
+                    العمود الأول: اسم الطالب<br>
+                    العمود الثاني: رقم الجوال (اختياري)
+                </div>
+                
+                <div class="file-upload-area" onclick="document.getElementById('excelFileInput').click()">
+                    <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleExcelUpload(event)">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>انقر لاختيار ملف Excel</p>
+                    <p id="excelFileName" style="font-size: 0.8rem; color: var(--success); margin-top: 0.5rem;"></p>
+                </div>
+                
+                <button class="btn btn-primary" onclick="processExcelFile()" style="width: 100%;" id="processExcelBtn" disabled>
+                    <i class="fas fa-upload"></i>
+                    معالجة الملف
+                </button>
+            </div>
+        </div>
 
-    function save() { localStorage.setItem('eduDB_v3', JSON.stringify(db)); }
+        <!-- ================ قسم إضافة الاختبارات (قابل للإخفاء) ================ -->
+        <div id="examSection" class="exam-section hideable" style="display: none;">
+            <div class="exam-header">
+                <div class="exam-title" id="examTitle">
+                    <i class="fas fa-pencil-alt"></i>
+                    <span>إضافة درجة اختبار</span>
+                </div>
+                <button class="add-close" onclick="hideExamSection()">×</button>
+            </div>
+            
+            <div class="exam-tabs" id="examTabs">
+                <button class="exam-tab active" onclick="showExamTab('exam1')">الاختبار الأول</button>
+                <button class="exam-tab" onclick="showExamTab('exam2')">الاختبار الثاني</button>
+            </div>
+            
+            <!-- الاختبار الأول -->
+            <div id="exam1Pane" class="exam-pane active">
+                <div class="exam-inputs">
+                    <div class="exam-input">
+                        <label>اختر الطالب</label>
+                        <select id="exam1StudentSelect" style="width: 100%; padding: 0.5rem; border: 2px solid var(--border-light); border-radius: var(--radius-md);">
+                            <option value="">اختر طالباً...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="exam-input">
+                        <label>درجة الاختبار الأول (من 20)</label>
+                        <input type="number" id="exam1Grade" min="0" max="20" step="1" placeholder="مثال: 18">
+                    </div>
+                    
+                    <button class="btn btn-exam1" onclick="addExamGrade('exam1')">
+                        <i class="fas fa-save"></i> حفظ
+                    </button>
+                </div>
+            </div>
+            
+            <!-- الاختبار الثاني -->
+            <div id="exam2Pane" class="exam-pane">
+                <div class="exam-inputs">
+                    <div class="exam-input">
+                        <label>اختر الطالب</label>
+                        <select id="exam2StudentSelect" style="width: 100%; padding: 0.5rem; border: 2px solid var(--border-light); border-radius: var(--radius-md);">
+                            <option value="">اختر طالباً...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="exam-input">
+                        <label>درجة الاختبار الثاني (من 20)</label>
+                        <input type="number" id="exam2Grade" min="0" max="20" step="1" placeholder="مثال: 17">
+                    </div>
+                    
+                    <button class="btn btn-exam2" onclick="addExamGrade('exam2')">
+                        <i class="fas fa-save"></i> حفظ
+                    </button>
+                </div>
+            </div>
+        </div>
 
-    function switchClass(id) {
-        currentClass = id;
-        document.querySelectorAll('.class-tab').forEach((t, i) => t.classList.toggle('active', `class${i+1}` === id));
-        document.querySelectorAll('.class-content').forEach((c, i) => c.classList.toggle('active', `class${i+1}` === id));
-        render();
-    }
+        <!-- ================ قسم الرسائل (قابل للإخفاء) ================ -->
+        <div id="messageSection" class="message-section hideable" style="display: none;">
+            <div class="message-header">
+                <h3>
+                    <i class="fab fa-whatsapp" style="color: var(--whatsapp);"></i>
+                    إرسال رسالة واتساب
+                </h3>
+                <button class="add-close" onclick="openWhatsAppPanel()">×</button>
+            </div>
+            
+            <div class="message-type-tabs">
+                <button class="message-type-tab active" onclick="showMessageType('manual')">رسالة يدوية</button>
+                <button class="message-type-tab" onclick="showMessageType('report')">تقرير مفصل</button>
+            </div>
+            
+            <select id="messageStudentSelect" class="student-select">
+                <option value="">اختر طالباً...</option>
+            </select>
+            
+            <!-- رسالة يدوية -->
+            <div id="manualMessagePane">
+                <div class="variables-bar">
+                    <button class="var-btn" onclick="insertVariable('{اسم الطالب}')">{اسم الطالب}</button>
+                    <button class="var-btn" onclick="insertVariable('{الإيجابي}')">{الإيجابي}</button>
+                    <button class="var-btn" onclick="insertVariable('{السلبي}')">{السلبي}</button>
+                    <button class="var-btn" onclick="insertVariable('{الدرجة}')">{الدرجة}</button>
+                    <button class="var-btn" onclick="insertVariable('{التقييم}')">{التقييم}%</button>
+                </div>
+                
+                <textarea id="customMessage" class="message-textarea" 
+                    placeholder="اكتب رسالتك هنا..."></textarea>
+            </div>
+            
+            <!-- تقرير مفصل -->
+            <div id="reportMessagePane" style="display: none;">
+                <div id="detailedReportPreview" class="detailed-report-preview">
+                    <!-- سيتم تعبئتها ديناميكياً -->
+                </div>
+            </div>
+            
+            <div class="message-actions">
+                <button class="btn" onclick="clearMessage()">
+                    <i class="fas fa-eraser"></i> مسح
+                </button>
+                <button class="btn btn-whatsapp" onclick="sendMessageToStudent()">
+                    <i class="fab fa-whatsapp"></i>
+                    إرسال للطالب
+                </button>
+                <button class="btn btn-whatsapp" onclick="sendMessageToClass()">
+                    <i class="fab fa-whatsapp"></i>
+                    إرسال للفصل
+                </button>
+            </div>
+        </div>
 
-    // معادلة النسبة الجديدة
-    function calculateSmartPercentage(score, clicks) {
-        if (clicks === 0) return 50;
-        let avg = score / clicks;
-        let percentage;
-        
-        if (avg >= 0) {
-            // من 0 إلى 2 تترجم من 50% إلى 100%
-            percentage = 50 + (avg * 25); 
-        } else {
-            // من 0 إلى -2 تترجم من 50% إلى 0%
-            percentage = 50 + (avg * 25);
-        }
-        return Math.round(Math.max(0, Math.min(100, percentage)));
-    }
+        <!-- ================ شريط التقدم (قابل للإخفاء) ================ -->
+        <div id="progressContainer" class="progress-container hideable" style="display: none;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span><i class="fab fa-whatsapp" style="color: var(--whatsapp);"></i> جاري الإرسال...</span>
+                <span id="progressCount">0/0</span>
+            </div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div id="progressStatus" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);"></div>
+        </div>
 
-    function addAction(name, key) {
-        const act = ACTIONS[key];
-        const student = db[currentClass][name];
-        const now = new Date();
-        
-        student.history.push({
-            id: Date.now(),
-            name: act.name,
-            val: act.val,
-            color: act.color,
-            time: now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
-            date: now.toLocaleDateString('ar-SA', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            }),
-            timestamp: now.toISOString()
-        });
-        
-        student.score += act.val;
-        save(); 
-        render();
-    }
+        <!-- ================ قائمة الطلاب (دائماً ظاهرة) ================ -->
+        <div class="students-header">
+            <h2>
+                <i class="fas fa-users" style="color: var(--primary);"></i>
+                جميع الطلاب
+            </h2>
+            <span class="students-count" id="studentsCount">0 طالب</span>
+        </div>
 
-    function deleteAction(studentName, id) {
-        const s = db[currentClass][studentName];
-        const idx = s.history.findIndex(a => a.id === id);
-        if (idx > -1) {
-            s.score -= s.history[idx].val;
-            s.history.splice(idx, 1);
-            save(); 
-            render(); 
-            openReport(studentName);
-        }
-    }
+        <div id="studentsList" class="students-grid">
+            <!-- يتم تعبئتها ديناميكياً -->
+        </div>
 
-    function render() {
-        const container = document.getElementById(`${currentClass}-content`);
-        const students = db[currentClass];
-        const names = Object.keys(students).sort((a, b) => a.localeCompare(b, 'ar'));
-        document.getElementById(`count-${currentClass}`).textContent = names.length;
-
-        if (names.length === 0) {
-            container.innerHTML = `<div class="control-panel"><textarea id="in-${currentClass}" rows="4" placeholder="الأسماء هنا..."></textarea><button onclick="importNames()">إضافة</button></div>`;
-            return;
-        }
-
-        let html = `<div style="background:#f9f9f9; padding:10px; font-weight:bold; display:grid; grid-template-columns:1.5fr 1fr 3.5fr;"><div>الطالب</div><div style="text-align:center">المستوى</div><div>الرصد</div></div>`;
-        names.forEach(name => {
-            const s = students[name];
-            const perc = calculateSmartPercentage(s.score, s.history.length);
-            html += `
-            <div class="student-row">
+        <!-- ================ كشف متابعة الفصل (قابل للإخفاء) ================ -->
+        <div id="trackingSheet" class="tracking-sheet hideable" style="display: none;">
+            <div class="tracking-header">
+                <div class="tracking-title">
+                    <i class="fas fa-table" style="color: var(--primary);"></i>
+                    <h3>كشف متابعة الفصل</h3>
+                    <span class="tracking-badge" id="trackingClassName">الصف الأول</span>
+                </div>
                 <div>
-                    <div style="font-weight:bold">${name}</div>
-                    <button onclick="openReport('${name}')" style="border:none; background:none; color:blue; cursor:pointer; font-size:0.7rem;">السجل / تراجع</button>
+                    <button class="btn" onclick="exportTrackingSheet()">
+                        <i class="fas fa-file-excel"></i> تصدير Excel
+                    </button>
+                    <button class="btn" onclick="hideTrackingSheet()" style="margin-right: 0.5rem;">
+                        <i class="fas fa-times"></i> إغلاق
+                    </button>
                 </div>
-                <div style="text-align:center">
-                    <div class="percentage-circle" style="--percentage:${perc}%" data-percentage="${perc}"></div>
-                    <small>نقاط: ${s.score} | ضغطات: ${s.history.length}</small>
-                </div>
-                <div style="display:flex; gap:4px; flex-wrap:wrap;">
-                    <button class="btn-action" style="background:${ACTIONS.P.color}" onclick="addAction('${name}','P')">مشاركة</button>
-                    <button class="btn-action" style="background:${ACTIONS.G.color}" onclick="addAction('${name}','G')">سلوك +</button>
-                    <button class="btn-action" style="background:${ACTIONS.BK.color}" onclick="addAction('${name}','BK')">كتاب ❌</button>
-                    <button class="btn-action" style="background:${ACTIONS.W.color}" onclick="addAction('${name}','W')">لم يكتب</button>
-                    <button class="btn-action" style="background:${ACTIONS.T.color}" onclick="addAction('${name}','T')">كلام</button>
-                    <button class="btn-action" style="background:${ACTIONS.B.color}" onclick="addAction('${name}','B')">سلوك -</button>
-                    <button class="btn-action" style="background:${ACTIONS.A.color}" onclick="addAction('${name}','A')">غياب</button>
-                </div>
-            </div>`;
-        });
-        html += `<div class="control-panel"><textarea id="in-${currentClass}" placeholder="أسماء إضافية..."></textarea><button onclick="importNames()">إضافة</button></div>`;
-        container.innerHTML = html;
-    }
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="tracking-table" id="trackingTable">
+                    <!-- يتم تعبئتها ديناميكياً -->
+                </table>
+            </div>
+        </div>
+    </main>
 
-    function importNames() {
-        const val = document.getElementById(`in-${currentClass}`).value;
-        val.split('\n').forEach(n => { 
-            if(n.trim() && !db[currentClass][n.trim()]) {
-                db[currentClass][n.trim()] = { score: 0, history: [] }; 
+    <!-- ================ مودال إضافة فصل ================ -->
+    <div id="addClassModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle" style="color: var(--primary);"></i> إضافة فصل جديد</h3>
+                <button class="add-close" onclick="closeAddClassModal()">×</button>
+            </div>
+            
+            <input type="text" id="newClassName" placeholder="اسم الفصل (مثال: الصف الرابع)" style="width: 100%; padding: 0.8rem; border: 2px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 1rem;">
+            
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="addNewClass()" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-save"></i> إضافة
+                </button>
+                <button onclick="closeAddClassModal()" class="btn" style="flex: 1;">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================ تعريف أنواع التقييم الافتراضية ================
+        let ACTION_TYPES = [
+            { value: 2, color: '#4361ee', name: 'مشاركة ممتازة', arabicName: 'مشاركة ممتازة', icon: 'fa-star', category: 'participation', label: '+٢' },
+            { value: 1, color: '#4895ef', name: 'مشاركة', arabicName: 'مشاركة', icon: 'fa-comment', category: 'participation', label: '+١' },
+            { value: 1, color: '#2ecc71', name: 'سلوك جيد', arabicName: 'سلوك جيد', icon: 'fa-smile', category: 'behavior', label: '+١' },
+            { value: 1, color: '#4cc9f0', name: 'حل الواجب', arabicName: 'حل الواجب', icon: 'fa-check', category: 'homework', label: '+١' },
+            { value: 0, color: '#95a5a6', name: 'غياب', arabicName: 'غياب', icon: 'fa-user-slash', category: 'absent', label: '٠' },
+            { value: -1, color: '#f8961e', name: 'سلوك سيء', arabicName: 'سلوك سيء', icon: 'fa-angry', category: 'behavior', label: '-١' },
+            { value: -1, color: '#f72585', name: 'لم يحل الواجب', arabicName: 'لم يحل الواجب', icon: 'fa-times', category: 'homework', label: '-١' },
+            { value: -2, color: '#e74c3c', name: 'سلوك خطير', arabicName: 'سلوك خطير', icon: 'fa-skull', category: 'behavior', label: '-٢' },
+            { value: -2, color: '#c0392b', name: 'غش', arabicName: 'غش', icon: 'fa-copy', category: 'homework', label: '-٢' },
+            { value: 2, color: '#f1c40f', name: 'تميز', arabicName: 'تميز', icon: 'fa-trophy', category: 'participation', label: '+٢' }
+        ];
+
+        const WEEK_DAYS = {
+            0: { name: 'الأحد', short: 'ح', color: '#e74c3c' },
+            1: { name: 'الإثنين', short: 'ن', color: '#e67e22' },
+            2: { name: 'الثلاثاء', short: 'ث', color: '#f1c40f' },
+            3: { name: 'الأربعاء', short: 'ر', color: '#2ecc71' },
+            4: { name: 'الخميس', short: 'خ', color: '#3498db' }
+        };
+
+        // ================ قاعدة البيانات ================
+        let db = JSON.parse(localStorage.getItem('finalPlatformDB')) || { 
+            classes: {
+                class1: { name: 'الصف الأول', students: {} },
+                class2: { name: 'الصف الثاني', students: {} },
+                class3: { name: 'الصف الثالث', students: {} }
+            },
+            teacherName: 'أحمد محمد',
+            subject: 'الرياضيات',
+            actionTypes: ACTION_TYPES,
+            buttonCount: 10,
+            smartHide: false,
+            version: '21.0'
+        };
+
+        let currentClass = 'class1';
+        let excelData = null;
+        let currentMessageType = 'manual';
+        let currentExamType = 'exam1';
+
+        // ================ الإخفاء الذكي ================
+        function toggleSmartHide() {
+            const btn = document.getElementById('smartHideBtn');
+            const hideables = document.querySelectorAll('.hideable');
+            
+            db.smartHide = !db.smartHide;
+            
+            hideables.forEach(el => {
+                if (db.smartHide) {
+                    el.classList.add('hidden');
+                } else {
+                    el.classList.remove('hidden');
+                }
+            });
+            
+            if (db.smartHide) {
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                btn.classList.add('active');
+            } else {
+                btn.innerHTML = '<i class="fas fa-eye"></i>';
+                btn.classList.remove('active');
             }
-        });
-        save(); 
-        render();
-    }
+            
+            saveToStorage();
+        }
 
-    function openReport(name) {
-        const s = db[currentClass][name];
-        document.getElementById('reportName').textContent = `سجل ${name}`;
-        
-        let h = '';
-        if (s.history.length === 0) {
-            h = '<div style="text-align:center; padding:20px; color:#777;">لا توجد ملاحظات مسجلة بعد</div>';
-        } else {
-            // عرض السجل من الأحدث إلى الأقدم
-            h = s.history.slice().reverse().map(a => `
-                <div class="history-item" style="border-right-color:${a.color};">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <strong style="color:${a.color}">${a.name}</strong>
-                        <span style="font-weight:bold; color:${a.val > 0 ? '#27ae60' : a.val < 0 ? '#e74c3c' : '#f39c12'}">
-                            ${a.val > 0 ? '+' : ''}${a.val}
-                        </span>
+        // ================ تهيئة النظام ================
+        function initSystem() {
+            console.log('تهيئة النظام...');
+            
+            if (!db.classes) {
+                db.classes = {
+                    class1: { name: 'الصف الأول', students: {} },
+                    class2: { name: 'الصف الثاني', students: {} },
+                    class3: { name: 'الصف الثالث', students: {} }
+                };
+            }
+            
+            if (db.actionTypes) {
+                ACTION_TYPES = db.actionTypes;
+            }
+            
+            document.getElementById('teacherName').textContent = db.teacherName || 'أحمد محمد';
+            document.getElementById('subject').textContent = db.subject || 'الرياضيات';
+            
+            // تطبيق حالة الإخفاء الذكي
+            if (db.smartHide) {
+                const btn = document.getElementById('smartHideBtn');
+                const hideables = document.querySelectorAll('.hideable');
+                
+                hideables.forEach(el => el.classList.add('hidden'));
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                btn.classList.add('active');
+            }
+            
+            renderClasses();
+            renderClass(currentClass);
+            updateAllSelects();
+            
+            console.log('تم التهيئة بنجاح');
+        }
+
+        // ================ حفظ البيانات ================
+        function saveToStorage() {
+            localStorage.setItem('finalPlatformDB', JSON.stringify(db));
+        }
+
+        // ================ إدارة الفصول ================
+        function renderClasses() {
+            const container = document.getElementById('classesContainer');
+            if (!container) return;
+            
+            let html = '';
+            
+            Object.keys(db.classes).forEach((classId) => {
+                const className = db.classes[classId].name;
+                const studentCount = Object.keys(db.classes[classId].students || {}).length;
+                const activeClass = classId === currentClass ? 'active' : '';
+                
+                html += `
+                    <button class="class-chip ${activeClass}" onclick="selectClass('${classId}')">
+                        <i class="fas fa-child"></i>
+                        ${className}
+                        <span class="badge">${studentCount}</span>
+                    </button>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function selectClass(classId) {
+            currentClass = classId;
+            renderClasses();
+            renderClass(classId);
+            updateAllSelects();
+        }
+
+        function updateAllSelects() {
+            const bulkSelect = document.getElementById('bulkClassSelect');
+            const excelSelect = document.getElementById('excelClassSelect');
+            const messageSelect = document.getElementById('messageStudentSelect');
+            const exam1Select = document.getElementById('exam1StudentSelect');
+            const exam2Select = document.getElementById('exam2StudentSelect');
+            
+            if (bulkSelect) {
+                bulkSelect.innerHTML = Object.keys(db.classes).map(id => 
+                    `<option value="${id}" ${id === currentClass ? 'selected' : ''}>${db.classes[id].name}</option>`
+                ).join('');
+            }
+            
+            if (excelSelect) {
+                excelSelect.innerHTML = Object.keys(db.classes).map(id => 
+                    `<option value="${id}">${db.classes[id].name}</option>`
+                ).join('');
+            }
+            
+            updateMessageStudentSelect();
+            updateExamStudentSelects();
+        }
+
+        function showAddClassModal() {
+            document.getElementById('addClassModal').style.display = 'block';
+        }
+
+        function closeAddClassModal() {
+            document.getElementById('addClassModal').style.display = 'none';
+            document.getElementById('newClassName').value = '';
+        }
+
+        function addNewClass() {
+            const name = document.getElementById('newClassName').value.trim();
+            if (!name) {
+                showNotification('⚠️ أدخل اسم الفصل', '#f8961e');
+                return;
+            }
+            
+            const newId = 'class' + (Object.keys(db.classes).length + 1);
+            db.classes[newId] = { name: name, students: {} };
+            
+            saveToStorage();
+            renderClasses();
+            updateAllSelects();
+            closeAddClassModal();
+            showNotification('✅ تم إضافة الفصل الجديد', '#2ecc71');
+        }
+
+        // ================ إضافة أسماء + أرقام دفعة واحدة ================
+        function addBulkNamesWithPhones() {
+            const className = document.getElementById('bulkClassSelect').value;
+            const text = document.getElementById('bulkNamesWithPhones').value.trim();
+            
+            if (!text) {
+                showNotification('⚠️ أدخل الأسماء والأرقام', '#f8961e');
+                return;
+            }
+
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let added = 0;
+            let updated = 0;
+
+            lines.forEach(line => {
+                let name = '', phone = '';
+                
+                if (line.includes('-')) {
+                    const parts = line.split('-').map(p => p.trim());
+                    name = parts[0];
+                    phone = parts[1] || '';
+                } else if (line.includes(',')) {
+                    const parts = line.split(',').map(p => p.trim());
+                    name = parts[0];
+                    phone = parts[1] || '';
+                } else {
+                    const words = line.split(' ');
+                    phone = words.pop() || '';
+                    name = words.join(' ');
+                }
+
+                phone = phone.replace(/[^0-9]/g, '');
+                
+                if (name.length < 2) return;
+                
+                if (!db.classes[className].students[name]) {
+                    db.classes[className].students[name] = createEmptyStudent(phone);
+                    added++;
+                } else {
+                    if (phone) {
+                        db.classes[className].students[name].phone = phone;
+                        updated++;
+                    }
+                }
+            });
+
+            saveToStorage();
+            renderClass(className);
+            renderClasses();
+            updateAllSelects();
+            
+            let message = `✅ تم إضافة ${added} طالب`;
+            if (updated > 0) message += `، تحديث ${updated} طالب`;
+            
+            showNotification(message, '#2ecc71');
+            document.getElementById('bulkNamesWithPhones').value = '';
+            document.getElementById('addSection').classList.remove('visible');
+        }
+
+        // ================ رفع Excel ================
+        function handleExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('excelFileName').innerHTML = `<i class="fas fa-check-circle"></i> ${file.name}`;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const wb = XLSX.read(e.target.result, { type: 'array' });
+                    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
+                    
+                    excelData = rows
+                        .map(row => ({
+                            name: row[0] ? row[0].toString().trim() : '',
+                            phone: row[1] ? row[1].toString().replace(/[^0-9]/g, '') : ''
+                        }))
+                        .filter(item => item.name.length >= 2);
+                    
+                    document.getElementById('processExcelBtn').disabled = false;
+                    document.getElementById('processExcelBtn').innerHTML = `
+                        <i class="fas fa-upload"></i> معالجة (${excelData.length} طالب)
+                    `;
+                    
+                } catch(e) {
+                    showNotification('خطأ في قراءة الملف', '#f72585');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processExcelFile() {
+            if (!excelData || excelData.length === 0) {
+                showNotification('⚠️ لا توجد بيانات', '#f8961e');
+                return;
+            }
+            
+            const className = document.getElementById('excelClassSelect').value;
+            let added = 0;
+            let updated = 0;
+            
+            excelData.forEach(item => {
+                if (!db.classes[className].students[item.name]) {
+                    db.classes[className].students[item.name] = createEmptyStudent(item.phone);
+                    added++;
+                } else {
+                    if (item.phone) {
+                        db.classes[className].students[item.name].phone = item.phone;
+                        updated++;
+                    }
+                }
+            });
+            
+            saveToStorage();
+            renderClass(className);
+            renderClasses();
+            updateAllSelects();
+            
+            showNotification(`✅ تم إضافة ${added} طالب وتحديث ${updated} طالب`, '#2ecc71');
+            
+            document.getElementById('excelFileInput').value = '';
+            document.getElementById('excelFileName').innerHTML = '';
+            document.getElementById('processExcelBtn').disabled = true;
+            document.getElementById('addSection').classList.remove('visible');
+        }
+
+        // ================ إنشاء طالب جديد ================
+        function createEmptyStudent(phone = '') {
+            return {
+                totalScore: 0,
+                actions: [],
+                stats: {
+                    participation: 0,
+                    excellent: 0,
+                    goodBehavior: 0,
+                    homeworkDone: 0,
+                    absent: 0,
+                    badBehavior: 0,
+                    homeworkNotDone: 0,
+                    cheating: 0
+                },
+                weeklyGrades: [],
+                exam1: null,
+                exam2: null,
+                phone: phone,
+                lastAction: null,
+                createdAt: new Date().toISOString()
+            };
+        }
+
+        // ================ حساب التقييمات ================
+        function calculatePercentage(student) {
+            if (!student || student.actions.length === 0) return 50;
+            const avg = student.totalScore / student.actions.length;
+            return Math.max(0, Math.min(100, Math.round(50 + (avg * 50))));
+        }
+
+        function calculateWeeklyGrade(student) {
+            const percentage = calculatePercentage(student);
+            return Math.round(percentage * 0.4);
+        }
+
+        function calculateFinalGrade(student) {
+            const weeklyGrade = calculateWeeklyGrade(student);
+            const exam1 = student.exam1 || 0;
+            const exam2 = student.exam2 || 0;
+            
+            return Math.round(weeklyGrade + exam1 + exam2);
+        }
+
+        function calculatePositiveStats(student) {
+            return (student.stats.participation || 0) + 
+                   (student.stats.excellent || 0) + 
+                   (student.stats.goodBehavior || 0) + 
+                   (student.stats.homeworkDone || 0);
+        }
+
+        function calculateNegativeStats(student) {
+            return (student.stats.badBehavior || 0) + 
+                   (student.stats.homeworkNotDone || 0) + 
+                   (student.stats.cheating || 0);
+        }
+
+        function getWeekStart(date) {
+            const d = new Date(date);
+            d.setDate(d.getDate() - d.getDay());
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+
+        function formatDate(date) {
+            return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
+        }
+
+        function addAction(cls, name, actionType) {
+            if (!db.classes[cls].students[name]) return;
+            
+            const action = {
+                ...actionType,
+                value: actionType.value,
+                timestamp: new Date().toISOString(),
+                date: new Date().toLocaleDateString('ar-SA'),
+                time: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+                weekStart: getWeekStart(new Date()).toISOString()
+            };
+            
+            const student = db.classes[cls].students[name];
+            student.actions.push(action);
+            student.totalScore += actionType.value;
+            student.lastAction = new Date().toISOString();
+            
+            switch(actionType.category) {
+                case 'participation':
+                    if (actionType.value === 2) student.stats.excellent++;
+                    else student.stats.participation++;
+                    break;
+                case 'behavior':
+                    if (actionType.value > 0) student.stats.goodBehavior++;
+                    else if (actionType.value === -2) student.stats.cheating++;
+                    else student.stats.badBehavior++;
+                    break;
+                case 'homework':
+                    if (actionType.value > 0) student.stats.homeworkDone++;
+                    else student.stats.homeworkNotDone++;
+                    break;
+                case 'absent':
+                    student.stats.absent++;
+                    break;
+            }
+            
+            saveToStorage();
+            renderClass(cls);
+            renderClasses();
+            showNotification(actionType.arabicName, actionType.color);
+        }
+
+        // ================ إدارة الاختبارات ================
+        function showExamSection(examType) {
+            currentExamType = examType;
+            document.getElementById('examSection').style.display = 'block';
+            
+            document.querySelectorAll('.exam-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.exam-pane').forEach(p => p.classList.remove('active'));
+            
+            if (examType === 'exam1') {
+                document.querySelectorAll('.exam-tab')[0].classList.add('active');
+                document.getElementById('exam1Pane').classList.add('active');
+            } else {
+                document.querySelectorAll('.exam-tab')[1].classList.add('active');
+                document.getElementById('exam2Pane').classList.add('active');
+            }
+            
+            updateExamStudentSelects();
+        }
+
+        function hideExamSection() {
+            document.getElementById('examSection').style.display = 'none';
+        }
+
+        function showExamTab(examType) {
+            currentExamType = examType;
+            
+            document.querySelectorAll('.exam-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.exam-pane').forEach(p => p.classList.remove('active'));
+            
+            if (examType === 'exam1') {
+                document.querySelectorAll('.exam-tab')[0].classList.add('active');
+                document.getElementById('exam1Pane').classList.add('active');
+            } else {
+                document.querySelectorAll('.exam-tab')[1].classList.add('active');
+                document.getElementById('exam2Pane').classList.add('active');
+            }
+        }
+
+        function updateExamStudentSelects() {
+            const students = db.classes[currentClass]?.students || {};
+            const exam1Select = document.getElementById('exam1StudentSelect');
+            const exam2Select = document.getElementById('exam2StudentSelect');
+            
+            let options = '<option value="">اختر طالباً...</option>';
+            Object.keys(students).forEach(name => {
+                options += `<option value="${name}">${name}</option>`;
+            });
+            
+            if (exam1Select) exam1Select.innerHTML = options;
+            if (exam2Select) exam2Select.innerHTML = options;
+        }
+
+        function addExamGrade(examType) {
+            let studentName, grade;
+            
+            if (examType === 'exam1') {
+                studentName = document.getElementById('exam1StudentSelect').value;
+                grade = parseInt(document.getElementById('exam1Grade').value);
+            } else {
+                studentName = document.getElementById('exam2StudentSelect').value;
+                grade = parseInt(document.getElementById('exam2Grade').value);
+            }
+            
+            if (!studentName) {
+                showNotification('⚠️ اختر طالباً', '#f8961e');
+                return;
+            }
+            
+            if (isNaN(grade) || grade < 0 || grade > 20) {
+                showNotification('⚠️ أدخل درجة صحيحة من 0 إلى 20', '#f8961e');
+                return;
+            }
+            
+            const student = db.classes[currentClass].students[studentName];
+            if (!student) return;
+            
+            if (examType === 'exam1') {
+                student.exam1 = grade;
+            } else {
+                student.exam2 = grade;
+            }
+            
+            saveToStorage();
+            renderClass(currentClass);
+            hideExamSection();
+            showNotification(`✅ تم إضافة الدرجة للطالب ${studentName}`, '#2ecc71');
+            
+            if (examType === 'exam1') {
+                document.getElementById('exam1Grade').value = '';
+            } else {
+                document.getElementById('exam2Grade').value = '';
+            }
+        }
+
+        // ================ تعديل أزرار التقييم ================
+        function toggleEditButtons() {
+            const section = document.getElementById('editButtonsSection');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+            
+            if (section.style.display === 'block') {
+                renderButtonsEditor();
+            }
+        }
+
+        function renderButtonsEditor() {
+            const container = document.getElementById('buttonsEditor');
+            const count = db.buttonCount || 10;
+            
+            let html = '';
+            for (let i = 0; i < count; i++) {
+                const btn = ACTION_TYPES[i] || { value: 0, color: '#95a5a6', arabicName: 'تقييم', icon: 'fa-star', label: '٠' };
+                
+                html += `
+                    <div class="button-editor">
+                        <h4 style="margin-bottom: 0.5rem;">الزر ${i + 1}</h4>
+                        <label>النص المعروض</label>
+                        <input type="text" class="btn-label-${i}" value="${btn.label}" placeholder="مثال: +٢">
+                        
+                        <label>الوصف</label>
+                        <input type="text" class="btn-desc-${i}" value="${btn.arabicName}" placeholder="وصف الزر">
+                        
+                        <label>القيمة</label>
+                        <input type="number" class="btn-value-${i}" value="${btn.value}" min="-3" max="3" step="1">
+                        
+                        <label>الأيقونة</label>
+                        <select class="btn-icon-${i}">
+                            <option value="fa-star" ${btn.icon === 'fa-star' ? 'selected' : ''}>⭐ نجمة</option>
+                            <option value="fa-comment" ${btn.icon === 'fa-comment' ? 'selected' : ''}>💬 تعليق</option>
+                            <option value="fa-smile" ${btn.icon === 'fa-smile' ? 'selected' : ''}>😊 ابتسامة</option>
+                            <option value="fa-check" ${btn.icon === 'fa-check' ? 'selected' : ''}>✅ صح</option>
+                            <option value="fa-user-slash" ${btn.icon === 'fa-user-slash' ? 'selected' : ''}>🚫 غياب</option>
+                            <option value="fa-angry" ${btn.icon === 'fa-angry' ? 'selected' : ''}>😠 غضب</option>
+                            <option value="fa-times" ${btn.icon === 'fa-times' ? 'selected' : ''}>❌ خطأ</option>
+                            <option value="fa-skull" ${btn.icon === 'fa-skull' ? 'selected' : ''}>💀 خطر</option>
+                            <option value="fa-copy" ${btn.icon === 'fa-copy' ? 'selected' : ''}>📝 غش</option>
+                            <option value="fa-trophy" ${btn.icon === 'fa-trophy' ? 'selected' : ''}>🏆 تميز</option>
+                        </select>
+                        
+                        <label>اللون</label>
+                        <input type="color" class="btn-color-${i}" value="${btn.color}">
+                        <div class="color-preview" style="background: ${btn.color};"></div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#666;">
-                        <span>📅 ${a.date}</span>
-                        <span>🕒 ${a.time}</span>
-                    </div>
-                    <div style="text-align:left; margin-top:5px;">
-                        <button onclick="deleteAction('${name}',${a.id})" 
-                                style="background:#e74c3c; color:white; border:none; border-radius:5px; padding:4px 8px; cursor:pointer; font-size:0.8rem;">
-                            حذف
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function updateButtonCount() {
+            const newCount = parseInt(document.getElementById('buttonCount').value);
+            if (newCount > 0 && newCount <= 20) {
+                db.buttonCount = newCount;
+                
+                while (ACTION_TYPES.length < newCount) {
+                    ACTION_TYPES.push({ value: 0, color: '#95a5a6', arabicName: 'تقييم', icon: 'fa-star', category: 'other', label: '٠' });
+                }
+                
+                if (ACTION_TYPES.length > newCount) {
+                    ACTION_TYPES = ACTION_TYPES.slice(0, newCount);
+                }
+                
+                renderButtonsEditor();
+            }
+        }
+
+        function saveButtons() {
+            const count = db.buttonCount || 10;
+            const newActionTypes = [];
+            
+            for (let i = 0; i < count; i++) {
+                const label = document.querySelector(`.btn-label-${i}`)?.value || '٠';
+                const desc = document.querySelector(`.btn-desc-${i}`)?.value || 'تقييم';
+                const value = parseInt(document.querySelector(`.btn-value-${i}`)?.value) || 0;
+                const icon = document.querySelector(`.btn-icon-${i}`)?.value || 'fa-star';
+                const color = document.querySelector(`.btn-color-${i}`)?.value || '#95a5a6';
+                
+                newActionTypes.push({
+                    value: value,
+                    color: color,
+                    name: desc,
+                    arabicName: desc,
+                    icon: icon,
+                    category: 'custom',
+                    label: label
+                });
+            }
+            
+            ACTION_TYPES = newActionTypes;
+            db.actionTypes = ACTION_TYPES;
+            saveToStorage();
+            
+            renderClass(currentClass);
+            showNotification('✅ تم حفظ الأزرار الجديدة', '#2ecc71');
+            toggleEditButtons();
+        }
+
+        // ================ حذف طالب ================
+        function deleteStudent(cls, name) {
+            if (confirm(`هل أنت متأكد من حذف ${name}؟`)) {
+                delete db.classes[cls].students[name];
+                saveToStorage();
+                renderClass(cls);
+                renderClasses();
+                updateAllSelects();
+                showNotification(`✅ تم حذف ${name}`, '#2ecc71');
+            }
+        }
+
+        // ================ عرض قائمة الطلاب (جميع الطلاب) ================
+        function renderClass(className) {
+            const container = document.getElementById('studentsList');
+            const students = db.classes[className]?.students || {};
+            const studentCount = Object.keys(students).length;
+
+            if (studentCount === 0) {
+                container.innerHTML = `
+                    <div style="background: var(--bg-white); border-radius: var(--radius-lg); padding: 3rem; text-align: center;">
+                        <i class="fas fa-user-graduate" style="font-size: 3rem; color: var(--border-light);"></i>
+                        <p style="margin: 1rem 0; color: var(--text-secondary);">لا يوجد طلاب في هذا الفصل</p>
+                        <button onclick="toggleAddSection()" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> إضافة طلاب
                         </button>
                     </div>
-                </div>
-            `).join('');
+                `;
+                updateStats();
+                return;
+            }
+
+            const sorted = Object.entries(students).sort((a, b) => a[0].localeCompare(b[0]));
+            
+            let html = '';
+            
+            sorted.forEach(([name, data]) => {
+                const finalGrade = calculateFinalGrade(data);
+                const buttonCount = db.buttonCount || 10;
+                const displayActions = ACTION_TYPES.slice(0, buttonCount);
+                
+                let examBadges = '';
+                if (data.exam1 !== undefined) {
+                    examBadges += `<span class="exam-badge" style="background: #f3e5f5; color: #9c27b0;"><i class="fas fa-pencil-alt"></i> أ:${data.exam1}</span>`;
+                }
+                if (data.exam2 !== undefined) {
+                    examBadges += `<span class="exam-badge" style="background: #fff3e0; color: #ff9800;"><i class="fas fa-pencil-alt"></i> ث:${data.exam2}</span>`;
+                }
+                
+                html += `
+                    <div class="student-row">
+                        <div class="student-info">
+                            <div class="student-avatar">${name.charAt(0)}</div>
+                            <div class="student-details">
+                                <div class="student-name">
+                                    ${name}
+                                    <span class="grade-badge">${finalGrade}/60</span>
+                                    ${data.phone ? `<span class="phone-badge" onclick="editPhone('${className}', '${name}')"><i class="fab fa-whatsapp"></i> ${data.phone}</span>` : ''}
+                                </div>
+                                <div class="student-meta">
+                                    <span>${data.actions.length} تقييم</span>
+                                    <span class="stats-badge positive-badge">
+                                        <i class="fas fa-smile"></i> +${calculatePositiveStats(data)}
+                                    </span>
+                                    <span class="stats-badge negative-badge">
+                                        <i class="fas fa-angry"></i> -${calculateNegativeStats(data)}
+                                    </span>
+                                    ${examBadges}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="evaluation-buttons">
+                            ${displayActions.map(type => `
+                                <button class="eval-btn" style="background: ${type.color};" 
+                                        onclick='addAction("${className}", "${name}", ${JSON.stringify(type).replace(/'/g, "&apos;")})'>
+                                    <i class="fas ${type.icon}"></i>
+                                    <span>${type.label}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="student-actions">
+                            <button class="action-icon" onclick='showStudentAnalysis("${className}", "${name}")' title="عرض التحليل">
+                                <i class="fas fa-chart-line"></i>
+                            </button>
+                            <button class="action-icon whatsapp" onclick='selectStudentForMessage("${className}", "${name}")' title="إرسال رسالة">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                            <button class="action-icon delete" onclick='deleteStudent("${className}", "${name}")' title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            updateStats();
         }
-        
-        // إضافة زر تصدير السجل
-        h += `
-        <div style="margin-top:20px; text-align:center;">
-            <button onclick="exportHistory('${name}')" 
-                    style="background:#27ae60; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;">
-                📥 تصدير السجل
-            </button>
-        </div>`;
-        
-        document.getElementById('reportDetails').innerHTML = h;
-        document.getElementById('reportModal').style.display = 'block';
-    }
 
-    function exportHistory(name) {
-        const student = db[currentClass][name];
-        let csv = 'التاريخ,الوقت,الإجراء,القيمة\n';
-        
-        student.history.forEach(action => {
-            csv += `${action.date},${action.time},${action.name},${action.val}\n`;
-        });
-        
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `سجل_${name}_${new Date().toLocaleDateString('ar-SA')}.csv`);
-        link.click();
-    }
+        // ================ تحديث الإحصائيات ================
+        function updateStats() {
+            const students = db.classes[currentClass]?.students || {};
+            const studentCount = Object.keys(students).length;
+            
+            let totalFinalGrade = 0;
+            Object.values(students).forEach(s => totalFinalGrade += calculateFinalGrade(s));
+            const avgFinalGrade = studentCount > 0 ? Math.round(totalFinalGrade / studentCount) : 0;
+            
+            document.getElementById('totalStudents').textContent = studentCount;
+            document.getElementById('avgGrade').textContent = avgFinalGrade + '/60';
+            document.getElementById('studentsCount').textContent = `${studentCount} طالب`;
+        }
 
-    function closeModal() { 
-        document.getElementById('reportModal').style.display = 'none'; 
-    }
-    
-    function resetSystem() { 
-        if(confirm("هل تريد حذف كل البيانات؟")) { 
-            localStorage.clear(); 
-            location.reload(); 
-        } 
-    }
-    
-    // عند تحميل الصفحة، نعرض البيانات
-    window.onload = render;
-</script>
+        // ================ كشف متابعة الفصل ================
+        function showTrackingSheet() {
+            const students = db.classes[currentClass]?.students || {};
+            const studentCount = Object.keys(students).length;
+            
+            if (studentCount === 0) {
+                showNotification('⚠️ لا يوجد طلاب في هذا الفصل', '#f8961e');
+                return;
+            }
+            
+            document.getElementById('trackingClassName').textContent = db.classes[currentClass].name;
+            
+            let allWeeks = new Set();
+            Object.values(students).forEach(s => {
+                if (s.weeklyGrades) {
+                    s.weeklyGrades.forEach(w => allWeeks.add(w.week));
+                }
+            });
+            
+            const weeks = Array.from(allWeeks).sort((a, b) => {
+                const [d1, m1, y1] = a.split('/').map(Number);
+                const [d2, m2, y2] = b.split('/').map(Number);
+                return new Date(y2, m2-1, d2) - new Date(y1, m1-1, d1);
+            }).slice(0, 8);
+            
+            let tableHTML = `
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>اسم الطالب</th>
+                        ${weeks.map(week => `<th>${week}</th>`).join('')}
+                        <th>الاختبار الأول</th>
+                        <th>الاختبار الثاني</th>
+                        <th>المجموع</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            const sortedStudents = Object.entries(students).sort((a, b) => a[0].localeCompare(b[0]));
+            
+            sortedStudents.forEach(([name, data], index) => {
+                const finalGrade = calculateFinalGrade(data);
+                
+                tableHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td class="student-name-cell">${name}</td>
+                        ${weeks.map(week => {
+                            const weekGrade = data.weeklyGrades?.find(w => w.week === week);
+                            const grade = weekGrade ? weekGrade.grade : '-';
+                            return `<td class="week-grade">${grade}</td>`;
+                        }).join('')}
+                        <td class="exam1-grade">${data.exam1 !== undefined ? data.exam1 : '-'}</td>
+                        <td class="exam2-grade">${data.exam2 !== undefined ? data.exam2 : '-'}</td>
+                        <td class="total-grade">${finalGrade}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `</tbody>`;
+            
+            document.getElementById('trackingTable').innerHTML = tableHTML;
+            document.getElementById('trackingSheet').style.display = 'block';
+        }
+
+        function hideTrackingSheet() {
+            document.getElementById('trackingSheet').style.display = 'none';
+        }
+
+        function exportTrackingSheet() {
+            const students = db.classes[currentClass]?.students || {};
+            
+            let allWeeks = new Set();
+            Object.values(students).forEach(s => {
+                if (s.weeklyGrades) {
+                    s.weeklyGrades.forEach(w => allWeeks.add(w.week));
+                }
+            });
+            
+            const weeks = Array.from(allWeeks).sort((a, b) => {
+                const [d1, m1, y1] = a.split('/').map(Number);
+                const [d2, m2, y2] = b.split('/').map(Number);
+                return new Date(y2, m2-1, d2) - new Date(y1, m1-1, d1);
+            }).slice(0, 8);
+            
+            let data = [
+                ['كشف متابعة الفصل - ' + db.classes[currentClass].name],
+                ['المادة: ' + db.subject, 'المعلم: ' + db.teacherName],
+                ['تاريخ التقرير: ' + new Date().toLocaleDateString('ar-SA')],
+                []
+            ];
+            
+            let header = ['#', 'اسم الطالب', ...weeks, 'الاختبار الأول', 'الاختبار الثاني', 'المجموع'];
+            data.push(header);
+            
+            const sortedStudents = Object.entries(students).sort((a, b) => a[0].localeCompare(b[0]));
+            
+            sortedStudents.forEach(([name, dataStudent], index) => {
+                const finalGrade = calculateFinalGrade(dataStudent);
+                
+                let row = [
+                    index + 1,
+                    name,
+                    ...weeks.map(week => {
+                        const weekGrade = dataStudent.weeklyGrades?.find(w => w.week === week);
+                        return weekGrade ? weekGrade.grade : '-';
+                    }),
+                    dataStudent.exam1 !== undefined ? dataStudent.exam1 : '-',
+                    dataStudent.exam2 !== undefined ? dataStudent.exam2 : '-',
+                    finalGrade
+                ];
+                
+                data.push(row);
+            });
+            
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'كشف المتابعة');
+            XLSX.writeFile(wb, `كشف_متابعة_${db.classes[currentClass].name}.xlsx`);
+            
+            showNotification('✅ تم تصدير كشف المتابعة', '#2ecc71');
+        }
+
+        // ================ تحديث قائمة الطلاب في الرسائل ================
+        function updateMessageStudentSelect() {
+            const select = document.getElementById('messageStudentSelect');
+            if (!select) return;
+            
+            const students = db.classes[currentClass]?.students || {};
+            
+            let options = '<option value="">اختر طالباً...</option>';
+            Object.keys(students).forEach(name => {
+                options += `<option value="${name}">${name}</option>`;
+            });
+            
+            select.innerHTML = options;
+        }
+
+        // ================ دوال الرسائل ================
+        function openWhatsAppPanel() {
+            const section = document.getElementById('messageSection');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+            updateMessageStudentSelect();
+        }
+
+        function showMessageType(type) {
+            currentMessageType = type;
+            
+            document.querySelectorAll('.message-type-tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            document.getElementById('manualMessagePane').style.display = type === 'manual' ? 'block' : 'none';
+            document.getElementById('reportMessagePane').style.display = type === 'report' ? 'block' : 'none';
+            
+            if (type === 'report') {
+                updateDetailedReportPreview();
+            }
+        }
+
+        function selectStudentForMessage(className, name) {
+            document.getElementById('messageStudentSelect').value = name;
+            openWhatsAppPanel();
+            
+            if (currentMessageType === 'report') {
+                updateDetailedReportPreview();
+            }
+            
+            showNotification(`✅ تم اختيار ${name}`, '#2ecc71');
+        }
+
+        function insertVariable(variable) {
+            const textarea = document.getElementById('customMessage');
+            textarea.value += variable;
+        }
+
+        function clearMessage() {
+            document.getElementById('customMessage').value = '';
+        }
+
+        function updateDetailedReportPreview() {
+            const select = document.getElementById('messageStudentSelect');
+            const name = select.value;
+            if (!name) {
+                document.getElementById('detailedReportPreview').innerHTML = '<p style="color: var(--text-secondary);">اختر طالباً لعرض التقرير</p>';
+                return;
+            }
+            
+            const student = db.classes[currentClass].students[name];
+            if (!student) return;
+            
+            const sortedActions = [...student.actions].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            ).slice(0, 15);
+            
+            let timelineHTML = '<div class="report-timeline">';
+            
+            sortedActions.forEach(action => {
+                const date = new Date(action.timestamp);
+                const dayName = WEEK_DAYS[date.getDay()]?.name || '';
+                const timeStr = action.time;
+                
+                let categoryClass = '';
+                if (action.category === 'participation') categoryClass = 'participation';
+                else if (action.category === 'behavior' && action.value > 0) categoryClass = 'behavior';
+                else if (action.category === 'homework' && action.value > 0) categoryClass = 'homework';
+                else if (action.category === 'absent') categoryClass = 'absent';
+                else categoryClass = 'negative';
+                
+                timelineHTML += `
+                    <div class="timeline-item ${categoryClass}">
+                        <span class="timeline-time">${dayName} ${timeStr}</span>
+                        <span class="timeline-desc">${action.arabicName}</span>
+                        <span class="timeline-value" style="color: ${action.color};">${action.value > 0 ? '+' + action.value : action.value}</span>
+                    </div>
+                `;
+            });
+            
+            if (sortedActions.length === 0) {
+                timelineHTML += '<p style="color: var(--text-secondary); text-align: center;">لا توجد تقييمات مسجلة</p>';
+            }
+            
+            timelineHTML += '</div>';
+            
+            document.getElementById('detailedReportPreview').innerHTML = timelineHTML;
+        }
+
+        function generateDetailedReport(student, name) {
+            const positive = calculatePositiveStats(student);
+            const negative = calculateNegativeStats(student);
+            const finalGrade = calculateFinalGrade(student);
+            const percentage = calculatePercentage(student);
+            
+            const actionsByDay = {};
+            student.actions.forEach(action => {
+                const date = new Date(action.timestamp);
+                const dayKey = date.toDateString();
+                if (!actionsByDay[dayKey]) actionsByDay[dayKey] = [];
+                actionsByDay[dayKey].push(action);
+            });
+            
+            let report = `📋 *تقرير أداء الطالب - ${name}*\n\n`;
+            report += `📊 *التقييم العام:* ${percentage}%\n`;
+            report += `🎯 *الدرجة النهائية:* ${finalGrade}/60\n`;
+            report += `⭐ *إجمالي الإيجابي:* +${positive}\n`;
+            report += `⚠️ *إجمالي السلبي:* -${negative}\n\n`;
+            
+            if (student.exam1 !== undefined || student.exam2 !== undefined) {
+                report += `📝 *نتائج الاختبارات:*\n`;
+                if (student.exam1 !== undefined) report += `   • الاختبار الأول: ${student.exam1}/20\n`;
+                if (student.exam2 !== undefined) report += `   • الاختبار الثاني: ${student.exam2}/20\n`;
+                report += '\n';
+            }
+            
+            report += `📅 *تفاصيل التقييمات:*\n\n`;
+            
+            const sortedDays = Object.keys(actionsByDay).sort((a, b) => new Date(b) - new Date(a)).slice(0, 7);
+            
+            sortedDays.forEach(day => {
+                const date = new Date(day);
+                const dayName = WEEK_DAYS[date.getDay()]?.name || '';
+                report += `📆 *${dayName} ${date.toLocaleDateString('ar-SA')}:*\n`;
+                
+                actionsByDay[day].forEach(action => {
+                    report += `   • ${action.time} - ${action.arabicName} (${action.value > 0 ? '+' + action.value : action.value})\n`;
+                });
+                report += '\n';
+            });
+            
+            return report;
+        }
+
+        async function sendMessageToStudent() {
+            const select = document.getElementById('messageStudentSelect');
+            const name = select.value;
+            if (!name) {
+                showNotification('⚠️ اختر طالباً أولاً', '#f8961e');
+                return;
+            }
+            
+            const student = db.classes[currentClass].students[name];
+            if (!student.phone) {
+                showNotification('⚠️ هذا الطالب ليس لديه رقم جوال', '#f8961e');
+                return;
+            }
+            
+            let phone = student.phone.replace(/[^0-9]/g, '');
+            if (phone.startsWith('966')) phone = phone.substring(3);
+            if (phone.startsWith('0')) phone = phone.substring(1);
+            
+            let finalMessage = '';
+            
+            if (currentMessageType === 'manual') {
+                const message = document.getElementById('customMessage').value.trim();
+                if (!message) {
+                    showNotification('⚠️ اكتب الرسالة أولاً', '#f8961e');
+                    return;
+                }
+                
+                const positive = calculatePositiveStats(student);
+                const negative = calculateNegativeStats(student);
+                const finalGrade = calculateFinalGrade(student);
+                const percentage = calculatePercentage(student);
+                
+                finalMessage = message
+                    .replace(/{اسم الطالب}/g, name)
+                    .replace(/{الإيجابي}/g, positive)
+                    .replace(/{السلبي}/g, negative)
+                    .replace(/{الدرجة}/g, finalGrade)
+                    .replace(/{التقييم}/g, percentage + '%');
+            } else {
+                finalMessage = generateDetailedReport(student, name);
+            }
+            
+            const whatsappURL = `https://wa.me/966${phone}?text=${encodeURIComponent(finalMessage)}`;
+            window.open(whatsappURL, '_blank');
+            
+            showNotification('✅ تم فتح واتساب', '#25D366');
+        }
+
+        async function sendMessageToClass() {
+            const students = db.classes[currentClass].students || {};
+            const studentsWithPhone = Object.entries(students).filter(([name, data]) => data.phone && data.phone.length > 5);
+            
+            if (studentsWithPhone.length === 0) {
+                showNotification('⚠️ لا يوجد طلاب بأرقام جوال', '#f8961e');
+                return;
+            }
+            
+            if (currentMessageType === 'manual') {
+                const message = document.getElementById('customMessage').value.trim();
+                if (!message) {
+                    showNotification('⚠️ اكتب الرسالة أولاً', '#f8961e');
+                    return;
+                }
+            }
+            
+            if (!confirm(`إرسال ${currentMessageType === 'manual' ? 'رسالة' : 'تقرير مفصل'} لـ ${studentsWithPhone.length} ولي أمر؟`)) return;
+            
+            const progressDiv = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressCount = document.getElementById('progressCount');
+            const progressStatus = document.getElementById('progressStatus');
+            
+            progressDiv.style.display = 'block';
+            
+            let sent = 0;
+            const total = studentsWithPhone.length;
+            
+            for (let [name, data] of studentsWithPhone) {
+                try {
+                    let phone = data.phone.replace(/[^0-9]/g, '');
+                    if (phone.startsWith('966')) phone = phone.substring(3);
+                    if (phone.startsWith('0')) phone = phone.substring(1);
+                    
+                    let finalMessage = '';
+                    
+                    if (currentMessageType === 'manual') {
+                        const message = document.getElementById('customMessage').value;
+                        const positive = calculatePositiveStats(data);
+                        const negative = calculateNegativeStats(data);
+                        const finalGrade = calculateFinalGrade(data);
+                        const percentage = calculatePercentage(data);
+                        
+                        finalMessage = message
+                            .replace(/{اسم الطالب}/g, name)
+                            .replace(/{الإيجابي}/g, positive)
+                            .replace(/{السلبي}/g, negative)
+                            .replace(/{الدرجة}/g, finalGrade)
+                            .replace(/{التقييم}/g, percentage + '%');
+                    } else {
+                        finalMessage = generateDetailedReport(data, name);
+                    }
+                    
+                    const whatsappURL = `https://wa.me/966${phone}?text=${encodeURIComponent(finalMessage)}`;
+                    window.open(whatsappURL, '_blank');
+                    
+                    sent++;
+                    
+                    const percent = (sent / total) * 100;
+                    progressFill.style.width = `${percent}%`;
+                    progressCount.textContent = `${sent}/${total}`;
+                    progressStatus.textContent = `تم إرسال إلى ${name}...`;
+                    
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                } catch(e) {
+                    console.error(e);
+                }
+            }
+            
+            progressStatus.textContent = `✅ تم إرسال ${sent} من ${total} رسالة`;
+            showNotification(`✅ تم إرسال ${sent} رسالة`, '#25D366');
+            
+            setTimeout(() => {
+                progressDiv.style.display = 'none';
+                progressFill.style.width = '0%';
+                progressCount.textContent = '0/0';
+            }, 3000);
+        }
+
+        // ================ إضافة رقم جوال ================
+        function editPhone(className, name) {
+            const newPhone = prompt('أدخل رقم الجوال:', db.classes[className].students[name].phone || '');
+            if (newPhone !== null) {
+                db.classes[className].students[name].phone = newPhone;
+                saveToStorage();
+                renderClass(className);
+                showNotification('✅ تم تحديث رقم الجوال', '#2ecc71');
+            }
+        }
+
+        // ================ إظهار/إخفاء قسم الإضافة ================
+        function toggleAddSection() {
+            const section = document.getElementById('addSection');
+            section.classList.toggle('visible');
+        }
+
+        function showAddTab(tabName) {
+            document.querySelectorAll('.add-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.add-pane').forEach(p => p.classList.remove('active'));
+            
+            if (tabName === 'text') {
+                document.querySelectorAll('.add-tab')[0].classList.add('active');
+                document.getElementById('addTextPane').classList.add('active');
+            } else {
+                document.querySelectorAll('.add-tab')[1].classList.add('active');
+                document.getElementById('addExcelPane').classList.add('active');
+            }
+        }
+
+        // ================ تحليل الطالب ================
+        function showStudentAnalysis(className, name) {
+            const student = db.classes[className].students[name];
+            if (!student) return;
+            
+            const percentage = calculatePercentage(student);
+            const finalGrade = calculateFinalGrade(student);
+            const positive = calculatePositiveStats(student);
+            const negative = calculateNegativeStats(student);
+            
+            let examInfo = '';
+            if (student.exam1 !== undefined || student.exam2 !== undefined) {
+                examInfo = '<p><strong>الاختبارات:</strong></p><ul>';
+                if (student.exam1 !== undefined) examInfo += `<li>الاختبار الأول: ${student.exam1}/20</li>`;
+                if (student.exam2 !== undefined) examInfo += `<li>الاختبار الثاني: ${student.exam2}/20</li>`;
+                examInfo += '</ul>';
+            }
+            
+            const analysisHTML = `
+                <div style="padding: 1rem;">
+                    <h3 style="margin-bottom: 1rem;">تحليل أداء ${name}</h3>
+                    <div style="display: grid; gap: 1rem;">
+                        <div style="display: flex; gap: 2rem;">
+                            <div style="background: ${getColorByPercentage(percentage)}; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700;">
+                                ${percentage}%
+                            </div>
+                            <div>
+                                <p><strong>الدرجة النهائية:</strong> ${finalGrade}/60</p>
+                                <p><strong>إجمالي التقييمات:</strong> ${student.actions.length}</p>
+                                <p><strong>إيجابي:</strong> <span style="color: #2ecc71;">+${positive}</span> | <strong>سلبي:</strong> <span style="color: #f72585;">-${negative}</span></p>
+                            </div>
+                        </div>
+                        ${examInfo}
+                    </div>
+                </div>
+            `;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h3>تحليل الطالب</h3>
+                        <button class="add-close" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        ${analysisHTML}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function getColorByPercentage(percentage) {
+            if (percentage < 25) return '#e74c3c';
+            if (percentage < 50) return '#f8961e';
+            if (percentage < 75) return '#f1c40f';
+            if (percentage < 90) return '#2ecc71';
+            return '#4361ee';
+        }
+
+        // ================ الإشعارات ================
+        function showNotification(message, color) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.background = color;
+            notification.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'notifySlide 0.3s reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // بدء التشغيل
+        document.addEventListener('DOMContentLoaded', initSystem);
+    </script>
 </body>
 </html>
