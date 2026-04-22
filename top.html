@@ -917,32 +917,31 @@
     }
     
     // 🌟 وظيفة مساعدة لحساب التقريب (تم التعديل هنا)
+    
     function calculateRounding(number, place) {
         const places = {
             'أقرب عشرة': { value: 10, decimals: 0 },
             'أقرب مئة': { value: 100, decimals: 0 },
             'أقرب ألف': { value: 1000, decimals: 0 },
+         
             'أقرب عشرة آلاف': { value: 10000, decimals: 0 },
             'أقرب مئة ألف': { value: 100000, decimals: 0 },
             'أقرب مليون': { value: 1000000, decimals: 0 },
             'جزء من عشرة': { value: 0.1, decimals: 1 },
             'جزء من مئة': { value: 0.01, decimals: 2 },
+          
             'جزء من ألف': { value: 0.001, decimals: 3 }
         };
-
         const { value, decimals } = places[place] || { value: 1, decimals: 0 };
-
         if (value >= 1) { // تقريب الأعداد الصحيحة
             const roundingFactor = value;
             const result = Math.round(number / roundingFactor) * roundingFactor;
             return { result, decimals };
         } else { // تقريب الأجزاء العشرية (تم التعديل لضمان التقريب الرياضي)
             const powerOfTen = Math.pow(10, decimals);
-            
             // 💡 الحل: نستخدم Math.round / powerOfTen مباشرة
             // لتطبيق التقريب الرياضي الصحيح وتجنب مشاكل toFixed()
             const result = Math.round(number * powerOfTen) / powerOfTen;
-            
             return { result: result, decimals };
         }
     }
