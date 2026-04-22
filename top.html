@@ -1465,13 +1465,12 @@
         updateParticipationStatsDisplay();
     }
     
-    function setupTournamentSchedule() {
+        function setupTournamentSchedule() {
         tournamentSchedule = [];
         let availableOps = shuffleArray([...ALL_OPERATIONS]);
 
         let modeMaxLevel = MAX_LEVEL; 
         const mode = document.getElementById('mode-select').value;
-        
         if (mode === 'elimination4') { 
              modeMaxLevel = 3;
         } else if (mode === 'elimination5') { 
@@ -1479,26 +1478,27 @@
         }
         
         for (let i = 1; i <= modeMaxLevel; i++) {
-            const op = availableOps.pop() || shuffleArray([...ALL_OPERATIONS]).pop(); 
+            const op = availableOps.pop() ||
+                shuffleArray([...ALL_OPERATIONS]).pop(); 
             tournamentSchedule.push({ level: i, operation: op });
         }
 
-        const remainingOps = availableOps; 
+        const remainingOps = availableOps;
         remainingOps.forEach(op => {
              tournamentSchedule.push({ level: modeMaxLevel, operation: op });
         });
-        
         let cycleOps = shuffleArray([...ALL_OPERATIONS]);
         while (tournamentSchedule.length < 10) { 
             const op = cycleOps.pop();
             tournamentSchedule.push({ level: modeMaxLevel, operation: op });
             if (cycleOps.length === 0) {
-                 cycleOps = shuffleArray([...ALL_OPERATIONS]); 
+                 cycleOps = shuffleArray([...ALL_OPERATIONS]);
             }
         }
         
-        currentTournamentRound = 0; 
+        currentTournamentRound = 0;
     }
+
     
     function processEliminationRoundEnd() {
         
