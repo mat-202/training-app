@@ -1464,9 +1464,9 @@
         updateParticipationStatsDisplay();
     }
     
-        function setupTournamentSchedule() {
-        tournamentSchedule = [];
-        let availableOps = shuffleArray([...ALL_OPERATIONS]);
+        
+    function setupTournamentSchedule() {
+        tournamentSchedule = []; 
 
         let modeMaxLevel = MAX_LEVEL; 
         const mode = document.getElementById('mode-select').value;
@@ -1476,23 +1476,33 @@
              modeMaxLevel = 4;
         }
         
-        for (let i = 1; i <= modeMaxLevel; i++) {
-            const op = availableOps.pop() ||
-                shuffleArray([...ALL_OPERATIONS]).pop(); 
-            tournamentSchedule.push({ level: i, operation: op });
+        let operationsSequence = [];
+        let lastOp = '';
+
+        // نولد قائمة طويلة من العمليات (مثلاً 20 جولة) لضمان عدم نفادها في حالات التعادل الطويلة
+        while (operationsSequence.length < 20) {
+            let nextBatch = shuffleArray([...ALL_OPERATIONS]);
+
+            // 🎯 الشرط الأهم: منع التكرار المتتالي للعمليات بين المجموعات
+            if (lastOp === nextBatch[0]) {
+                // إذا تطابقت العملية الأولى مع آخر عملية سابقة، نبدلها مع العملية الثانية
+                [nextBatch[0], nextBatch[1]] = [nextBatch[1], nextBatch[0]];
+            }
+
+            // إضافة المجموعة الجديدة إلى التسلسل
+            operationsSequence.push(...nextBatch);
+            // تحديث آخر عملية لاستخدامها كمرجع في الدورة القادمة
+            lastOp = nextBatch[nextBatch.length - 1];
         }
 
-        const remainingOps = availableOps;
-        remainingOps.forEach(op => {
-             tournamentSchedule.push({ level: modeMaxLevel, operation: op });
-        });
-        let cycleOps = shuffleArray([...ALL_OPERATIONS]);
-        while (tournamentSchedule.length < 10) { 
-            const op = cycleOps.pop();
-            tournamentSchedule.push({ level: modeMaxLevel, operation: op });
-            if (cycleOps.length === 0) {
-                 cycleOps = shuffleArray([...ALL_OPERATIONS]);
-            }
+        // إنشاء جدول البطولة مع ربط العمليات بالمستويات التصاعدية
+        for (let i = 0; i < operationsSequence.length; i++) {
+            // المستوى يتصاعد حتى يصل للحد الأقصى المسموح به للمرحلة ثم يثبت
+            let roundLevel = Math.min(i + 1, modeMaxLevel);
+            tournamentSchedule.push({
+                level: roundLevel,
+                operation: operationsSequence[i]
+            });
         }
         
         currentTournamentRound = 0;
