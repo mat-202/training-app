@@ -2,248 +2,923 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>أبطال العمليات الحسابية (تخصيص جميع العمليات) بالأرقام العربية</title>
+    <title>أبطال العمليات الحسابية (تخصيص جميع العمليات)</title>
     <style>
-        [span_0](start_span)[span_1](start_span)/* الأنماط الأساسية (CSS) [cite: 1-82] */
         body { font-family: 'Arial', sans-serif; text-align: center; margin-top: 30px; background-color: #f9f9ff; }
         .main-content { display: flex; justify-content: center; max-width: 1000px; margin: auto; }
         .container { width: 100%; padding: 20px; border: 5px solid #4dabf7; border-radius: 15px; background-color: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
         h1 { color: #4dabf7; margin-bottom: 20px; }
+        
         .names-input-section { margin-bottom: 20px; padding: 15px; border: 1px dashed #ccc; border-radius: 8px; display: flex; justify-content: space-between; gap: 10px; }
         .folder { width: 33%; text-align: right; }
         .folder-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .folder label { font-weight: bold; color: #e63946; display: inline-block; }
         .folder textarea { width: 100%; resize: vertical; margin-bottom: 5px; box-sizing: border-box; }
         .folder button { width: 100%; background-color: #4dabf7; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; margin-bottom: 10px; }
-        .contestants-list { margin-top: 5px; height: 120px; overflow-y: scroll; border: 1px solid #4dabf7; border-radius: 4px; padding: 5px; text-align: right; background-color: #f8faff; }
         
-        /* إضافات الأزرار الجديدة (إيقاف وإعادة) */
-        #pause-btn { background-color: #ffd43b; border: 2px solid #fab005; border-radius: 5px; cursor: pointer; padding: 5px 10px; font-size: 1.2em; margin-left: 10px; transition: 0.2s; }
-        #pause-btn:hover { background-color: #fab005; }
-        #replay-btn { padding: 12px 25px; font-size: 1.4em; color: white; background-color: #fd7e14; border: none; cursor: pointer; border-radius: 8px; display: none; margin-right: 10px; transition: 0.3s; }
-        #replay-btn:hover { background-color: #e8590c; }
+        .contestants-list { margin-top: 5px; height: 120px; overflow-y: scroll; -webkit-overflow-scrolling: touch; border: 1px solid #4dabf7; border-radius: 4px; padding: 5px; text-align: right; background-color: #f8faff; }
+        .contestant-item { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px dotted #ccc; }
+        .contestant-item:last-child { border-bottom: none; }
+        .contestant-item input[type="checkbox"] { margin-left: 10px; }
+        .contestant-item button { background: none; border: none; cursor: pointer; font-size: 0.9em; color: #e63946; padding: 0; width: auto; }
 
-        [cite_start]/* بقية التنسيقات (المؤقت والسؤال والأجوبة) [cite: 23-97] */
         .round-setup { margin-bottom: 20px; padding: 15px; background-color: #f1f3f5; border-radius: 8px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 15px; }
+        .round-setup label { font-weight: bold; }
+        .round-setup select { padding: 8px; font-size: 1em; border-radius: 5px; border: 1px solid #ffd43b; }
+        .op-level-control { transition: opacity 0.5s; }
+        .hide-op-level .op-level-control { opacity: 0.2; pointer-events: none; }
+
         .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; gap: 15px; }
+        #turn-indicator { font-size: 1.5em; flex: 1; text-align: right; }
+        
         .timer-and-count-container { display: flex; align-items: center; gap: 10px; min-width: 200px; justify-content: flex-start; }
         #timer-display { font-size: 2em; font-weight: bold; color: #333; padding: 5px 15px; border: 3px dashed #ffd43b; border-radius: 8px; min-width: 120px; text-align: center; }
-        #remaining-count-display { font-size: 1.2em; font-weight: bold; color: #4dabf7; padding: 5px 10px; border: 2px solid #4dabf7; border-radius: 6px; background-color: #e7f5ff; }
+        #remaining-count-display { font-size: 1.2em; font-weight: bold; color: #4dabf7; padding: 5px 10px; border: 2px solid #4dabf7; border-radius: 6px; background-color: #e7f5ff; white-space: nowrap; min-width: 60px; text-align: center; }
+        #remaining-count-display .count-number { color: #e63946; font-size: 1.1em; font-weight: bold; margin-right: 3px; }
+
         #question { font-size: 3em; margin: 30px auto; color: #333; min-height: 150px; width: 350px; text-align: right; }
+        .q-line { display: flex; justify-content: flex-end; font-size: 1em; height: 1.2em; line-height: 1.2em; flex-wrap: wrap; }
+        #q-num1, #q-num2 { min-width: 150px; text-align: right; padding-right: 5px; white-space: nowrap; }
+        #q-op2 { min-width: 120px; text-align: center; font-size: 0.8em; font-weight: bold; padding-right: 5px; }
+        #q-line-separator { border-bottom: 5px solid #000; margin: 5px 0 10px 0; width: 100%; }
+
         #answer-options-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px auto; max-width: 700px; }
-        .answer-btn { background-color: #4dabf7; color: white; padding: 20px 15px; font-size: 2em; border: none; cursor: pointer; border-radius: 10px; transition: 0.3s; box-shadow: 0 4px #339af0; min-height: 80px; }
-        .answer-btn:hover:not(:disabled) { background-color: #339af0; transform: translateY(2px); }
+        .answer-btn { background-color: #4dabf7; color: white; padding: 20px 15px; font-size: 2em; border: none; cursor: pointer; border-radius: 10px; transition: background-color 0.3s, transform 0.1s; box-shadow: 0 4px #339af0; min-height: 80px; }
+        .answer-btn:hover:not(:disabled) { background-color: #339af0; transform: translateY(2px); box-shadow: 0 2px #1c7ed6; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.6; box-shadow: none; }
         .correct-answer { background-color: #40c057 !important; box-shadow: 0 4px #2f9e44 !important; }
         .wrong-answer { background-color: #e63946 !important; box-shadow: 0 4px #c92a2a !important; }
-        #start-btn, #next-round-btn { padding: 12px 25px; font-size: 1.4em; color: white; border: none; cursor: pointer; border-radius: 8px; }
+
+        .controls { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        #start-btn, #next-round-btn { padding: 12px 25px; font-size: 1.4em; color: white; border: none; cursor: pointer; border-radius: 8px; transition: background-color 0.3s; }
         #start-btn { background-color: #40c057; }
-        #next-round-btn { background-color: #4dabf7; display: none; }
-        .footer-text { margin-top: 40px; padding: 10px 0; font-size: 1.1em; color: #555; text-align: center; border-top: 1px solid #ccc; }
-        @media screen and (max-width: 768px) { .header-section { flex-direction: column; } #turn-indicator { width: 100%; text-align: center; } .timer-and-count-container { justify-content: center; width: 100%; } }
+        #next-round-btn { background-color: #4dabf7; display: none; } 
+        
+        /* 🌟 الأزرار الجديدة: الإيقاف المؤقت وإعادة الجولة 🌟 */
+        #pause-btn { background-color: #ffd43b; border: 2px solid #fab005; border-radius: 5px; cursor: pointer; padding: 5px 10px; font-size: 1.2em; transition: all 0.2s; }
+        #pause-btn:hover { background-color: #fab005; }
+        #replay-btn { padding: 12px 25px; font-size: 1.4em; color: white; background-color: #fd7e14; border: none; cursor: pointer; border-radius: 8px; display: none; transition: background-color 0.3s; margin-right: 10px; }
+        #replay-btn:hover { background-color: #e8590c; }
+
+        .correct { color: #40c057; font-weight: bold; }
+        .wrong { color: #e63946; font-weight: bold; }
+        
+        .remaining-contestants-section { margin-top: 30px; padding: 15px; border: 1px solid #4dabf7; border-radius: 10px; background-color: #e7f5ff; max-width: 1000px; margin-left: auto; margin-right: auto; text-align: right; }
+        .remaining-contestants-section h2 { color: #339af0; border-bottom: 2px dashed #a5d8ff; padding-bottom: 5px; margin-bottom: 10px; font-size: 1.3em; }
+        #remaining-contestants-display { font-size: 1.1em; font-weight: bold; color: #333; line-height: 1.6; }
+        
+        .participation-stats-section { margin-top: 20px; padding: 10px; border: 1px solid #40c057; border-radius: 8px; background-color: #ebfbee; max-width: 1000px; margin-left: auto; margin-right: auto; text-align: right; }
+        .participation-stats-section h3 { color: #2f9e44; margin-bottom: 8px; font-size: 1.1em; }
+        #participation-stats-display { font-size: 1em; color: #333; line-height: 1.4; }
+        
+        .footer-text { margin-top: 40px; padding: 10px 0; font-size: 1.1em; color: #555; text-align: center; border-top: 1px solid #ccc; max-width: 1000px; margin-left: auto; margin-right: auto; }
+
+        @media screen and (max-width: 1024px) and (orientation: landscape) {
+            .main-content { max-width: 100%; padding: 10px; }
+            .container { padding: 15px; width: 100%; }
+            #answer-options-container { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; max-width: 100%; margin: 15px auto; }
+            .answer-btn { font-size: 1.5em; padding: 15px 10px; min-height: 70px; }
+            #question { font-size: 2.5em; margin: 20px auto; min-height: 130px; width: 300px; }
+            .q-line { font-size: 0.9em; height: 1.1em; line-height: 1.1em; }
+            .names-input-section { flex-direction: column; }
+            .folder { width: 100%; margin-bottom: 15px; }
+            .folder:last-child { margin-bottom: 0; }
+            .round-setup { flex-direction: column; align-items: stretch; gap: 10px; }
+            .round-setup > * { width: 100%; }
+            .round-setup label, .round-setup select { width: 100%; margin-bottom: 5px; }
+            h1 { font-size: 1.8em; margin-bottom: 15px; }
+            #timer-display { font-size: 1.5em; min-width: 110px; padding: 4px 12px; }
+            #remaining-count-display { font-size: 1.1em; padding: 4px 8px; }
+            #turn-indicator { font-size: 1.2em; }
+            .remaining-contestants-section { padding: 10px; margin-top: 20px; }
+            .remaining-contestants-section h2 { font-size: 1.1em; }
+            #start-btn, #next-round-btn, #replay-btn { padding: 10px 20px; font-size: 1.2em; }
+        }
+        @media screen and (max-width: 768px) and (orientation: landscape) {
+            #answer-options-container { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .answer-btn { font-size: 1.3em; padding: 12px 8px; min-height: 60px; }
+            #question { font-size: 2.2em; min-height: 110px; width: 280px; }
+            h1 { font-size: 1.6em; }
+        }
+        @media screen and (max-width: 768px) {
+            .header-section { flex-direction: column; gap: 10px; }
+            #turn-indicator { order: 1; text-align: center; width: 100%; }
+            .timer-and-count-container { order: 2; width: 100%; justify-content: center; }
+        }
     </style>
 </head>
 <body>
+
 <div class="main-content">
     <div class="container">
         <h1>أبطال العمليات الحسابية</h1>
+        
         <div class="names-input-section" id="names-section">
             <div class="folder">
-                <div class="folder-header"><label>اسم المجلد أ:</label><input type="text" id="folder-a-name-input" value="المجموعة أ"></div>
-                <textarea id="bulk-input-A" rows="4" placeholder="ألصق الأسماء هنا"></textarea>
-                <button onclick="updateContestantsFromBulk('A')">تحديث القائمة</button>
+                <div class="folder-header">
+                    <label for="folder-a-name-input">اسم المجلد:</label>
+                    <input type="text" id="folder-a-name-input" value="المجموعة أ">
+                </div>
+                <textarea id="bulk-input-A" rows="4" placeholder="ألصق قائمة الأسماء هنا (كل اسم في سطر)"></textarea>
+                <button onclick="updateContestantsFromBulk('A')">تحديث القائمة من هنا</button>
+                <hr>
                 <div id="contestants-list-A" class="contestants-list"></div>
             </div>
             <div class="folder">
-                <div class="folder-header"><label>اسم المجلد ب:</label><input type="text" id="folder-b-name-input" value="المجموعة ب"></div>
-                <textarea id="bulk-input-B" rows="4" placeholder="ألصق الأسماء هنا"></textarea>
-                <button onclick="updateContestantsFromBulk('B')">تحديث القائمة</button>
+                <div class="folder-header">
+                    <label for="folder-b-name-input">اسم المجلد:</label>
+                    <input type="text" id="folder-b-name-input" value="المجموعة ب">
+                </div>
+                <textarea id="bulk-input-B" rows="4" placeholder="ألصق قائمة الأسماء هنا (كل اسم في سطر)"></textarea>
+                <button onclick="updateContestantsFromBulk('B')">تحديث القائمة من هنا</button>
+                <hr>
                 <div id="contestants-list-B" class="contestants-list"></div>
             </div>
             <div class="folder">
-                <div class="folder-header"><label>اسم المجلد ج:</label><input type="text" id="folder-c-name-input" value="المجموعة ج"></div>
-                <textarea id="bulk-input-C" rows="4" placeholder="ألصق الأسماء هنا"></textarea>
-                <button onclick="updateContestantsFromBulk('C')">تحديث القائمة</button>
+                <div class="folder-header">
+                    <label for="folder-c-name-input">اسم المجلد:</label>
+                    <input type="text" id="folder-c-name-input" value="المجموعة ج">
+                </div>
+                <textarea id="bulk-input-C" rows="4" placeholder="ألصق قائمة الأسماء هنا (كل اسم في سطر)"></textarea>
+                <button onclick="updateContestantsFromBulk('C')">تحديث القائمة من هنا</button>
+                <hr>
                 <div id="contestants-list-C" class="contestants-list"></div>
             </div>
         </div>
 
         <div class="round-setup" id="round-setup">
+            <label for="folder-select">اختر مجلد المنافسة:</label>
             <select id="folder-select">
-                <option value="A">المجموعة أ</option><option value="B">المجموعة ب</option><option value="C">المجموعة ج</option>
+                <option value="A">المجموعة أ</option>
+                <option value="B">المجموعة ب</option>
+                <option value="C">المجموعة ج</option>
             </select>
-            <select id="operation-select">
-                <option value="+">جمع</option><option value="-">طرح</option><option value="*">ضرب</option><option value="/">قسمة</option><option value="R">تقريب</option>
-            </select>
-            <select id="level-select">
-                <option value="1">المستوى 1</option><option value="2">المستوى 2</option><option value="3">المستوى 3</option><option value="4">المستوى 4</option><option value="5">المستوى 5</option>
-            </select>
+            
+            <div class="op-level-control">
+                <label for="operation-select">اختر العملية:</label>
+                <select id="operation-select">
+                    <option value="+">جمع</option>
+                    <option value="-">طرح</option>
+                    <option value="*">ضرب</option>
+                    <option value="/">قسمة</option>
+                    <option value="R">تقريب</option> 
+                </select>
+            </div>
+            
+            <div class="op-level-control">
+                <label for="level-select">اختر المستوى:</label>
+                <select id="level-select">
+                    <option value="1">المستوى 1</option>
+                    <option value="2">المستوى 2</option>
+                    <option value="3">المستوى 3</option>
+                    <option value="4">المستوى 4</option>
+                    <option value="5">المستوى 5</option>
+                </select>
+            </div>
+            
+            <label for="mode-select">اختر وضع المسابقة:</label>
             <select id="mode-select" onchange="toggleOpLevelControls()">
-                <option value="elimination4">مسابقة صف ثالث</option><option value="elimination5">مسابقة صف رابع</option><option value="elimination3">مسابقة صف خامس فأعلى</option><option value="elimination1">مسابقة عامة (ثابت)</option><option value="elimination2">مسابقة عامة (تصاعدي)</option>
+                <option value="elimination4">مسابقة صف ثالث (تصاعدي شامل - حد أقصى 3)</option>
+                <option value="elimination5">مسابقة صف رابع (تصاعدي شامل - حد أقصى 4)</option>
+                <option value="elimination3">مسابقة صف خامس فأعلى (تصاعدي شامل - حد أقصى 5)</option>
+                <option value="elimination1">مسابقة عامة (قسم ومستوى ثابت)</option>
+                <option value="elimination2">مسابقة عامة (قسم ثابت ومستوى تصاعدي)</option>
             </select>
+            
             <button id="start-btn" onclick="startGame()">بدء المسابقة</button> 
-            <button id="next-round-btn" onclick="startNewRound()">جولة جديدة</button>
+            <button id="next-round-btn" onclick="startNewRound()" style="display: none;">جولة جديدة</button>
             <button id="replay-btn" onclick="replayCurrentRound()">إعادة الجولة (مستوى 5)</button>
         </div>
 
         <div class="header-section">
-            <div id="turn-indicator">الدور: <span id="current-player">أدخل الأسماء</span></div>
+            <div id="turn-indicator">
+                الدور: <span id="current-player" class="player-turn">أدخل الأسماء</span>
+            </div>
             <div class="timer-and-count-container">
-                <button id="pause-btn" onclick="togglePause()">⏸️</button>
+                <button id="pause-btn" onclick="togglePause()" title="إيقاف مؤقت/استئناف">⏸️</button>
                 <div id="timer-display">30 ثوانٍ</div> 
-                <div id="remaining-count-display"><span class="count-number">0</span> متبقون</div>
+                <div id="remaining-count-display">
+                    <span class="count-number">0</span> متبقون
+                </div>
             </div>
         </div>
 
         <div id="question">
-             <div class="q-line"><span id="q-op"></span><span id="q-num1">اضغط بدء المسابقة</span></div>
-             <div class="q-line"><span id="q-op2"></span><span id="q-num2"></span></div>
+             <div class="q-line" id="q-line-1">
+                 <span id="q-op"></span>
+                 <span id="q-num1">اضغط بدء المسابقة</span>
+             </div>
+             <div class="q-line" id="q-line-2">
+                 <span id="q-op2"></span>
+                 <span id="q-num2"></span>
+             </div>
              <div id="q-line-separator"></div>
         </div> 
+        
         <div id="answer-options-container"></div>
         <div id="feedback"></div>
+
         <div class="score-boards">
-            <div id="score1-display">المتسابق 1: 0</div><div id="score2-display">المتسابق 2: 0</div>
+            <div id="score1-display" class="score">المتسابق 1: 0</div>
+            <div id="score2-display" class="score">المتسابق 2: 0</div>
         </div>
     </div>
 </div>
 
 <div class="remaining-contestants-section">
     <h2>المتسابقون الذين ما زالوا في المنافسة</h2>
-    <p id="remaining-contestants-display">اضغط "جولة إقصاء جديدة" لعرض الأسماء...</p>
+    <p id="remaining-contestants-display" dir="rtl">اضغط "جولة إقصاء جديدة" لعرض المتسابقين المتبقين...</p>
 </div>
-<p class="footer-text">إعداد: الأستاذ عبدالعزيز الحجيلي</p>
 
-    
+<div class="participation-stats-section">
+    <h3>إحصائيات المشاركات (عدد المرات التي لعب فيها كل متسابق)</h3>
+    <p id="participation-stats-display" dir="rtl">سيتم عرض إحصائيات المشاركات بعد بدء المسابقة...</p>
+</div>
+
+<p class="footer-text" dir="rtl">إعداد: الأستاذ عبدالعزيز الحجيلي</p>
 <script>
-    [cite_start]// المتغيرات الأساسية [cite: 116-128]
-    let num1, num2, correctAnswerValue, correctAnswerDisplay, score1 = 0, score2 = 0, currentPlayer = 1;
-    let isProcessing = false, gameStarted = false, isPaused = false;
+    let num1, num2, correctAnswerValue, correctAnswerDisplay; 
+    let score1 = 0, score2 = 0, currentPlayer = 1; 
+    let isProcessing = false, gameStarted = false, isPaused = false; 
+
     let playerName1 = "المتسابق 1", playerName2 = "المتسابق 2", currentFolderKey = '';
     let allStudentsByFolder = { A: [], B: [], C: [] };
-    let folderNames = { A: "المجموعة أ", B: "المجموعة ب", C: "المجموعة ج" };
-    let globalScores = {}, playerParticipationCount = {}, folderStudentsInPlay = [], availablePlayersForNextRound = [];
-    let currentRoundingDecimals = 0, currentRoundingPlace = '', timerInterval, timeRemaining = 30;
-    let currentMode = 'elimination1', player1Wins = 0, player2Wins = 0, eliminationQuestionsCount = 0, isTieBreaker = false;
-    let currentTournamentRound = 0, tournamentSchedule = [], fixedOperation = '';
-    const MAX_ELIMINATION_QUESTIONS = 2, MAX_RECENT_WINNERS = 3, ARABIC_LOCALE = 'ar-SA', ALL_OPERATIONS = ['+', '-', '*', '/', 'R'], MAX_LEVEL = 5;
-    let recentWinners = [];
+    let folderNames = { A: "المجموعة أ", B: "المجموعة ب", C: "المجموعة ج" }; 
+    let globalScores = {}, currentRoundingDecimals = 0, currentRoundingPlace = ''; 
 
-    [cite_start]// --- وظائف التحديث والاستعادة (حل مشكلة الأسماء) [cite: 130-159] ---
+    const TIME_LIMIT = 30; 
+    let timeRemaining = TIME_LIMIT, timerInterval;
+    const ARABIC_LOCALE = 'ar-SA'; 
+    
+    let currentMode = 'elimination1';
+    const MAX_ELIMINATION_QUESTIONS = 2; 
+    let eliminationQuestionsCount = 0; 
+    let player1Wins = 0, player2Wins = 0;
+    let folderStudentsInPlay = [], isTieBreaker = false; 
+    
+    let currentTournamentRound = 0, tournamentSchedule = [], fixedOperation = ''; 
+    const ALL_OPERATIONS = ['+', '-', '*', '/', 'R']; 
+    const MAX_LEVEL = 5;
+    let recentWinners = [];
+    const MAX_RECENT_WINNERS = 3;
+    let playerParticipationCount = {}, availablePlayersForNextRound = [];
+    
+    // --- 🌟 دالة الإضافة الجماعية المنيعة 🌟 ---
     function updateContestantsFromBulk(folderKey) {
-        const textarea = document.getElementById(`bulk-input-${folderKey}`);
-        if (!textarea) return;
-        const newNames = textarea.value.split(/[\n,;]+/).map(n => n.trim()).filter(n => n.length > 0);
-        let currentList = allStudentsByFolder[folderKey] || [];
-        newNames.forEach(name => { if (!currentList.find(c => c.name === name)) currentList.push({ name: name, selected: true }); });
-        allStudentsByFolder[folderKey] = currentList;
-        textarea.value = '';
-        saveContestantsData();
-        renderContestantsList(folderKey);
-        alert("تم تحديث القائمة بنجاح.");
+        try {
+            const textarea = document.getElementById(`bulk-input-${folderKey}`);
+            if (!textarea || textarea.value.trim() === '') {
+                alert("الرجاء إدخال أسماء في المربع أولاً!");
+                return;
+            }
+
+            if (!allStudentsByFolder || typeof allStudentsByFolder !== 'object' || Array.isArray(allStudentsByFolder)) {
+                allStudentsByFolder = { A: [], B: [], C: [] };
+            }
+            if (!Array.isArray(allStudentsByFolder[folderKey])) {
+                allStudentsByFolder[folderKey] = [];
+            }
+
+            const newNames = textarea.value.split(/[\n,;]+/).map(name => name.trim()).filter(name => name.length > 0);
+            let updatedContestants = [...allStudentsByFolder[folderKey]];
+            let addedCount = 0;
+            
+            newNames.forEach(name => {
+                const existing = updatedContestants.find(c => c.name === name);
+                if (!existing) {
+                    updatedContestants.push({ name: name, selected: true });
+                    addedCount++;
+                } else {
+                    existing.selected = true;
+                }
+            });
+            
+            allStudentsByFolder[folderKey] = updatedContestants;
+            textarea.value = ''; 
+            
+            saveContestantsData();
+            renderContestantsList(folderKey);
+            
+            alert(`نجاح! تم إضافة ${addedCount.toLocaleString(ARABIC_LOCALE)} اسماً.`);
+        } catch (error) {
+            alert("تم اكتشاف بيانات قديمة تمنع الإضافة وتم تنظيفها. يرجى الضغط على (تحديث القائمة) مرة أخرى.");
+            allStudentsByFolder = { A: [], B: [], C: [] };
+            localStorage.removeItem('mathHeroesNamesData');
+        }
+    }
+
+    function removeContestant(folderKey, name) {
+        allStudentsByFolder[folderKey] = allStudentsByFolder[folderKey].filter(c => c.name !== name);
+        saveContestantsData(); renderContestantsList(folderKey);
+    }
+
+    function toggleContestantSelection(folderKey, name) {
+        const contestant = allStudentsByFolder[folderKey].find(c => c.name === name);
+        if (contestant) { contestant.selected = !contestant.selected; saveContestantsData(); }
     }
 
     function renderContestantsList(folderKey) {
-        const container = document.getElementById(`contestants-list-${folderKey}`);
-        if (!container) return;
-        container.innerHTML = '';
-        allStudentsByFolder[folderKey].forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'contestant-item';
-            div.innerHTML = `<span><input type="checkbox" ${c.selected?'checked':''} onchange="toggleSelection('${folderKey}','${c.name}')"> ${c.name}</span><button onclick="removeContestant('${folderKey}','${c.name}')">❌</button>`;
-            container.appendChild(div);
+        const listContainer = document.getElementById(`contestants-list-${folderKey}`);
+        if (!listContainer) return;
+        listContainer.innerHTML = '';
+        allStudentsByFolder[folderKey].forEach(contestant => {
+            const item = document.createElement('div');
+            item.className = 'contestant-item';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox'; checkbox.checked = contestant.selected;
+            checkbox.onchange = () => toggleContestantSelection(folderKey, contestant.name);
+            const nameSpan = document.createElement('span'); nameSpan.textContent = contestant.name;
+            const deleteBtn = document.createElement('button'); deleteBtn.textContent = '❌'; deleteBtn.title = `حذف ${contestant.name}`;
+            deleteBtn.onclick = () => removeContestant(folderKey, contestant.name);
+            const leftSide = document.createElement('div');
+            leftSide.style.display = 'flex'; leftSide.style.alignItems = 'center';
+            leftSide.appendChild(checkbox); leftSide.appendChild(nameSpan);
+            item.appendChild(leftSide); item.appendChild(deleteBtn);
+            listContainer.appendChild(item);
         });
     }
 
-    function toggleSelection(f, n) { let c = allStudentsByFolder[f].find(x=>x.name===n); if(c) c.selected = !c.selected; saveContestantsData(); }
-    function removeContestant(f, n) { allStudentsByFolder[f] = allStudentsByFolder[f].filter(x=>x.name!==n); saveContestantsData(); renderContestantsList(f); }
-    function saveContestantsData() { localStorage.setItem('mathHeroesNamesData', JSON.stringify(allStudentsByFolder)); }
+    function toggleOpLevelControls() {
+        const mode = document.getElementById('mode-select').value;
+        const roundSetup = document.getElementById('round-setup');
+        if (mode === 'elimination1' || mode === 'elimination2') { roundSetup.classList.remove('hide-op-level'); } 
+        else { roundSetup.classList.add('hide-op-level'); }
+    }
+    document.addEventListener('DOMContentLoaded', toggleOpLevelControls);
+
+    function updateRemainingContestantsDisplay() {
+        const displayElement = document.getElementById('remaining-contestants-display');
+        const folderName = folderNames[currentFolderKey] || 'المجموعة الحالية';
+        if (folderStudentsInPlay.length === 0) {
+            displayElement.innerHTML = `لا يوجد متسابقون متبقون في **${folderName}**. اضغط "جولة إقصاء جديدة" لبدء بطولة جديدة.`;
+        } else if (folderStudentsInPlay.length === 1) {
+            displayElement.innerHTML = `**البطل الحالي:** 👑 ${folderStudentsInPlay[0]} 👑. اضغط "بدء بطولة جديدة" للبدء من جديد.`;
+        } else {
+            const listItems = folderStudentsInPlay.map(name => `<span>${name}</span>`).join(' • ');
+            displayElement.innerHTML = `**المتبقون (${folderStudentsInPlay.length.toLocaleString(ARABIC_LOCALE)}):** ${listItems}`;
+        }
+        updateRemainingCountDisplay();
+    }
     
-    [cite_start]// --- دالة التحميل المحسنة (لاستعادة الأسماء بدقة) [cite: 284-299] ---
-    function loadContestantsAndScores() {
-        try {
-            const names = localStorage.getItem('mathHeroesNamesData');
-            if (names) {
-                const parsed = JSON.parse(names);
-                if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) allStudentsByFolder = parsed;
-            }
-            const fNames = localStorage.getItem('mathHeroesFolderNames');
-            if (fNames) folderNames = JSON.parse(fNames);
-            renderContestantsList('A'); renderContestantsList('B'); renderContestantsList('C');
-            updateRemainingCountDisplay();
-        } catch (e) { console.error("Error loading names", e); }
+    function updateRemainingCountDisplay() {
+        const countElement = document.getElementById('remaining-count-display');
+        const countNumberElement = countElement.querySelector('.count-number');
+        if (folderStudentsInPlay.length === 0) { countNumberElement.textContent = '0'; } 
+        else { countNumberElement.textContent = folderStudentsInPlay.length.toLocaleString(ARABIC_LOCALE); }
+    }
+    
+    function updateParticipationStatsDisplay() {
+        const statsElement = document.getElementById('participation-stats-display');
+        if (Object.keys(playerParticipationCount).length === 0) {
+            statsElement.innerHTML = `لا توجد إحصائيات مشاركات حتى الآن.`; return;
+        }
+        const statsArray = Object.entries(playerParticipationCount).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+        const statsItems = statsArray.map(stat => `<span>${stat.name}: ${stat.count.toLocaleString(ARABIC_LOCALE)} مشاركة</span>`).join(' • ');
+        statsElement.innerHTML = `**إحصائيات المشاركات:** ${statsItems}`;
     }
 
-    // --- وظائف اللعبة والتحكم الجديد (إيقاف وإعادة) ---
+    function saveContestantsData() { try { localStorage.setItem('mathHeroesNamesData', JSON.stringify(allStudentsByFolder)); } catch (e) { console.error("Could not save names data", e); } }
+    
+    function saveGlobalScores() {
+        try {
+            localStorage.setItem('mathHeroesGlobalScores', JSON.stringify(globalScores));
+            localStorage.setItem('mathHeroesFolderNames', JSON.stringify(folderNames));
+            localStorage.setItem('mathHeroesParticipationCount', JSON.stringify(playerParticipationCount));
+            saveContestantsData(); 
+        } catch (e) { console.error("Could not save scores/data", e); }
+    }
+
+    // --- 🌟 دالة التحميل المحسنة لضمان الاستعادة 🌟 ---
+    function loadContestantsAndScores() {
+        try {
+            const savedFolderNames = localStorage.getItem('mathHeroesFolderNames');
+            if (savedFolderNames) {
+                folderNames = JSON.parse(savedFolderNames);
+                document.getElementById('folder-a-name-input').value = folderNames.A || "المجموعة أ";
+                document.getElementById('folder-b-name-input').value = folderNames.B || "المجموعة ب";
+                document.getElementById('folder-c-name-input').value = folderNames.C || "المجموعة ج";
+            }
+
+            const savedNamesData = localStorage.getItem('mathHeroesNamesData');
+            if (savedNamesData) {
+                const parsedData = JSON.parse(savedNamesData);
+                if (parsedData && typeof parsedData === 'object' && !Array.isArray(parsedData)) {
+                    allStudentsByFolder = parsedData;
+                } else { allStudentsByFolder = { A: [], B: [], C: [] }; }
+            } else { allStudentsByFolder = { A: [], B: [], C: [] }; }
+            
+            const savedScores = localStorage.getItem('mathHeroesGlobalScores');
+            globalScores = savedScores ? JSON.parse(savedScores) : {};
+            const savedParticipationCount = localStorage.getItem('mathHeroesParticipationCount');
+            playerParticipationCount = savedParticipationCount ? JSON.parse(savedParticipationCount) : {};
+            
+            renderContestantsList('A'); renderContestantsList('B'); renderContestantsList('C');
+        } catch (e) {
+            console.error("خطأ في استعادة البيانات:", e);
+            allStudentsByFolder = { A: [], B: [], C: [] };
+        }
+    }
+    // --- 🌟 دوال التحكم بالوقت والإيقاف 🌟 ---
+    function clearTimer() { clearInterval(timerInterval); document.getElementById('timer-display').style.color = '#333'; }
+
     function togglePause() {
         if (!gameStarted || isProcessing) return;
         isPaused = !isPaused;
-        const btn = document.getElementById('pause-btn');
+        const pauseBtn = document.getElementById('pause-btn');
         if (isPaused) {
-            clearInterval(timerInterval); btn.textContent = '▶️';
-            document.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
+            clearInterval(timerInterval);
+            pauseBtn.textContent = '▶️';
+            document.getElementById('feedback').innerHTML = '<span style="color: #fd7e14;">تم الإيقاف مؤقتاً</span>';
+            document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
         } else {
-            startTimer(timeRemaining); btn.textContent = '⏸️';
-            document.querySelectorAll('.answer-btn').forEach(b => b.disabled = false);
+            startTimer(timeRemaining);
+            pauseBtn.textContent = '⏸️';
+            document.getElementById('feedback').innerHTML = '';
+            document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = false);
         }
     }
 
     function replayCurrentRound() {
         player1Wins = 0; player2Wins = 0; eliminationQuestionsCount = 0; isTieBreaker = false;
-        currentTournamentRound = 4; // المستوى الخامس
-        document.getElementById('score1-display').innerHTML = `${playerName1}: 0`;
-        document.getElementById('score2-display').innerHTML = `${playerName2}: 0`;
-        document.getElementById('feedback').innerHTML = `إعادة الجولة بين: ${playerName1} و ${playerName2}`;
+        if (currentMode !== 'elimination1') currentTournamentRound = 4; // تبدأ الإعادة من المستوى الخامس إذا كان تصاعدي
+        document.getElementById('score1-display').innerHTML = `${playerName1} (فوز): 0`;
+        document.getElementById('score2-display').innerHTML = `${playerName2} (فوز): 0`;
+        document.getElementById('feedback').innerHTML = `إعادة المواجهة بين: ${playerName1} و ${playerName2}`;
+        document.getElementById('replay-btn').style.display = 'none';
         setTimeout(generateQuestion, 1500);
     }
 
-    [cite_start]// --- دالة بدء جولة جديدة (إظهار الزر) [cite: 359-376] ---
+    function startTimer(duration) {
+        clearTimer(); timeRemaining = duration;
+        const timerDisplay = document.getElementById('timer-display');
+        timerDisplay.innerHTML = `${timeRemaining.toLocaleString(ARABIC_LOCALE)} ثوانٍ`;
+        timerInterval = setInterval(() => {
+            timeRemaining -= 1;
+            timerDisplay.innerHTML = `${timeRemaining.toLocaleString(ARABIC_LOCALE)} ثوانٍ`;
+            if (timeRemaining <= 5) { timerDisplay.style.color = 'red'; } else { timerDisplay.style.color = '#333'; }
+            if (timeRemaining <= 0) { handleTimeUp(); }
+        }, 1000);
+    }
+
+    function handleTimeUp() {
+        clearTimer(); isProcessing = true; 
+        document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
+        const feedbackElement = document.getElementById('feedback');
+        feedbackElement.innerHTML = `<span class="wrong">انتهى الوقت! (صفر فوز لـ ${currentPlayer === 1 ? playerName1 : playerName2}). الإجابة الصحيحة هي: ${correctAnswerDisplay}</span>`;
+        eliminationQuestionsCount += 1;
+        currentPlayer = (currentPlayer === 1) ? 2 : 1; 
+        document.getElementById('score1-display').innerHTML = `${playerName1} (فوز): ${player1Wins.toLocaleString(ARABIC_LOCALE)}`;
+        document.getElementById('score2-display').innerHTML = `${playerName2} (فوز): ${player2Wins.toLocaleString(ARABIC_LOCALE)}`;
+        
+        if (isTieBreaker && eliminationQuestionsCount >= 2) { processEliminationRoundEnd(); return; }
+        if (!isTieBreaker && eliminationQuestionsCount >= MAX_ELIMINATION_QUESTIONS) { processEliminationRoundEnd(); return; }
+        setTimeout(generateQuestion, 2500);
+    }
+
+    function selectRandomPlayers(folderKey) {
+        let students;
+        if (folderStudentsInPlay.length <= 1) { 
+             folderStudentsInPlay = allStudentsByFolder[folderKey].filter(c => c.selected).map(c => c.name);
+             availablePlayersForNextRound = [...folderStudentsInPlay];
+        }
+        students = availablePlayersForNextRound.length > 0 ? availablePlayersForNextRound : folderStudentsInPlay;
+        if (students.length < 2) {
+            availablePlayersForNextRound = [...folderStudentsInPlay];
+            students = availablePlayersForNextRound;
+            if (students.length < 2) return null;
+        }
+
+        const availableStudents = [...students];
+        const filteredStudents = availableStudents.filter(student => !recentWinners.includes(student));
+        const finalCandidates = filteredStudents.length >= 2 ? filteredStudents : availableStudents;
+        
+        if (finalCandidates.length < 2) {
+            const allAvailable = [...folderStudentsInPlay];
+            if (allAvailable.length < 2) return null;
+            const index1 = Math.floor(Math.random() * allAvailable.length);
+            const player1 = allAvailable[index1];
+            const remainingPlayers = allAvailable.filter((_, idx) => idx !== index1);
+            const index2 = Math.floor(Math.random() * remainingPlayers.length);
+            const player2 = remainingPlayers[index2];
+            return [player1, player2];
+        }
+        
+        const index1 = Math.floor(Math.random() * finalCandidates.length);
+        const player1 = finalCandidates[index1];
+        const remainingPlayers = finalCandidates.filter((_, idx) => idx !== index1);
+        const index2 = Math.floor(Math.random() * remainingPlayers.length);
+        const player2 = remainingPlayers[index2];
+        
+        if (!playerParticipationCount[player1]) playerParticipationCount[player1] = 0;
+        if (!playerParticipationCount[player2]) playerParticipationCount[player2] = 0;
+        playerParticipationCount[player1] += 1;
+        playerParticipationCount[player2] += 1;
+        
+        availablePlayersForNextRound = availablePlayersForNextRound.filter(player => player !== player1 && player !== player2);
+        return [player1, player2];
+    }
+    
+    function finishEliminationRound(winnerName, loserName) {
+        document.getElementById('replay-btn').style.display = 'none'; // إخفاء زر الإعادة
+        document.getElementById('feedback').innerHTML = `<span class="correct">انتهت الجولة: ${winnerName} يفوز!</span> - <span class="wrong">${loserName} يخرج من المنافسة.</span>`;
+        folderStudentsInPlay = folderStudentsInPlay.filter(name => {
+            const normalizedName = name.trim().toLowerCase();
+            const normalizedLoser = loserName.trim().toLowerCase();
+            return normalizedName !== normalizedLoser;
+        });
+        availablePlayersForNextRound = availablePlayersForNextRound.filter(player => player !== loserName);
+        
+        if (!recentWinners.includes(winnerName)) {
+            recentWinners.unshift(winnerName);
+            if (recentWinners.length > MAX_RECENT_WINNERS) { recentWinners.pop(); }
+        }
+        
+        eliminationQuestionsCount = 0; player1Wins = 0; player2Wins = 0; isTieBreaker = false; fixedOperation = '';
+        tournamentSchedule = []; currentTournamentRound = 0;
+        
+        if (folderStudentsInPlay.length === 1) {
+             const champion = folderStudentsInPlay[0];
+             document.getElementById('feedback').innerHTML = `<h1>🏆 البطل هو: ${champion}! 🏆</h1>`;
+             globalScores[champion] = (globalScores[champion] || 0) + 1; 
+             document.getElementById('next-round-btn').textContent = 'بدء بطولة جديدة';
+             document.getElementById('next-round-btn').style.display = 'block';
+             document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
+             recentWinners = [];
+        } else {
+             document.getElementById('next-round-btn').style.display = 'block';
+             document.getElementById('next-round-btn').textContent = 'جولة إقصاء جديدة';
+        }
+        
+        saveGlobalScores(); updateRemainingContestantsDisplay(); updateParticipationStatsDisplay();
+    }
+        
+    function setupTournamentSchedule() {
+        tournamentSchedule = [];
+        let modeMaxLevel = MAX_LEVEL; 
+        const mode = document.getElementById('mode-select').value;
+        if (mode === 'elimination4') { modeMaxLevel = 3; } else if (mode === 'elimination5') { modeMaxLevel = 4; }
+        let operationsSequence = [], lastOp = '';
+
+        while (operationsSequence.length < 20) {
+            let nextBatch = shuffleArray([...ALL_OPERATIONS]);
+            if (lastOp === nextBatch[0]) { [nextBatch[0], nextBatch[1]] = [nextBatch[1], nextBatch[0]]; }
+            operationsSequence.push(...nextBatch);
+            lastOp = nextBatch[nextBatch.length - 1];
+        }
+        for (let i = 0; i < operationsSequence.length; i++) {
+            let roundLevel = Math.min(i + 1, modeMaxLevel);
+            tournamentSchedule.push({ level: roundLevel, operation: operationsSequence[i] });
+        }
+        currentTournamentRound = 0;
+    }
+
+    function processEliminationRoundEnd() {
+        if (player1Wins === player2Wins) {
+            if (currentMode === 'elimination2' || currentMode === 'elimination3' || currentMode === 'elimination4' || currentMode === 'elimination5') {
+                 currentTournamentRound += 1;
+                 let newLevel, opName;
+                 if (currentMode === 'elimination2') {
+                     newLevel = Math.min(currentTournamentRound + 1, MAX_LEVEL);
+                     opName = fixedOperation === 'R' ? 'تقريب' : fixedOperation;
+                 } else { 
+                      const nextRound = tournamentSchedule[Math.min(currentTournamentRound, tournamentSchedule.length - 1)];
+                      newLevel = nextRound.level;
+                      opName = nextRound.operation === 'R' ? 'تقريب' : nextRound.operation;
+                 }
+                 const statusMsg = `<span class="wrong">تعادل! ترقية إلى المستوى ${newLevel.toLocaleString(ARABIC_LOCALE)} والعملية: ${opName}</span>`;
+                 document.getElementById('feedback').innerHTML = statusMsg;
+            } else { 
+                document.getElementById('feedback').innerHTML = `<span class="wrong">تعادل! سؤال فاصل إضافي (لكل متسابق)...</span>`;
+            }
+            
+            isTieBreaker = true; eliminationQuestionsCount = 0; currentPlayer = 1; 
+            setTimeout(generateQuestion, 2500); return; 
+        }
+        
+        if (player1Wins !== player2Wins) {
+            const winner = player1Wins > player2Wins ? playerName1 : playerName2;
+            const loser = player1Wins > player2Wins ? playerName2 : playerName1;
+            finishEliminationRound(winner, loser); return;
+        }
+    }
+
     function startNewRound() {
-        if (!gameStarted) { alert('ابدأ المسابقة أولاً'); return; }
+        if (!gameStarted) { alert('يرجى بدء المسابقة أولاً لتحميل الأسماء.'); return; }
+        
         currentFolderKey = document.getElementById('folder-select').value;
         currentMode = document.getElementById('mode-select').value;
-        const selected = selectRandomPlayers(currentFolderKey);
-        if (!selected) return;
-        playerName1 = selected[0]; playerName2 = selected[1];
-        player1Wins = 0; player2Wins = 0; eliminationQuestionsCount = 0;
-        document.getElementById('replay-btn').style.display = 'inline-block'; // إظهار زر الإعادة
-        document.getElementById('next-round-btn').style.display = 'none';
-        currentPlayer = 1;
+        const selectedFolderName = folderNames[currentFolderKey];
+        
+        if (folderStudentsInPlay.length <= 1) { 
+             folderStudentsInPlay = allStudentsByFolder[currentFolderKey].filter(c => c.selected).map(c => c.name);
+             if (folderStudentsInPlay.length < 2) {
+                 alert(`يجب أن يكون لديك متسابقان على الأقل في ${selectedFolderName}`);
+                 document.getElementById('next-round-btn').textContent = 'جولة جديدة';
+                 document.getElementById('next-round-btn').style.display = 'block';
+                 return;
+             }
+             availablePlayersForNextRound = [...folderStudentsInPlay];
+        }
+
+        const selectedPlayers = selectRandomPlayers(currentFolderKey);
+        if (!selectedPlayers) {
+            document.getElementById('next-round-btn').style.display = 'block'; 
+            document.getElementById('next-round-btn').textContent = 'جولة جديدة'; return;
+        }
+
+        playerName1 = selectedPlayers[0]; playerName2 = selectedPlayers[1];
+        player1Wins = 0; player2Wins = 0; eliminationQuestionsCount = 0; isTieBreaker = false; currentTournamentRound = 0; 
+        
+        let modeDisplay = document.getElementById('mode-select').options[document.getElementById('mode-select').selectedIndex].text;
+        if (currentMode === 'elimination2') {
+             fixedOperation = document.getElementById('operation-select').value;
+             document.getElementById('feedback').innerHTML = `الآن يتنافس: ${playerName1} vs ${playerName2} من ${selectedFolderName} (${modeDisplay} - العملية الثابتة: ${fixedOperation === 'R' ? 'تقريب' : fixedOperation})`;
+        } else if (currentMode === 'elimination3' || currentMode === 'elimination4' || currentMode === 'elimination5') {
+             setupTournamentSchedule();
+             document.getElementById('feedback').innerHTML = `الآن يتنافس: ${playerName1} vs ${playerName2} من ${selectedFolderName} (${modeDisplay})`;
+        } else {
+             document.getElementById('feedback').innerHTML = `الآن يتنافس: ${playerName1} vs ${playerName2} من ${selectedFolderName} (${modeDisplay})`;
+        }
+
+        document.getElementById('score1-display').innerHTML = `${playerName1} (فوز): ${player1Wins.toLocaleString(ARABIC_LOCALE)}`;
+        document.getElementById('score2-display').innerHTML = `${playerName2} (فوز): ${player2Wins.toLocaleString(ARABIC_LOCALE)}`;
+        
+        document.getElementById('next-round-btn').style.display = 'none'; 
+        document.getElementById('replay-btn').style.display = 'block'; // 🌟 إظهار زر الإعادة 🌟
+        
+        currentPlayer = 1; document.getElementById('answer-options-container').innerHTML = ''; 
+        updateRemainingContestantsDisplay(); updateParticipationStatsDisplay();
         setTimeout(generateQuestion, 2000);
     }
 
-    [cite_start]// --- دالة إنهاء الجولة (إخفاء الزر) [cite: 326-337] ---
-    function finishEliminationRound(w, l) {
-        document.getElementById('replay-btn').style.display = 'none'; // إخفاء زر الإعادة
-        document.getElementById('feedback').innerHTML = `${w} يفوز بالجولة!`;
-        folderStudentsInPlay = folderStudentsInPlay.filter(n => n !== l);
-        if (folderStudentsInPlay.length === 1) {
-            document.getElementById('feedback').innerHTML = `<h1>🏆 البطل: ${folderStudentsInPlay[0]} 🏆</h1>`;
-        } else {
-            document.getElementById('next-round-btn').style.display = 'block';
+    function startGame() {
+        folderNames.A = document.getElementById('folder-a-name-input').value.trim() || "المجموعة أ";
+        folderNames.B = document.getElementById('folder-b-name-input').value.trim() || "المجموعة ب";
+        folderNames.C = document.getElementById('folder-c-name-input').value.trim() || "المجموعة ج";
+        saveGlobalScores(); 
+
+        currentFolderKey = document.getElementById('folder-select').value;
+        const selectedContestants = allStudentsByFolder[currentFolderKey].filter(c => c.selected).map(c => c.name);
+        if (selectedContestants.length < 2) { alert(`يجب أن يكون لديك متسابقان على الأقل تم اختيارهما لبدء المسابقة.`); return; }
+
+        gameStarted = true;
+        document.getElementById('start-btn').textContent = 'إعادة تحميل الأسماء والبدء';
+        document.getElementById('next-round-btn').style.display = 'block'; 
+        document.getElementById('next-round-btn').textContent = 'جولة إقصاء جديدة';
+        document.getElementById('names-section').style.opacity = 0.5; 
+        
+        folderStudentsInPlay = selectedContestants; recentWinners = []; availablePlayersForNextRound = [...folderStudentsInPlay];
+        document.getElementById('feedback').innerHTML = `تم تحميل الأسماء. اضغط "جولة إقصاء جديدة" للبدء.`;
+        document.getElementById('q-num1').textContent = 'جاهزون للانطلاق!'; document.getElementById('q-num2').textContent = ''; document.getElementById('q-op2').textContent = '';
+        document.getElementById('answer-options-container').innerHTML = ''; 
+        updateRemainingContestantsDisplay(); updateParticipationStatsDisplay();
+    }
+
+    // --- دوال الرياضيات وبناء الأسئلة ---
+    function generateNumberWithRange(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function generateNumberWithDigits(digits, allowDecimals = 0) {
+        let number;
+        if (digits === 1) { number = Math.floor(Math.random() * 9) + 1; } 
+        else if (digits > 1) { const min = Math.pow(10, digits - 1); const max = Math.pow(10, digits) - 1; number = Math.floor(Math.random() * (max - min + 1)) + min; } 
+        else { number = 0; }
+        if (allowDecimals > 0) { const decimalPart = Math.random(); number = number + decimalPart; number = parseFloat(number.toFixed(Math.max(allowDecimals + 4, 10))); }
+        return number;
+    }
+
+    function getNumberBounds(level, op) {
+        level = parseInt(level);
+        const d = (digits, decimals = 0) => ({ d: digits, dec: decimals });
+        const dec = 0;
+        if (op === '+' || op === '-') {
+            if (level === 1) return { n1: d(1, dec), n2: d(1, dec) };
+            if (level === 2) return { n1: d(2, dec), n2: d(2, dec) };
+            if (level === 3) return { n1: d(3, dec), n2: d(3, dec) };
+            if (level === 4) return { n1: d(4, dec), n2: d(4, dec) };
+            if (level === 5) return { n1: d(5, dec), n2: d(5, dec) };
+            return { n1: d(1, dec), n2: d(1, dec) }; 
+        } 
+        if (op === '*' || op === '/') {
+             if (level === 1) return { n1: { min: 1, max: 10 }, n2: { min: 1, max: 3 } };
+             if (level === 2) return { n1: { min: 1, max: 10 }, n2: { min: 4, max: 6 } };
+             if (level === 3) return { n1: { min: 1, max: 10 }, n2: { min: 7, max: 10 } };
+             if (op === '/') {
+                if (level === 4) return { n1: { min: 100, max: 9999 }, n2: { min: 2, max: 9 } };
+                if (level === 5) return { n1: { min: 1000, max: 99999 }, n2: { min: 2, max: 9 } };
+             }
+             if (level === 4) return { n1: { min: 10, max: 9999 }, n2: { min: 2, max: 9 } };
+             if (level === 5) return { n1: { min: 10, max: 9999 }, n2: { min: 10, max: 99 } };
         }
-        saveGlobalScores(); updateRemainingContestantsDisplay();
+        return { n1: d(1), n2: d(1) };
     }
 
-    [cite_start]// --- بقية وظائف الحساب والأسئلة (بدون حذف) [cite: 160-280] ---
-    function startTimer(d) {
-        clearInterval(timerInterval); timeRemaining = d;
-        timerInterval = setInterval(() => {
-            timeRemaining--; document.getElementById('timer-display').textContent = `${timeRemaining} ثوانٍ`;
-            if (timeRemaining <= 0) handleTimeUp();
-        }, 1000);
+    function generateOperationQuestion(level, op) {
+        const bounds = getNumberBounds(level, op);
+        let n1, n2, result; level = parseInt(level); let maxDecimals = 0;
+        if (op === '+' || op === '-') {
+             const dec1 = bounds.n1.dec, dec2 = bounds.n2.dec;
+             maxDecimals = Math.max(dec1, dec2); 
+             n1 = generateNumberWithDigits(bounds.n1.d, dec1); n2 = generateNumberWithDigits(bounds.n2.d, dec2);
+             if (op === '+') { result = n1 + n2; } 
+             else if (op === '-') {
+                while (n2 >= n1 || n2 === 0) { 
+                    n2 = generateNumberWithDigits(bounds.n2.d, dec2);
+                    if (n1 <= 1) n1 = generateNumberWithDigits(bounds.n1.d, dec1); 
+                }
+                result = n1 - n2;
+             }
+             result = parseFloat(result.toFixed(maxDecimals));
+             return { n1, n2, result, requiredDecimals: maxDecimals, isRounding: false, op: op };
+        }
+        if (op === '*' || op === '/') {
+             let factor1 = generateNumberWithRange(bounds.n1.min, bounds.n1.max), factor2 = generateNumberWithRange(bounds.n2.min, bounds.n2.max), product = factor1 * factor2;
+             if (level >= 1 && level <= 3) { if (factor1 < factor2) [factor1, factor2] = [factor2, factor1]; }
+             if (op === '*') { n1 = factor1; n2 = factor2; result = product; } 
+             else if (op === '/') { n1 = product; n2 = factor2; result = factor1; }
+             return { n1, n2, result, requiredDecimals: 0, isRounding: false, op: op };
+        }
+        return { n1: 1, n2: 1, result: 2, requiredDecimals: 0, isRounding: false, op: op };
     }
     
-    // (يجب تضمين دوال generateQuestion و checkAnswer و getNumberBounds من ملفك الأصلي هنا لضمان عمل الحسابات)
-    // سأختصرها لضمان وصول الكود لكن تأكد من وجودها في ملفك.
-    
-    function startGame() { 
-        gameStarted = true; 
-        document.getElementById('next-round-btn').style.display = 'block';
-        folderStudentsInPlay = allStudentsByFolder[document.getElementById('folder-select').value].filter(c=>c.selected).map(c=>c.name);
-        updateRemainingCountDisplay();
+    function calculateRounding(number, place) {
+        const places = { 'أقرب عشرة': { value: 10, decimals: 0 }, 'أقرب مئة': { value: 100, decimals: 0 }, 'أقرب ألف': { value: 1000, decimals: 0 }, 'أقرب عشرة آلاف': { value: 10000, decimals: 0 }, 'أقرب مئة ألف': { value: 100000, decimals: 0 }, 'أقرب مليون': { value: 1000000, decimals: 0 }, 'جزء من عشرة': { value: 0.1, decimals: 1 }, 'جزء من مئة': { value: 0.01, decimals: 2 }, 'جزء من ألف': { value: 0.001, decimals: 3 } };
+        const { value, decimals } = places[place] || { value: 1, decimals: 0 };
+        if (value >= 1) { const result = Math.round(number / value) * value; return { result, decimals }; } 
+        else { const powerOfTen = Math.pow(10, decimals); const result = Math.round(number * powerOfTen) / powerOfTen; return { result: result, decimals }; }
     }
 
-    window.onload = loadContestantsAndScores;
+    function generateRoundingQuestion(level) {
+        let numberToRound, roundingPlaceKey, finalDecimalPlaces = 0, decimalPlacesToGenerate = 0; level = parseInt(level);
+        if (level === 1) { roundingPlaceKey = 'أقرب عشرة'; numberToRound = generateNumberWithRange(10, 99999); decimalPlacesToGenerate = 0; } 
+        else if (level === 2) { const options = ['أقرب مئة', 'أقرب ألف']; roundingPlaceKey = options[Math.floor(Math.random() * options.length)]; numberToRound = generateNumberWithRange(100, 999999); decimalPlacesToGenerate = 0; } 
+        else if (level === 3) {
+            const options = { 'جزء من عشرة': 1, 'جزء من مئة': 2 }; const keys = Object.keys(options);
+            roundingPlaceKey = keys[Math.floor(Math.random() * keys.length)]; finalDecimalPlaces = options[roundingPlaceKey];
+            decimalPlacesToGenerate = finalDecimalPlaces + 1 + Math.floor(Math.random() * 2); 
+            numberToRound = generateNumberWithDigits(generateNumberWithRange(1, 2), decimalPlacesToGenerate);
+        } else {
+            const wholeOptions = ['أقرب ألف', 'أقرب عشرة آلاف', 'أقرب مئة ألف'];
+            const randomPlace = wholeOptions[Math.floor(Math.random() * wholeOptions.length)];
+            if (Math.random() < 0.3 && level === 5) { 
+                 roundingPlaceKey = 'جزء من ألف'; finalDecimalPlaces = 3; decimalPlacesToGenerate = 4 + Math.floor(Math.random() * 2);
+                 numberToRound = generateNumberWithDigits(generateNumberWithRange(1, 4), decimalPlacesToGenerate);
+            } else { 
+                 roundingPlaceKey = randomPlace; let minBound = randomPlace === 'أقرب ألف' ? 1000 : randomPlace === 'أقرب عشرة آلاف' ? 10000 : 100000;
+                 numberToRound = generateNumberWithRange(minBound * 1.5, minBound * 10); decimalPlacesToGenerate = 0;
+            }
+        }
+        const { result: correctAnswerValue, decimals } = calculateRounding(numberToRound, roundingPlaceKey);
+        finalDecimalPlaces = decimals;
+        return { n1: numberToRound, n2: roundingPlaceKey, result: correctAnswerValue, roundingDisplayDecimals: finalDecimalPlaces, displayDecimalsForN1: decimalPlacesToGenerate, isRounding: true, originalRoundingPlace: roundingPlaceKey, op: 'R' };
+    }
+    
+    function formatNumberDisplay(value, maxDecimals = 0, isRounding = false) {
+        if (typeof value === 'string') return value;
+        if (isRounding && maxDecimals === 0) { return Math.round(value).toLocaleString(ARABIC_LOCALE, { useGrouping: false, maximumFractionDigits: 0 }); }
+        return value.toLocaleString(ARABIC_LOCALE, { useGrouping: false, minimumFractionDigits: maxDecimals, maximumFractionDigits: maxDecimals });
+    }
+
+    function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+    
+    function generateDistractors(questionData) {
+        const op = questionData.op, correctAnswer = questionData.result, decimalPlaces = questionData.requiredDecimals || questionData.roundingDisplayDecimals || 0; 
+        let distractors = new Set(), correct = parseFloat(correctAnswer.toFixed(decimalPlaces)), attempts = 0;
+        
+        const addDistractor = (val) => {
+            val = parseFloat(val.toFixed(decimalPlaces));
+            if (Math.abs(val - correct) > Math.pow(10, -(decimalPlaces + 1)) && distractors.size < 3) {
+                if (correct >= 0 && val < 0) return false;
+                distractors.add(val); return true;
+            }
+            return false;
+        };
+        
+        if (op === '+' || op === '-') {
+            let smallOffset = decimalPlaces === 0 ? 1 : Math.pow(10, -decimalPlaces);
+            if (addDistractor(correct + smallOffset)) {} if (addDistractor(correct - smallOffset)) {}
+            let mediumOffset = decimalPlaces === 0 ? 10 : Math.pow(10, -(decimalPlaces - 1));
+            if (addDistractor(correct + mediumOffset)) {} if (addDistractor(correct - mediumOffset)) {}
+            let largeOffset = decimalPlaces === 0 ? 100 : Math.pow(10, -(decimalPlaces - 2));
+             if (largeOffset < correct * 0.5) { if (distractors.size < 3) addDistractor(correct + largeOffset); if (distractors.size < 3) addDistractor(correct - largeOffset); }
+            while (distractors.size < 3 && attempts < 20) {
+                 let deviation = Math.random() * (Math.max(correct / ((decimalPlaces > 0) ? 0.5 : 10), 10)) + smallOffset;
+                 let potentialAnswer = correct + ((Math.random() < 0.5 ? 1 : -1) * deviation);
+                 if (potentialAnswer < 0 && correct >= 0) { potentialAnswer = Math.abs(potentialAnswer); }
+                 if (addDistractor(potentialAnswer)) {} attempts++;
+            }
+            while (distractors.size < 3) { addDistractor(generateNumberWithDigits(5, decimalPlaces)); }
+        } else if (op === 'R') {
+             const numberToRound = questionData.n1, targetPlace = questionData.originalRoundingPlace;
+             const placesMapping = { 'أقرب عشرة': { value: 10, offset: [1, 100] }, 'أقرب مئة': { value: 100, offset: [10, 1000] }, 'أقرب ألف': { value: 1000, offset: [100, 10000] }, 'أقرب عشرة آلاف': { value: 10000, offset: [1000, 100000] }, 'أقرب مئة ألف': { value: 100000, offset: [10000, 1000000] }, 'أقرب مليون': { value: 1000000, offset: [100000, 10000000] }, 'جزء من عشرة': { value: 0.1, offset: [0.01, 1] }, 'جزء من مئة': { value: 0.01, offset: [0.001, 0.1] }, 'جزء من ألف': { value: 0.001, offset: [0.0001, 0.01] } };
+             const placeInfo = placesMapping[targetPlace], allPlaces = Object.keys(placesMapping), placeValue = placeInfo ? placeInfo.value : 1;
+             if (placeInfo) {
+                 if (distractors.size < 3) { let wrongRounding = (correct > numberToRound) ? correct - placeValue : correct + placeValue; if (wrongRounding > 0) addDistractor(wrongRounding); }
+                 if (distractors.size < 3 && placeInfo.offset[0] !== 0) {
+                      const placeName = allPlaces.find(p => { const { result: calcResult } = calculateRounding(1, p); return Math.abs(calcResult - placeInfo.offset[0]) < 0.000001; });
+                      if(placeName) { const { result: altAnswer } = calculateRounding(numberToRound, placeName); if (Math.abs(altAnswer - correct) < placeValue * 1.5) { addDistractor(altAnswer); } }
+                 }
+                 if (distractors.size < 3 && placeValue >= 1 && numberToRound !== correct) {
+                     let partToKeep = numberToRound % placeValue;
+                     if (partToKeep > 0) { let mistake = correct + partToKeep; if (Math.abs(mistake - numberToRound) < placeValue * 2) { addDistractor(Math.round(mistake)); } }
+                 }
+             }
+             let fallbackOffset = placeValue / 10; if (fallbackOffset < 1) fallbackOffset = 1;
+             if (distractors.size < 3) addDistractor(correct + fallbackOffset); if (distractors.size < 3) addDistractor(correct - fallbackOffset);
+             while (distractors.size < 3) { let farNumber = correct + (Math.random() < 0.5 ? -1 : 1) * Math.max(correct / 5, 20); if (farNumber < 0) farNumber = correct * 2; addDistractor(farNumber); }
+        } else if (op === '*' || op === '/') {
+            const n1 = questionData.n1, n2 = questionData.n2;
+            if (decimalPlaces === 0 && correct > 10) { if (correct % 10 === 0 && correct / 10 !== 0) addDistractor(correct / 10); addDistractor(correct * 10); }
+            if (op === '/') { addDistractor(n1 * n2); } else if (op === '*') { addDistractor(Math.round(n1 / n2)); }
+            let smallOffset = decimalPlaces === 0 ? 1 : Math.pow(10, -decimalPlaces);
+            if (distractors.size < 3) addDistractor(correct + smallOffset * generateNumberWithRange(1, 5)); if (distractors.size < 3) addDistractor(correct - smallOffset * generateNumberWithRange(1, 5));
+             while (distractors.size < 3) { let farNumber = correct + (Math.random() < 0.5 ? -1 : 1) * Math.max(correct / 2, 50); if (farNumber < 0) farNumber = correct + 100; addDistractor(farNumber); }
+        }
+        return Array.from(distractors).slice(0, 3).map(d => formatNumberDisplay(d, decimalPlaces));
+    }
+
+    function generateQuestion() {
+        if (!gameStarted) return;
+        clearTimer(); isProcessing = false;
+        document.getElementById('feedback').innerHTML = ''; document.getElementById('answer-options-container').innerHTML = ''; 
+        let op, level;
+        if (currentMode === 'elimination3' || currentMode === 'elimination4' || currentMode === 'elimination5') {
+             const roundInfo = tournamentSchedule[Math.min(currentTournamentRound, tournamentSchedule.length - 1)];
+             op = roundInfo.operation; level = roundInfo.level;
+             document.getElementById('feedback').innerHTML = `الدور لـ **${currentPlayer === 1 ? playerName1 : playerName2}** - 🎯 الهدف: المستوى ${level.toLocaleString(ARABIC_LOCALE)} (${op === 'R' ? 'تقريب' : op})`;
+        } else if (currentMode === 'elimination2') {
+             op = fixedOperation; level = Math.min(currentTournamentRound + 1, MAX_LEVEL); 
+             document.getElementById('feedback').innerHTML = `الدور لـ **${currentPlayer === 1 ? playerName1 : playerName2}** - 🎯 الهدف: المستوى ${level.toLocaleString(ARABIC_LOCALE)} (${op === 'R' ? 'تقريب' : op})`;
+        } else { 
+             op = document.getElementById('operation-select').value; level = document.getElementById('level-select').value;
+        }
+
+        let questionData, decimalsToDisplay = 0, n1DisplayDecimals = 0, isRoundingQuestion = false;
+
+        if (op === 'R') {
+             questionData = generateRoundingQuestion(level);
+             decimalsToDisplay = questionData.roundingDisplayDecimals; currentRoundingDecimals = decimalsToDisplay; 
+             n1DisplayDecimals = questionData.displayDecimalsForN1; currentRoundingPlace = questionData.originalRoundingPlace; isRoundingQuestion = true;
+        } else {
+             questionData = generateOperationQuestion(level, op);
+             decimalsToDisplay = questionData.requiredDecimals; currentRoundingDecimals = decimalsToDisplay; n1DisplayDecimals = decimalsToDisplay; 
+        }
+        
+        num1 = questionData.n1; num2 = questionData.n2; correctAnswerValue = questionData.result;
+        const formattedNum1 = formatNumberDisplay(num1, (op === 'R') ? n1DisplayDecimals : decimalsToDisplay, op === 'R');
+        let formattedNum2 = '', operatorDisplay = op;
+
+        if (op === 'R') { operatorDisplay = 'قرب إلى:'; formattedNum2 = num2; } 
+        else { formattedNum2 = formatNumberDisplay(num2, (op === '+' || op === '-') ? decimalsToDisplay : 0, false); operatorDisplay = op === '*' ? '×' : op === '/' ? '÷' : op; }
+
+        document.getElementById('q-num1').textContent = formattedNum1;
+        document.getElementById('q-op2').textContent = operatorDisplay;
+        document.getElementById('q-num2').textContent = formattedNum2;
+        correctAnswerDisplay = formatNumberDisplay(correctAnswerValue, decimalsToDisplay, op === 'R' && (decimalsToDisplay === 0));
+        
+        const distractors = generateDistractors({ isRounding: isRoundingQuestion, result: correctAnswerValue, requiredDecimals: decimalsToDisplay, n1: num1, n2: num2, op: op, originalRoundingPlace: currentRoundingPlace }); 
+        let options = shuffleArray([...distractors, correctAnswerDisplay]);
+
+        const optionsContainer = document.getElementById('answer-options-container'); optionsContainer.innerHTML = '';
+        options.forEach(option => {
+            const button = document.createElement('button'); button.className = 'answer-btn'; button.textContent = option;
+            button.onclick = () => checkAnswer(button, option); optionsContainer.appendChild(button);
+        });
+        
+        document.getElementById('current-player').textContent = currentPlayer === 1 ? playerName1 : playerName2;
+        document.getElementById('timer-display').style.color = '#333';
+        document.getElementById('replay-btn').style.display = 'none'; // إخفاء الإعادة أثناء حل السؤال
+        startTimer(TIME_LIMIT);
+    }
+    
+    function checkAnswer(selectedButton, selectedAnswer) {
+        if (isProcessing) return;
+        isProcessing = true; clearTimer(); 
+        
+        const isCorrect = selectedAnswer === correctAnswerDisplay;
+        const feedbackElement = document.getElementById('feedback');
+        document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
+        
+        if (isCorrect) {
+            selectedButton.classList.add('correct-answer');
+            feedbackElement.innerHTML = `<span class="correct">إجابة صحيحة! (+1 فوز لـ ${currentPlayer === 1 ? playerName1 : playerName2})</span>`;
+            if (currentPlayer === 1) { player1Wins += 1; } else { player2Wins += 1; }
+        } else {
+            selectedButton.classList.add('wrong-answer');
+            document.querySelectorAll('.answer-btn').forEach(btn => { if (btn.textContent === correctAnswerDisplay) { btn.classList.add('correct-answer'); } });
+            feedbackElement.innerHTML = `<span class="wrong">إجابة خاطئة! الإجابة الصحيحة هي: ${correctAnswerDisplay}</span>`;
+        }
+
+        eliminationQuestionsCount += 1;
+        document.getElementById('score1-display').innerHTML = `${playerName1} (فوز): ${player1Wins.toLocaleString(ARABIC_LOCALE)}`;
+        document.getElementById('score2-display').innerHTML = `${playerName2} (فوز): ${player2Wins.toLocaleString(ARABIC_LOCALE)}`;
+        
+        if (isTieBreaker && eliminationQuestionsCount >= 2) { processEliminationRoundEnd(); return; }
+        if (!isTieBreaker && eliminationQuestionsCount >= MAX_ELIMINATION_QUESTIONS) { processEliminationRoundEnd(); return; }
+
+        currentPlayer = (currentPlayer === 1) ? 2 : 1;
+        setTimeout(generateQuestion, 2500);
+    }
+    
+    window.onload = () => { loadContestantsAndScores(); toggleOpLevelControls(); updateRemainingCountDisplay(); };
 </script>
 </body>
 </html>
