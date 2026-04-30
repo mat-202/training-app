@@ -54,7 +54,6 @@
         #start-btn { background-color: #40c057; }
         #next-round-btn { background-color: #4dabf7; display: none; } 
         
-        /* 🌟 الأزرار الجديدة: الإيقاف المؤقت وإعادة الجولة 🌟 */
         #pause-btn { background-color: #ffd43b; border: 2px solid #fab005; border-radius: 5px; cursor: pointer; padding: 5px 10px; font-size: 1.2em; transition: all 0.2s; }
         #pause-btn:hover { background-color: #fab005; }
         #replay-btn { padding: 12px 25px; font-size: 1.4em; color: white; background-color: #fd7e14; border: none; cursor: pointer; border-radius: 8px; display: none; transition: background-color 0.3s; margin-right: 10px; }
@@ -236,7 +235,9 @@
 </div>
 
 <p class="footer-text" dir="rtl">إعداد: الأستاذ عبدالعزيز الحجيلي</p>
-<script>
+
+
+    <script>
     let num1, num2, correctAnswerValue, correctAnswerDisplay; 
     let score1 = 0, score2 = 0, currentPlayer = 1; 
     let isProcessing = false, gameStarted = false, isPaused = false; 
@@ -263,7 +264,6 @@
     const MAX_RECENT_WINNERS = 3;
     let playerParticipationCount = {}, availablePlayersForNextRound = [];
     
-    // --- 🌟 دالة الإضافة الجماعية المنيعة 🌟 ---
     function updateContestantsFromBulk(folderKey) {
         try {
             const textarea = document.getElementById(`bulk-input-${folderKey}`);
@@ -388,7 +388,6 @@
         } catch (e) { console.error("Could not save scores/data", e); }
     }
 
-    // --- 🌟 دالة التحميل المحسنة لضمان الاستعادة 🌟 ---
     function loadContestantsAndScores() {
         try {
             const savedFolderNames = localStorage.getItem('mathHeroesFolderNames');
@@ -418,7 +417,9 @@
             allStudentsByFolder = { A: [], B: [], C: [] };
         }
     }
-    // --- 🌟 دوال التحكم بالوقت والإيقاف 🌟 ---
+
+
+
     function clearTimer() { clearInterval(timerInterval); document.getElementById('timer-display').style.color = '#333'; }
 
     function togglePause() {
@@ -439,12 +440,22 @@
     }
 
     function replayCurrentRound() {
+        // 🌟 إرجاع الخاسر إلى القائمة لاستئناف اللعب 🌟
+        if (!folderStudentsInPlay.includes(playerName1)) folderStudentsInPlay.push(playerName1);
+        if (!folderStudentsInPlay.includes(playerName2)) folderStudentsInPlay.push(playerName2);
+        
         player1Wins = 0; player2Wins = 0; eliminationQuestionsCount = 0; isTieBreaker = false;
+        
         if (currentMode !== 'elimination1') currentTournamentRound = 4; // تبدأ الإعادة من المستوى الخامس إذا كان تصاعدي
+        
         document.getElementById('score1-display').innerHTML = `${playerName1} (فوز): 0`;
         document.getElementById('score2-display').innerHTML = `${playerName2} (فوز): 0`;
         document.getElementById('feedback').innerHTML = `إعادة المواجهة بين: ${playerName1} و ${playerName2}`;
+        
         document.getElementById('replay-btn').style.display = 'none';
+        document.getElementById('next-round-btn').style.display = 'none';
+        
+        updateRemainingContestantsDisplay();
         setTimeout(generateQuestion, 1500);
     }
 
@@ -519,12 +530,10 @@
     }
     
     function finishEliminationRound(winnerName, loserName) {
-        document.getElementById('replay-btn').style.display = 'none'; // إخفاء زر الإعادة
         document.getElementById('feedback').innerHTML = `<span class="correct">انتهت الجولة: ${winnerName} يفوز!</span> - <span class="wrong">${loserName} يخرج من المنافسة.</span>`;
+        
         folderStudentsInPlay = folderStudentsInPlay.filter(name => {
-            const normalizedName = name.trim().toLowerCase();
-            const normalizedLoser = loserName.trim().toLowerCase();
-            return normalizedName !== normalizedLoser;
+            return name.trim().toLowerCase() !== loserName.trim().toLowerCase();
         });
         availablePlayersForNextRound = availablePlayersForNextRound.filter(player => player !== loserName);
         
@@ -541,12 +550,18 @@
              document.getElementById('feedback').innerHTML = `<h1>🏆 البطل هو: ${champion}! 🏆</h1>`;
              globalScores[champion] = (globalScores[champion] || 0) + 1; 
              document.getElementById('next-round-btn').textContent = 'بدء بطولة جديدة';
-             document.getElementById('next-round-btn').style.display = 'block';
+             
+             // 🌟 إظهار الأزرار بعد انتهاء الجولة 🌟
+             document.getElementById('next-round-btn').style.display = 'inline-block';
+             document.getElementById('replay-btn').style.display = 'inline-block'; 
+             
              document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
              recentWinners = [];
         } else {
-             document.getElementById('next-round-btn').style.display = 'block';
              document.getElementById('next-round-btn').textContent = 'جولة إقصاء جديدة';
+             // 🌟 إظهار الأزرار ليختار المعلم 🌟
+             document.getElementById('next-round-btn').style.display = 'inline-block';
+             document.getElementById('replay-btn').style.display = 'inline-block';
         }
         
         saveGlobalScores(); updateRemainingContestantsDisplay(); updateParticipationStatsDisplay();
@@ -612,9 +627,9 @@
         if (folderStudentsInPlay.length <= 1) { 
              folderStudentsInPlay = allStudentsByFolder[currentFolderKey].filter(c => c.selected).map(c => c.name);
              if (folderStudentsInPlay.length < 2) {
-                 alert(`يجب أن يكون لديك متسابقان على الأقل في ${selectedFolderName}`);
+                 alert(`يجب أن يكون لديك متسابقان على الأقل تم اختيارهما في ${selectedFolderName}`);
                  document.getElementById('next-round-btn').textContent = 'جولة جديدة';
-                 document.getElementById('next-round-btn').style.display = 'block';
+                 document.getElementById('next-round-btn').style.display = 'inline-block';
                  return;
              }
              availablePlayersForNextRound = [...folderStudentsInPlay];
@@ -622,7 +637,7 @@
 
         const selectedPlayers = selectRandomPlayers(currentFolderKey);
         if (!selectedPlayers) {
-            document.getElementById('next-round-btn').style.display = 'block'; 
+            document.getElementById('next-round-btn').style.display = 'inline-block'; 
             document.getElementById('next-round-btn').textContent = 'جولة جديدة'; return;
         }
 
@@ -643,8 +658,9 @@
         document.getElementById('score1-display').innerHTML = `${playerName1} (فوز): ${player1Wins.toLocaleString(ARABIC_LOCALE)}`;
         document.getElementById('score2-display').innerHTML = `${playerName2} (فوز): ${player2Wins.toLocaleString(ARABIC_LOCALE)}`;
         
+        // 🌟 إخفاء الأزرار أثناء اللعب 🌟
         document.getElementById('next-round-btn').style.display = 'none'; 
-        document.getElementById('replay-btn').style.display = 'block'; // 🌟 إظهار زر الإعادة 🌟
+        document.getElementById('replay-btn').style.display = 'none';
         
         currentPlayer = 1; document.getElementById('answer-options-container').innerHTML = ''; 
         updateRemainingContestantsDisplay(); updateParticipationStatsDisplay();
@@ -663,7 +679,7 @@
 
         gameStarted = true;
         document.getElementById('start-btn').textContent = 'إعادة تحميل الأسماء والبدء';
-        document.getElementById('next-round-btn').style.display = 'block'; 
+        document.getElementById('next-round-btn').style.display = 'inline-block'; 
         document.getElementById('next-round-btn').textContent = 'جولة إقصاء جديدة';
         document.getElementById('names-section').style.opacity = 0.5; 
         
@@ -674,7 +690,6 @@
         updateRemainingContestantsDisplay(); updateParticipationStatsDisplay();
     }
 
-    // --- دوال الرياضيات وبناء الأسئلة ---
     function generateNumberWithRange(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
     function generateNumberWithDigits(digits, allowDecimals = 0) {
         let number;
@@ -885,7 +900,7 @@
         
         document.getElementById('current-player').textContent = currentPlayer === 1 ? playerName1 : playerName2;
         document.getElementById('timer-display').style.color = '#333';
-        document.getElementById('replay-btn').style.display = 'none'; // إخفاء الإعادة أثناء حل السؤال
+        document.getElementById('replay-btn').style.display = 'none'; // التأكد من إخفاء الإعادة أثناء الحل
         startTimer(TIME_LIMIT);
     }
     
@@ -922,3 +937,5 @@
 </script>
 </body>
 </html>
+
+        
