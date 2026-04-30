@@ -449,7 +449,28 @@
                 width: 100%;
                 justify-content: center;
             }
-        }
+        } #pause-btn {
+    background-color: #ffd43b;
+    border: 2px solid #fab005;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-size: 1.2em;
+    transition: all 0.2s;
+}
+#replay-btn {
+    padding: 12px 25px;
+    font-size: 1.4em;
+    color: white;
+    background-color: #fd7e14; 
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    display: none; 
+    transition: background-color 0.3s;
+}
+#replay-btn:hover { background-color: #e8590c; }
+
     </style>
 </head>
 <body>
@@ -535,7 +556,8 @@
             
             <button id="start-btn" onclick="startGame()">بدء المسابقة</button> 
             <button id="next-round-btn" onclick="startNewRound()" style="display: none;">جولة جديدة</button>
-        </div>
+        </div> <button id="replay-btn" onclick="replayCurrentRound()">إعادة الجولة (مستوى 5)</button>
+
 
         <div class="header-section">
             <div id="turn-indicator">
@@ -1406,6 +1428,8 @@
     }
     
     function finishEliminationRound(winnerName, loserName) {
+        document.getElementById('replay-btn').style.display = 'none';
+
         document.getElementById('feedback').innerHTML = `<span class="correct">انتهت الجولة: ${winnerName} يفوز!</span> - <span class="wrong">${loserName} يخرج من المنافسة.</span>`;
         
         // تأكيد إزالة الخاسر من القائمة
@@ -1464,7 +1488,34 @@
         updateParticipationStatsDisplay();
     }
     
-        
+       let isPaused = false; 
+
+function togglePause() {
+    if (!gameStarted || isProcessing) return;
+    isPaused = !isPaused;
+    const pauseBtn = document.getElementById('pause-btn');
+    if (isPaused) {
+        clearInterval(timerInterval);
+        pauseBtn.textContent = '▶️';
+        document.getElementById('feedback').innerHTML = '<span style="color: #fd7e14;">تم الإيقاف مؤقتاً</span>';
+        document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
+    } else {
+        startTimer(timeRemaining);
+        pauseBtn.textContent = '⏸️';
+        document.getElementById('feedback').innerHTML = '';
+        document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = false);
+    }
+}
+
+function replayCurrentRound() {
+    player1Wins = 0; player2Wins = 0; eliminationQuestionsCount = 0; isTieBreaker = false;
+    currentTournamentRound = 4; // تبدأ الإعادة من المستوى الخامس مباشرة
+    document.getElementById('score1-display').innerHTML = `${playerName1} (فوز): 0`;
+    document.getElementById('score2-display').innerHTML = `${playerName2} (فوز): 0`;
+    document.getElementById('feedback').innerHTML = `إعادة المواجهة بين: ${playerName1} و ${playerName2}`;
+    setTimeout(generateQuestion, 1500);
+}
+ 
     function setupTournamentSchedule() {
         tournamentSchedule = []; 
 
@@ -1665,7 +1716,34 @@
         updateRemainingContestantsDisplay();
         updateParticipationStatsDisplay();
     }
-    
+    let isPaused = false; 
+
+function togglePause() {
+    if (!gameStarted || isProcessing) return;
+    isPaused = !isPaused;
+    const pauseBtn = document.getElementById('pause-btn');
+    if (isPaused) {
+        clearInterval(timerInterval);
+        pauseBtn.textContent = '▶️';
+        document.getElementById('feedback').innerHTML = '<span style="color: #fd7e14;">تم الإيقاف مؤقتاً</span>';
+        document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
+    } else {
+        startTimer(timeRemaining);
+        pauseBtn.textContent = '⏸️';
+        document.getElementById('feedback').innerHTML = '';
+        document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = false);
+    }
+}
+
+function replayCurrentRound() {
+    player1Wins = 0; player2Wins = 0; eliminationQuestionsCount = 0; isTieBreaker = false;
+    currentTournamentRound = 4; // المستوى الخامس
+    document.getElementById('score1-display').innerHTML = `${playerName1} (فوز): 0`;
+    document.getElementById('score2-display').innerHTML = `${playerName2} (فوز): 0`;
+    document.getElementById('feedback').innerHTML = `إعادة المواجهة بين: ${playerName1} و ${playerName2}`;
+    setTimeout(generateQuestion, 1500);
+}
+
     function generateQuestion() {
         if (!gameStarted) return;
         
