@@ -439,13 +439,18 @@
         }
     }
 
-    function replayCurrentRound() {
+        function replayCurrentRound() {
         // 🌟 إرجاع الخاسر إلى القائمة لاستئناف اللعب 🌟
         if (!folderStudentsInPlay.includes(playerName1)) folderStudentsInPlay.push(playerName1);
         if (!folderStudentsInPlay.includes(playerName2)) folderStudentsInPlay.push(playerName2);
         
-        player1Wins = 0; player2Wins = 0; eliminationQuestionsCount = 0; isTieBreaker = false;
+        player1Wins = 0; player2Wins = 0; eliminationQuestionsCount = 0; isTieBreaker = false; currentPlayer = 1;
         
+        // 🌟 الإصلاح هنا: إعادة بناء جدول المسابقة قبل تعيين الجولة 🌟
+        if (currentMode === 'elimination3' || currentMode === 'elimination4' || currentMode === 'elimination5') {
+             setupTournamentSchedule();
+        }
+
         if (currentMode !== 'elimination1') currentTournamentRound = 4; // تبدأ الإعادة من المستوى الخامس إذا كان تصاعدي
         
         document.getElementById('score1-display').innerHTML = `${playerName1} (فوز): 0`;
@@ -458,6 +463,7 @@
         updateRemainingContestantsDisplay();
         setTimeout(generateQuestion, 1500);
     }
+
 
     function startTimer(duration) {
         clearTimer(); timeRemaining = duration;
