@@ -199,19 +199,19 @@ h1 { font-size: 1.6em; }
 <div class="op-level-control">
 <label for="level-select">اختر المستوى:</label>
 <select id="level-select">
-<option value="1">المستوى 1</option>
-<option value="2">المستوى 2</option>
-<option value="3">المستوى 3</option>
-<option value="4">المستوى 4</option>
-<option value="5">المستوى 5</option>
+<option value="1">المستوى ١</option>
+<option value="2">المستوى ٢</option>
+<option value="3">المستوى ٣</option>
+<option value="4">المستوى ٤</option>
+<option value="5">المستوى ٥</option>
 </select>
 </div>
 
 <label for="mode-select">اختر وضع المسابقة:</label>
 <select id="mode-select" onchange="toggleOpLevelControls()">
-<option value="elimination4">مسابقة صف ثالث (تصاعدي شامل - حد أقصى 3)</option>
-<option value="elimination5">مسابقة صف رابع (تصاعدي شامل - حد أقصى 4)</option>
-<option value="elimination3">مسابقة صف خامس فأعلى (تصاعدي شامل - حد أقصى 5)</option>
+<option value="elimination4">مسابقة صف ثالث (تصاعدي شامل - حد أقصى ٣)</option>
+<option value="elimination5">مسابقة صف رابع (تصاعدي شامل - حد أقصى ٤)</option>
+<option value="elimination3">مسابقة صف خامس فأعلى (تصاعدي شامل - حد أقصى ٥)</option>
 <option value="elimination1">مسابقة عامة (قسم ومستوى ثابت)</option>
 <option value="elimination2">مسابقة عامة (قسم ثابت ومستوى تصاعدي)</option>
 </select>
@@ -227,11 +227,11 @@ h1 { font-size: 1.6em; }
 <button id="pause-btn" class="icon-btn" onclick="togglePause()" title="إيقاف مؤقت / استئناف">⏸️</button>
 <button id="save-btn" class="icon-btn" onclick="saveGameProgress()" title="حفظ التقدم (لكل المجموعات)">💾</button>
 <button id="resume-btn" class="icon-btn" onclick="resumeGameProgress()" title="استئناف آخر تقدم محفوظ">📂</button>
-<button id="replay-btn" class="icon-btn" onclick="replayCurrentRound()" title="إعادة الجولة (مستوى 5)">🔄</button>
+<button id="replay-btn" class="icon-btn" onclick="replayCurrentRound()" title="إعادة الجولة">🔄</button>
 <button id="next-round-btn" class="icon-btn" onclick="startNewRound()" title="جولة جديدة">⏭️</button>
-<div id="timer-display">30 ثوانٍ</div>
+<div id="timer-display">٣٠ ثانية</div>
 <div id="remaining-count-display">
-<span class="count-number">0</span> متبقون
+<span class="count-number">٠</span> متبقون
 </div>
 </div>
 </div>
@@ -252,8 +252,8 @@ h1 { font-size: 1.6em; }
 <div id="feedback"></div>
 
 <div class="score-boards">
-<div id="score1-display" class="score">المتسابق 1: 0</div>
-<div id="score2-display" class="score">المتسابق 2: 0</div>
+<div id="score1-display" class="score">المتسابق ١</div>
+<div id="score2-display" class="score">المتسابق ٢</div>
 </div>
 </div>
 </div>
@@ -272,33 +272,45 @@ h1 { font-size: 1.6em; }
 
 <script>
 // ============================================================
+// 🌟 تحويل الأرقام إلى الأرقام العربية الشرقية 🌟
+// ============================================================
+function toArabicDigits(input) {
+    if (input === null || input === undefined) return '';
+    return String(input).replace(/[0-9]/g, function(d) {
+        return '٠١٢٣٤٥٦٧٨٩'[d];
+    });
+}
+
+// ============================================================
 // المتغيرات العامة
 // ============================================================
 let num1, num2, correctAnswerValue, correctAnswerDisplay;
 let currentPlayer = 1;
 let isProcessing = false, gameStarted = false, isPaused = false;
 
-let playerName1 = "المتسابق 1", playerName2 = "المتسابق 2", currentFolderKey = '';
+let playerName1 = "المتسابق ١", playerName2 = "المتسابق ٢", currentFolderKey = '';
 let allStudentsByFolder = { A: [], B: [], C: [] };
 let folderNames = { A: "المجموعة أ", B: "المجموعة ب", C: "المجموعة ج" };
 let globalScores = {}, currentRoundingDecimals = 0, currentRoundingPlace = '';
 
 const TIME_LIMIT = 30;
 let timeRemaining = TIME_LIMIT, timerInterval;
-const ARABIC_LOCALE = 'ar-SA';
 
 let currentMode = 'elimination1';
-let eliminationQuestionsCount = 0;
 let player1Wins = 0, player2Wins = 0;
-let folderStudentsInPlay = [], isTieBreaker = false;
+let folderStudentsInPlay = [];
 
 // 🌟 نظام الأخطاء 🌟
 const MAX_MISTAKES = 2;
-const MAX_QUESTIONS_PER_PLAYER = 10;
 let player1Mistakes = 0, player2Mistakes = 0;
 let player1Questions = 0, player2Questions = 0;
 
-let currentTournamentRound = 0, tournamentSchedule = [], fixedOperation = '';
+// 🌟🌟🌟 منطق المسابقة الجديد (تدرّج المستوى وتغيير المهارة) 🌟🌟🌟
+let currentRoundLevel = 1;              // المستوى الحالي
+let currentRoundOperation = '+';        // العملية الحالية
+let previousRoundOperation = '';        // العملية السابقة (لتجنب التكرار)
+let fixedOperation = '';                // للأنماط التي تستخدم عملية ثابتة
+
 const ALL_OPERATIONS = ['+', '-', '*', '/', 'R'];
 const MAX_LEVEL = 5;
 let recentWinners = [];
@@ -310,36 +322,77 @@ const GAME_PROGRESS_KEY_PREFIX = 'mathHeroesGameProgress_';
 let autoSaveTimeout = null;
 
 // ============================================================
-// 🌟 دوال مساعدة للتنسيق 🌟
+// 🌟 دوال منطق المستويات والعمليات 🌟
 // ============================================================
-function formatNum(n) {
-    try {
-        return n.toLocaleString(ARABIC_LOCALE);
-    } catch (e) {
-        return String(n);
+function getMaxLevelForMode() {
+    if (currentMode === 'elimination4') return 3; // صف ثالث
+    if (currentMode === 'elimination5') return 4; // صف رابع
+    if (currentMode === 'elimination3') return 5; // صف خامس
+    if (currentMode === 'elimination2') return 5;
+    return 5;
+}
+
+function isAutoProgressMode() {
+    return currentMode === 'elimination2' || currentMode === 'elimination3'
+        || currentMode === 'elimination4' || currentMode === 'elimination5';
+}
+
+function isOperationChangingMode() {
+    return currentMode === 'elimination3' || currentMode === 'elimination4' || currentMode === 'elimination5';
+}
+
+function pickNewOperation(exclude) {
+    const available = ALL_OPERATIONS.filter(function(op) { return op !== exclude; });
+    return available[Math.floor(Math.random() * available.length)];
+}
+
+function initRoundProgression() {
+    currentRoundLevel = 1;
+    previousRoundOperation = '';
+    if (currentMode === 'elimination1') {
+        currentRoundOperation = document.getElementById('operation-select').value;
+    } else if (currentMode === 'elimination2') {
+        fixedOperation = document.getElementById('operation-select').value;
+        currentRoundOperation = fixedOperation;
+    } else {
+        currentRoundOperation = pickNewOperation('');
     }
 }
 
+function advanceRound() {
+    // ترقية المستوى
+    if (isAutoProgressMode()) {
+        const maxLevel = getMaxLevelForMode();
+        if (currentRoundLevel < maxLevel) {
+            currentRoundLevel++;
+        }
+    }
+    // تغيير العملية (مع عدم التكرار المتتالي)
+    if (isOperationChangingMode()) {
+        previousRoundOperation = currentRoundOperation;
+        currentRoundOperation = pickNewOperation(previousRoundOperation);
+    }
+}
+
+function getOperationName(op) {
+    if (op === '+') return 'جمع';
+    if (op === '-') return 'طرح';
+    if (op === '*') return 'ضرب';
+    if (op === '/') return 'قسمة';
+    if (op === 'R') return 'تقريب';
+    return op;
+}
+
 // ============================================================
-// 🌟🌟🌟 دالة إضافة الأسماء - مُصلَحة وآمنة 🌟🌟🌟
+// 🌟 دوال إضافة الأسماء والحفظ 🌟
 // ============================================================
 function updateContestantsFromBulk(folderKey) {
     try {
-        // 1) احصل على مربع النص
         const textarea = document.getElementById('bulk-input-' + folderKey);
-        if (!textarea) {
-            alert("خطأ: لم يتم العثور على مربع الإدخال للمجموعة " + folderKey);
-            return;
-        }
-
-        // 2) تحقق من إدخال نص
+        if (!textarea) { alert("خطأ: لم يتم العثور على مربع الإدخال للمجموعة " + folderKey); return; }
         const rawValue = textarea.value || '';
-        if (rawValue.trim() === '') {
-            alert("الرجاء إدخال أسماء في المربع أولاً!");
-            return;
-        }
+        if (rawValue.trim() === '') { alert("الرجاء إدخال أسماء في المربع أولاً!"); return; }
 
-        // 3) تأكد من أن البنية صحيحة
         if (!allStudentsByFolder || typeof allStudentsByFolder !== 'object' || Array.isArray(allStudentsByFolder)) {
             allStudentsByFolder = { A: [], B: [], C: [] };
         }
@@ -347,18 +400,13 @@ function updateContestantsFromBulk(folderKey) {
             allStudentsByFolder[folderKey] = [];
         }
 
-        // 4) استخرج الأسماء
         const newNames = rawValue
             .split(/[\r\n,;،؛]+/)
             .map(function(n) { return n.trim(); })
             .filter(function(n) { return n.length > 0; });
 
-        if (newNames.length === 0) {
-            alert("لم يتم العثور على أسماء صالحة في المربع!");
-            return;
-        }
+        if (newNames.length === 0) { alert("لم يتم العثور على أسماء صالحة في المربع!"); return; }
 
-        // 5) أضف الأسماء (مع تجنب التكرار)
         let updatedContestants = allStudentsByFolder[folderKey].slice();
         let addedCount = 0;
 
@@ -373,21 +421,14 @@ function updateContestantsFromBulk(folderKey) {
             }
         }
 
-        // 6) احفظ
         allStudentsByFolder[folderKey] = updatedContestants;
         textarea.value = '';
-
-        // 7) احفظ في localStorage
         saveContestantsData();
-
-        // 8) أعد رسم القائمة
         renderContestantsList(folderKey);
 
-        // 9) اعرض رسالة النجاح
         const folderLabel = folderNames[folderKey] || folderKey;
-        alert("✅ نجاح!\n\nتم إضافة " + addedCount + " اسماً جديداً إلى " + folderLabel +
-              ".\nالإجمالي الآن: " + updatedContestants.length + " متسابق.");
-
+        alert("✅ نجاح!\n\nتم إضافة " + toArabicDigits(addedCount) + " اسماً جديداً إلى " + folderLabel
+            + ".\nالإجمالي الآن: " + toArabicDigits(updatedContestants.length) + " متسابق.");
     } catch (error) {
         console.error('خطأ في إضافة الأسماء:', error);
         alert("حدث خطأ أثناء الإضافة: " + (error && error.message ? error.message : error));
@@ -448,11 +489,8 @@ function renderContestantsList(folderKey) {
 }
 
 function saveContestantsData() {
-    try {
-        localStorage.setItem('mathHeroesNamesData', JSON.stringify(allStudentsByFolder));
-    } catch (e) {
-        console.error("Could not save names data", e);
-    }
+    try { localStorage.setItem('mathHeroesNamesData', JSON.stringify(allStudentsByFolder)); }
+    catch (e) { console.error("Could not save names data", e); }
 }
 
 // ============================================================
@@ -478,7 +516,7 @@ function updateRemainingContestantsDisplay() {
         displayElement.innerHTML = 'البطل الحالي: 👑 ' + folderStudentsInPlay[0] + ' 👑. اضغط "⏭️ جولة جديدة" للبدء من جديد.';
     } else {
         const listItems = folderStudentsInPlay.map(function(name) { return '<span>' + name + '</span>'; }).join(' • ');
-        displayElement.innerHTML = '<strong>المتبقون (' + folderStudentsInPlay.length + '):</strong> ' + listItems;
+        displayElement.innerHTML = '<strong>المتبقون (' + toArabicDigits(folderStudentsInPlay.length) + '):</strong> ' + listItems;
     }
     updateRemainingCountDisplay();
 }
@@ -488,7 +526,7 @@ function updateRemainingCountDisplay() {
     if (!countElement) return;
     const countNumberElement = countElement.querySelector('.count-number');
     if (!countNumberElement) return;
-    countNumberElement.textContent = folderStudentsInPlay.length;
+    countNumberElement.textContent = toArabicDigits(folderStudentsInPlay.length);
 }
 
 function updateParticipationStatsDisplay() {
@@ -500,7 +538,9 @@ function updateParticipationStatsDisplay() {
     const statsArray = Object.entries(playerParticipationCount)
         .map(function(e) { return { name: e[0], count: e[1] }; })
         .sort(function(a, b) { return b.count - a.count; });
-    const statsItems = statsArray.map(function(s) { return '<span>' + s.name + ': ' + s.count + '</span>'; }).join(' • ');
+    const statsItems = statsArray.map(function(s) {
+        return '<span>' + s.name + ': ' + toArabicDigits(s.count) + '</span>';
+    }).join(' • ');
     statsElement.innerHTML = statsItems;
 }
 
@@ -508,20 +548,18 @@ function updateScoreDisplays() {
     const badge = function(m) {
         const cls = m >= MAX_MISTAKES ? 'mistake-2' : (m === 1 ? 'mistake-1' : 'mistake-0');
         const icon = m >= MAX_MISTAKES ? '⛔' : '❌';
-        return '<span class="mistake-badge ' + cls + '">' + icon + ' ' + m + '/' + MAX_MISTAKES + '</span>';
+        return '<span class="mistake-badge ' + cls + '">' + icon + ' ' + toArabicDigits(m) + '/' + toArabicDigits(MAX_MISTAKES) + '</span>';
     };
     document.getElementById('score1-display').innerHTML =
-        playerName1 + '<br>✅ فوز: ' + player1Wins + ' &nbsp; ' + badge(player1Mistakes);
+        playerName1 + '<br>✅ فوز: ' + toArabicDigits(player1Wins) + ' &nbsp; ' + badge(player1Mistakes);
     document.getElementById('score2-display').innerHTML =
-        playerName2 + '<br>✅ فوز: ' + player2Wins + ' &nbsp; ' + badge(player2Mistakes);
+        playerName2 + '<br>✅ فوز: ' + toArabicDigits(player2Wins) + ' &nbsp; ' + badge(player2Mistakes);
 }
 
 function resetRoundCounters() {
     player1Wins = 0; player2Wins = 0;
     player1Mistakes = 0; player2Mistakes = 0;
     player1Questions = 0; player2Questions = 0;
-    eliminationQuestionsCount = 0;
-    isTieBreaker = false;
     updateScoreDisplays();
 }
 
@@ -618,18 +656,13 @@ function saveFolderProgress(folderKey, showIndicator) {
 }
 
 function saveGameProgress() {
-    if (!gameStarted) {
-        alert('لا توجد مسابقة نشطة لحفظها. يرجى بدء المسابقة أولاً.');
-        return;
-    }
+    if (!gameStarted) { alert('لا توجد مسابقة نشطة لحفظها. يرجى بدء المسابقة أولاً.'); return; }
     remainingByFolder[currentFolderKey] = folderStudentsInPlay.slice();
     let savedCount = 0;
-    ['A', 'B', 'C'].forEach(function(k) {
-        if (saveFolderProgress(k, false)) savedCount++;
-    });
+    ['A', 'B', 'C'].forEach(function(k) { if (saveFolderProgress(k, false)) savedCount++; });
     showAutoSaveIndicator();
     const fb = document.getElementById('feedback');
-    fb.innerHTML = '<span class="correct">✅ تم حفظ التقدم لـ ' + savedCount + ' مجموعات بنجاح.</span>';
+    fb.innerHTML = '<span class="correct">✅ تم حفظ التقدم لـ ' + toArabicDigits(savedCount) + ' مجموعات بنجاح.</span>';
     setTimeout(function() {
         if (fb.innerHTML.indexOf('تم حفظ التقدم') !== -1) fb.innerHTML = '';
     }, 3000);
@@ -645,10 +678,7 @@ function resumeGameProgress() {
     const savedFolders = ['A', 'B', 'C'].filter(function(k) {
         return localStorage.getItem(GAME_PROGRESS_KEY_PREFIX + k);
     });
-    if (savedFolders.length === 0) {
-        alert('📂 لا يوجد تقدم محفوظ لاستئنافه.');
-        return;
-    }
+    if (savedFolders.length === 0) { alert('📂 لا يوجد تقدم محفوظ لاستئنافه.'); return; }
 
     let targetFolder = document.getElementById('folder-select').value;
     if (savedFolders.indexOf(targetFolder) === -1) targetFolder = savedFolders[0];
@@ -658,7 +688,6 @@ function resumeGameProgress() {
 
     try {
         const state = JSON.parse(saved);
-
         savedFolders.forEach(function(k) {
             try {
                 const s = JSON.parse(localStorage.getItem(GAME_PROGRESS_KEY_PREFIX + k));
@@ -702,7 +731,7 @@ function resumeGameProgress() {
         if (count === 1) {
             document.getElementById('feedback').innerHTML = '<span class="correct">✅ تم استئناف المسابقة. بطل <strong>' + folderName + '</strong> هو: 👑 ' + folderStudentsInPlay[0] + ' 👑 — آخر حفظ: ' + savedAtText + '</span>';
         } else if (count >= 2) {
-            document.getElementById('feedback').innerHTML = '<span class="correct">✅ تم استئناف المسابقة لمجموعة <strong>' + folderName + '</strong>. المتبقون: <strong>' + count + '</strong>. اضغط ⏭️ للبدء. — آخر حفظ: ' + savedAtText + '</span>';
+            document.getElementById('feedback').innerHTML = '<span class="correct">✅ تم استئناف المسابقة لمجموعة <strong>' + folderName + '</strong>. المتبقون: <strong>' + toArabicDigits(count) + '</strong>. اضغط ⏭️ للبدء. — آخر حفظ: ' + savedAtText + '</span>';
         } else {
             document.getElementById('feedback').innerHTML = '<span style="color: #fd7e14;">تم الاستئناف لكن لا يوجد متسابقون متبقون في <strong>' + folderName + '</strong>. اضغط ⏭️ لبدء بطولة جديدة.</span>';
         }
@@ -744,7 +773,7 @@ function handleFolderChange() {
     if (gameStarted) {
         updateRemainingContestantsDisplay();
         const folderName = folderNames[newFolder];
-        document.getElementById('feedback').innerHTML = '<span style="color: #4dabf7;">تم التبديل إلى مجموعة <strong>' + folderName + '</strong>. المتبقون: ' + folderStudentsInPlay.length + '</span>';
+        document.getElementById('feedback').innerHTML = '<span style="color: #4dabf7;">تم التبديل إلى مجموعة <strong>' + folderName + '</strong>. المتبقون: ' + toArabicDigits(folderStudentsInPlay.length) + '</span>';
         setTimeout(function() {
             const fb = document.getElementById('feedback');
             if (fb.innerHTML.indexOf('تم التبديل إلى مجموعة') !== -1) fb.innerHTML = '';
@@ -783,12 +812,8 @@ function replayCurrentRound() {
     remainingByFolder[currentFolderKey] = folderStudentsInPlay.slice();
 
     resetRoundCounters();
+    initRoundProgression();
     currentPlayer = 1;
-
-    if (currentMode === 'elimination3' || currentMode === 'elimination4' || currentMode === 'elimination5') {
-        setupTournamentSchedule();
-    }
-    if (currentMode !== 'elimination1') currentTournamentRound = 4;
 
     document.getElementById('feedback').innerHTML = 'إعادة المواجهة بين: ' + playerName1 + ' و ' + playerName2;
     document.getElementById('replay-btn').style.display = 'none';
@@ -803,10 +828,10 @@ function startTimer(duration) {
     clearTimer();
     timeRemaining = duration;
     const timerDisplay = document.getElementById('timer-display');
-    timerDisplay.innerHTML = timeRemaining + ' ثوانٍ';
+    timerDisplay.innerHTML = toArabicDigits(timeRemaining) + ' ثانية';
     timerInterval = setInterval(function() {
         timeRemaining -= 1;
-        timerDisplay.innerHTML = timeRemaining + ' ثوانٍ';
+        timerDisplay.innerHTML = toArabicDigits(timeRemaining) + ' ثانية';
         if (timeRemaining <= 5) { timerDisplay.style.color = 'red'; }
         else { timerDisplay.style.color = '#333'; }
         if (timeRemaining <= 0) { handleTimeUp(); }
@@ -824,22 +849,21 @@ function handleTimeUp() {
     else { player2Mistakes++; player2Questions++; }
     updateScoreDisplays();
 
-    if (player1Questions === player2Questions) {
+    // 🌟 إذا كان اللاعب 2، نتحقق من الخروج ونرقّي الجولة 🌟
+    if (currentPlayer === 2) {
         const p1Out = player1Mistakes >= MAX_MISTAKES;
         const p2Out = player2Mistakes >= MAX_MISTAKES;
         if (p1Out || p2Out) {
             setTimeout(function() { endRoundByMistakes(p1Out, p2Out); }, 2000);
             return;
         }
+        // لا أحد خرج: رقّي المستوى، غيّر العملية، وابدأ دور المتسابق 1
+        advanceRound();
+        currentPlayer = 1;
+    } else {
+        // نفس السؤال يُطرح على اللاعب 2
+        currentPlayer = 2;
     }
-
-    eliminationQuestionsCount += 1;
-    if (isTieBreaker && eliminationQuestionsCount >= 2) { setTimeout(processEliminationRoundEnd, 2000); return; }
-    if (!isTieBreaker && player1Questions >= MAX_QUESTIONS_PER_PLAYER && player1Questions === player2Questions) {
-        setTimeout(processEliminationRoundEnd, 2000); return;
-    }
-
-    currentPlayer = (currentPlayer === 1) ? 2 : 1;
     setTimeout(generateQuestion, 2500);
 }
 
@@ -901,8 +925,8 @@ function finishEliminationRound(winnerName, loserName) {
         if (recentWinners.length > MAX_RECENT_WINNERS) recentWinners.pop();
     }
 
-    eliminationQuestionsCount = 0; player1Wins = 0; player2Wins = 0; isTieBreaker = false; fixedOperation = '';
-    player1Mistakes = 0; player2Mistakes = 0; player1Questions = 0; player2Questions = 0;
+    resetRoundCounters();
+    currentRoundLevel = 1; currentRoundOperation = '+'; previousRoundOperation = ''; fixedOperation = '';
     tournamentSchedule = []; currentTournamentRound = 0;
 
     if (folderStudentsInPlay.length === 1) {
@@ -936,9 +960,9 @@ function handleBothEliminated() {
     });
     remainingByFolder[currentFolderKey] = folderStudentsInPlay.slice();
 
-    eliminationQuestionsCount = 0; player1Wins = 0; player2Wins = 0; isTieBreaker = false;
-    player1Mistakes = 0; player2Mistakes = 0; player1Questions = 0; player2Questions = 0;
-    fixedOperation = ''; tournamentSchedule = []; currentTournamentRound = 0;
+    resetRoundCounters();
+    currentRoundLevel = 1; currentRoundOperation = '+'; previousRoundOperation = ''; fixedOperation = '';
+    tournamentSchedule = []; currentTournamentRound = 0;
 
     document.getElementById('next-round-btn').style.display = 'inline-flex';
     document.getElementById('replay-btn').style.display = 'inline-flex';
@@ -953,7 +977,7 @@ function handleBothEliminated() {
         } else if (folderStudentsInPlay.length === 0) {
             document.getElementById('feedback').innerHTML = '<h1 style="color: #e63946;">⚠️ خرج جميع المتسابقين - لا يوجد بطل!</h1>';
         } else {
-            document.getElementById('feedback').innerHTML += '<p style="color:#4dabf7;">المتبقون: <strong>' + folderStudentsInPlay.length + '</strong> — اضغط ⏭️ للجولة التالية.</p>';
+            document.getElementById('feedback').innerHTML += '<p style="color:#4dabf7;">المتبقون: <strong>' + toArabicDigits(folderStudentsInPlay.length) + '</strong> — اضغط ⏭️ للجولة التالية.</p>';
         }
         saveGlobalScores();
         updateRemainingContestantsDisplay();
@@ -975,58 +999,8 @@ function endRoundByMistakes(p1Out, p2Out) {
     }
 }
 
-function setupTournamentSchedule() {
-    tournamentSchedule = [];
-    let modeMaxLevel = MAX_LEVEL;
-    const mode = document.getElementById('mode-select').value;
-    if (mode === 'elimination4') { modeMaxLevel = 3; }
-    else if (mode === 'elimination5') { modeMaxLevel = 4; }
-
-    let operationsSequence = [], lastOp = '';
-    while (operationsSequence.length < 20) {
-        let nextBatch = shuffleArray(ALL_OPERATIONS.slice());
-        if (lastOp === nextBatch[0]) {
-            const tmp = nextBatch[0]; nextBatch[0] = nextBatch[1]; nextBatch[1] = tmp;
-        }
-        for (let i = 0; i < nextBatch.length; i++) operationsSequence.push(nextBatch[i]);
-        lastOp = nextBatch[nextBatch.length - 1];
-    }
-    for (let i = 0; i < operationsSequence.length; i++) {
-        let roundLevel = Math.min(i + 1, modeMaxLevel);
-        tournamentSchedule.push({ level: roundLevel, operation: operationsSequence[i] });
-    }
-    currentTournamentRound = 0;
-}
-
-function processEliminationRoundEnd() {
-    if (player1Wins === player2Wins) {
-        if (currentMode === 'elimination2' || currentMode === 'elimination3' || currentMode === 'elimination4' || currentMode === 'elimination5') {
-            currentTournamentRound += 1;
-            let newLevel, opName;
-            if (currentMode === 'elimination2') {
-                newLevel = Math.min(currentTournamentRound + 1, MAX_LEVEL);
-                opName = fixedOperation === 'R' ? 'تقريب' : fixedOperation;
-            } else {
-                const nextRound = tournamentSchedule[Math.min(currentTournamentRound, tournamentSchedule.length - 1)];
-                newLevel = nextRound.level;
-                opName = nextRound.operation === 'R' ? 'تقريب' : nextRound.operation;
-            }
-            document.getElementById('feedback').innerHTML = '<span class="wrong">تعادل! ترقية إلى المستوى ' + newLevel + ' والعملية: ' + opName + '</span>';
-        } else {
-            document.getElementById('feedback').innerHTML = '<span class="wrong">تعادل! سؤال فاصل إضافي (لكل متسابق)...</span>';
-        }
-        isTieBreaker = true; eliminationQuestionsCount = 0; currentPlayer = 1;
-        setTimeout(generateQuestion, 2500);
-        return;
-    }
-
-    if (player1Wins !== player2Wins) {
-        const winner = player1Wins > player2Wins ? playerName1 : playerName2;
-        const loser = player1Wins > player2Wins ? playerName2 : playerName1;
-        finishEliminationRound(winner, loser);
-        return;
-    }
-}
+// (tournamentSchedule لم يعد مستخدماً لكن نُبقيه للتوافق مع الحفظ)
+let tournamentSchedule = [], currentTournamentRound = 0;
 
 function startNewRound() {
     if (!gameStarted) { alert('يرجى بدء المسابقة أولاً لتحميل الأسماء.'); return; }
@@ -1056,17 +1030,19 @@ function startNewRound() {
     playerName2 = selectedPlayers[1];
 
     resetRoundCounters();
-    currentTournamentRound = 0;
+    initRoundProgression();
 
     let modeDisplay = document.getElementById('mode-select').options[document.getElementById('mode-select').selectedIndex].text;
+    let modeNote = '<br><small style="color:#e63946;">⚠️ خطآن لكل متسابق = خروج | ترقية المستوى وتغيير المهارة تلقائياً</small>';
+
     if (currentMode === 'elimination2') {
-        fixedOperation = document.getElementById('operation-select').value;
-        document.getElementById('feedback').innerHTML = 'الآن يتنافس: ' + playerName1 + ' vs ' + playerName2 + ' من ' + selectedFolderName + ' (' + modeDisplay + ' - العملية الثابتة: ' + (fixedOperation === 'R' ? 'تقريب' : fixedOperation) + ')';
-    } else if (currentMode === 'elimination3' || currentMode === 'elimination4' || currentMode === 'elimination5') {
-        setupTournamentSchedule();
-        document.getElementById('feedback').innerHTML = 'الآن يتنافس: ' + playerName1 + ' vs ' + playerName2 + ' من ' + selectedFolderName + ' (' + modeDisplay + ')<br><small style="color:#e63946;">⚠️ خطآن لكل متسابق = خروج</small>';
+        document.getElementById('feedback').innerHTML = 'الآن يتنافس: ' + playerName1 + ' و ' + playerName2 + ' من ' + selectedFolderName + ' (' + modeDisplay + ' - العملية الثابتة: ' + getOperationName(fixedOperation) + ')'
+            + '<br><small style="color:#e63946;">⚠️ خطآن لكل متسابق = خروج | ترقية المستوى تلقائياً</small>';
+    } else if (currentMode === 'elimination1') {
+        document.getElementById('feedback').innerHTML = 'الآن يتنافس: ' + playerName1 + ' و ' + playerName2 + ' من ' + selectedFolderName + ' (' + modeDisplay + ')'
+            + '<br><small style="color:#e63946;">⚠️ خطآن لكل متسابق = خروج</small>';
     } else {
-        document.getElementById('feedback').innerHTML = 'الآن يتنافس: ' + playerName1 + ' vs ' + playerName2 + ' من ' + selectedFolderName + ' (' + modeDisplay + ')<br><small style="color:#e63946;">⚠️ خطآن لكل متسابق = خروج</small>';
+        document.getElementById('feedback').innerHTML = 'الآن يتنافس: ' + playerName1 + ' و ' + playerName2 + ' من ' + selectedFolderName + ' (' + modeDisplay + ')' + modeNote;
     }
 
     document.getElementById('next-round-btn').style.display = 'none';
@@ -1224,7 +1200,6 @@ function calculateRounding(number, place) {
     }
 }
 
-// 🌟 دالة التقريب المعدّلة حسب المستويات 🌟
 function generateRoundingQuestion(level) {
     let numberToRound, roundingPlaceKey, finalDecimalPlaces = 0, decimalPlacesToGenerate = 0;
     level = parseInt(level);
@@ -1270,14 +1245,19 @@ function generateRoundingQuestion(level) {
     };
 }
 
+// 🌟 عرض الأرقام بالعربية 🌟
 function formatNumberDisplay(value, maxDecimals, isRounding) {
     if (maxDecimals === undefined) maxDecimals = 0;
     if (isRounding === undefined) isRounding = false;
     if (typeof value === 'string') return value;
+    let str;
     if (isRounding && maxDecimals === 0) {
-        return String(Math.round(value));
+        str = String(Math.round(value));
+    } else {
+        str = value.toFixed(maxDecimals);
     }
-    return value.toFixed(maxDecimals);
+    // استبدال الأرقام بالأرقام العربية
+    return toArabicDigits(str);
 }
 
 function shuffleArray(array) {
@@ -1393,14 +1373,13 @@ function generateQuestion() {
     let op, level;
 
     if (currentMode === 'elimination3' || currentMode === 'elimination4' || currentMode === 'elimination5') {
-        const roundInfo = tournamentSchedule[Math.min(currentTournamentRound, tournamentSchedule.length - 1)];
-        op = roundInfo.operation;
-        level = roundInfo.level;
-        document.getElementById('feedback').innerHTML = 'الدور لـ <strong>' + (currentPlayer === 1 ? playerName1 : playerName2) + '</strong> - 🎯 الهدف: المستوى ' + level + ' (' + (op === 'R' ? 'تقريب' : op) + ')';
+        op = currentRoundOperation;
+        level = currentRoundLevel;
+        document.getElementById('feedback').innerHTML = 'الدور لـ <strong>' + (currentPlayer === 1 ? playerName1 : playerName2) + '</strong> - 🎯 المستوى ' + toArabicDigits(level) + ' — المهارة: ' + getOperationName(op);
     } else if (currentMode === 'elimination2') {
         op = fixedOperation;
-        level = Math.min(currentTournamentRound + 1, MAX_LEVEL);
-        document.getElementById('feedback').innerHTML = 'الدور لـ <strong>' + (currentPlayer === 1 ? playerName1 : playerName2) + '</strong> - 🎯 الهدف: المستوى ' + level + ' (' + (op === 'R' ? 'تقريب' : op) + ')';
+        level = currentRoundLevel;
+        document.getElementById('feedback').innerHTML = 'الدور لـ <strong>' + (currentPlayer === 1 ? playerName1 : playerName2) + '</strong> - 🎯 المستوى ' + toArabicDigits(level) + ' — المهارة: ' + getOperationName(op);
     } else {
         op = document.getElementById('operation-select').value;
         level = document.getElementById('level-select').value;
@@ -1469,6 +1448,9 @@ function generateQuestion() {
     startTimer(TIME_LIMIT);
 }
 
+// ============================================================
+// 🌟🌟🌟 checkAnswer مع منطق الجولة الجديد 🌟🌟🌟
+// ============================================================
 function checkAnswer(selectedButton, selectedAnswer) {
     if (isProcessing) return;
     isProcessing = true;
@@ -1480,7 +1462,7 @@ function checkAnswer(selectedButton, selectedAnswer) {
 
     if (isCorrect) {
         selectedButton.classList.add('correct-answer');
-        feedbackElement.innerHTML = '<span class="correct">✅ إجابة صحيحة! (+1 فوز لـ ' + (currentPlayer === 1 ? playerName1 : playerName2) + ')</span>';
+        feedbackElement.innerHTML = '<span class="correct">✅ إجابة صحيحة! (+١ فوز لـ ' + (currentPlayer === 1 ? playerName1 : playerName2) + ')</span>';
         if (currentPlayer === 1) player1Wins += 1; else player2Wins += 1;
     } else {
         selectedButton.classList.add('wrong-answer');
@@ -1492,7 +1474,7 @@ function checkAnswer(selectedButton, selectedAnswer) {
         if (mistakeCount >= MAX_MISTAKES) {
             warnMsg = ' <span style="color:#c92a2a; font-weight:bold;">⛔ خطأ ثانٍ! ' + (currentPlayer === 1 ? playerName1 : playerName2) + ' سيخرج!</span>';
         } else {
-            warnMsg = ' <span style="color:#e67700;">(خطأ ' + mistakeCount + '/' + MAX_MISTAKES + ')</span>';
+            warnMsg = ' <span style="color:#e67700;">(خطأ ' + toArabicDigits(mistakeCount) + '/' + toArabicDigits(MAX_MISTAKES) + ')</span>';
         }
         feedbackElement.innerHTML = '<span class="wrong">❌ إجابة خاطئة! الإجابة الصحيحة: ' + correctAnswerDisplay + '</span>' + warnMsg;
         if (currentPlayer === 1) player1Mistakes += 1; else player2Mistakes += 1;
@@ -1501,26 +1483,22 @@ function checkAnswer(selectedButton, selectedAnswer) {
     if (currentPlayer === 1) player1Questions += 1; else player2Questions += 1;
     updateScoreDisplays();
 
-    if (player1Questions === player2Questions) {
+    // 🌟 بعد إجابة اللاعب 2 → نتحقق ونرقّي الجولة 🌟
+    if (currentPlayer === 2) {
         const p1Out = player1Mistakes >= MAX_MISTAKES;
         const p2Out = player2Mistakes >= MAX_MISTAKES;
         if (p1Out || p2Out) {
             setTimeout(function() { endRoundByMistakes(p1Out, p2Out); }, 2000);
             return;
         }
-        if (!isTieBreaker && player1Questions >= MAX_QUESTIONS_PER_PLAYER) {
-            setTimeout(processEliminationRoundEnd, 2000);
-            return;
-        }
+        // لا أحد خرج: ترقية المستوى وتغيير المهارة
+        advanceRound();
+        currentPlayer = 1;
+    } else {
+        // نفس المستوى والعملية للاعب 2
+        currentPlayer = 2;
     }
 
-    eliminationQuestionsCount += 1;
-    if (isTieBreaker && eliminationQuestionsCount >= 2) {
-        setTimeout(processEliminationRoundEnd, 2000);
-        return;
-    }
-
-    currentPlayer = (currentPlayer === 1) ? 2 : 1;
     setTimeout(generateQuestion, 2500);
 }
 
