@@ -373,7 +373,7 @@ let player1Mistakes = 0, player2Mistakes = 0;
 let player1Questions = 0, player2Questions = 0;
 
 // 🌟🌟🌟 حالة الوميض في لوحة النتائج 🌟🌟🌟
-let player1FlashClass = ''; // '' | 'winner-flash' | 'loser-flash'
+let player1FlashClass = '';
 let player2FlashClass = '';
 
 // 🌟🌟🌟 منطق المسابقة (تدرّج المستوى وتغيير المهارة) 🌟🌟🌟
@@ -648,7 +648,6 @@ s2.innerHTML =
 + '<span class="score-mistakes">' + badge(player2Mistakes) + '</span>';
 }
 
-// 🌟 ضبط حالة الوميض بناءً على من فاز 🌟
 function setScoreFlashes(winnerIsPlayer1) {
 if (winnerIsPlayer1) {
 player1FlashClass = 'winner-flash';
@@ -659,7 +658,6 @@ player2FlashClass = 'winner-flash';
 }
 }
 
-// 🌟 إزالة الوميض (يُستدعى عند بدء جولة جديدة) 🌟
 function clearScoreFlashes() {
 player1FlashClass = '';
 player2FlashClass = '';
@@ -725,7 +723,6 @@ updateParticipationStatsDisplay();
 saveFolderProgress(currentFolderKey, true);
 }
 
-// 🌟 جدولة الإعادة التلقائية بعد إعلان البطل 🌟
 function scheduleChampionAutoRestore(championName) {
 if (championRestoreTimer) clearTimeout(championRestoreTimer);
 championRestoreTimer = setTimeout(function() {
@@ -1101,7 +1098,6 @@ recentWinners.unshift(winnerName);
 if (recentWinners.length > MAX_RECENT_WINNERS) recentWinners.pop();
 }
 
-// 🌟 لا نُصفّر النتائج هنا — نُظهر النتيجة النهائية مع وميض أخضر/أحمر 🌟
 setScoreFlashes(winnerName === playerName1);
 updateScoreDisplays();
 
@@ -1116,7 +1112,6 @@ document.getElementById('next-round-btn').style.display = 'inline-flex';
 document.getElementById('replay-btn').style.display = 'inline-flex';
 document.querySelectorAll('.answer-btn').forEach(function(btn) { btn.disabled = true; });
 recentWinners = [];
-// 🌟 إعادة جميع المتسابقين تلقائياً بعد إعلان البطل 🌟
 scheduleChampionAutoRestore(champion);
 } else {
 document.getElementById('next-round-btn').style.display = 'inline-flex';
@@ -1141,7 +1136,6 @@ return p !== playerName1 && p !== playerName2;
 });
 remainingByFolder[currentFolderKey] = folderStudentsInPlay.slice();
 
-// 🌟 وميض أحمر على الاثنين (كلاهما خاسر) 🌟
 player1FlashClass = 'loser-flash';
 player2FlashClass = 'loser-flash';
 updateScoreDisplays();
@@ -1159,7 +1153,6 @@ const champion = folderStudentsInPlay[0];
 document.getElementById('feedback').innerHTML = '<h2 style="color: #e63946;">⚠️ كلا المتسابقين خرجا معاً!</h2><h1>🏆 البطل هو: ' + champion + '! 🏆</h1>';
 globalScores[champion] = (globalScores[champion] || 0) + 1;
 recentWinners = [];
-// 🌟 إعادة جميع المتسابقين تلقائياً بعد إعلان البطل 🌟
 scheduleChampionAutoRestore(champion);
 } else if (folderStudentsInPlay.length === 0) {
 document.getElementById('feedback').innerHTML = '<h1 style="color: #e63946;">⚠️ خرج جميع المتسابقين - لا يوجد بطل!</h1>';
@@ -1186,7 +1179,6 @@ finishEliminationRound(playerName1, playerName2);
 }
 }
 
-// (tournamentSchedule لم يعد مستخدماً لكن نُبقيه للتوافق مع الحفظ)
 let tournamentSchedule = [], currentTournamentRound = 0;
 
 function startNewRound() {
@@ -1354,14 +1346,14 @@ result = n1 - n2;
 result = parseFloat(result.toFixed(maxDecimals));
 return { n1: n1, n2: n2, result: result, requiredDecimals: maxDecimals, isRounding: false, op: op };
 }
-if (op === '' || op === '/') {
+if (op === '*' || op === '/') {
 let factor1 = generateNumberWithRange(bounds.n1.min, bounds.n1.max);
 let factor2 = generateNumberWithRange(bounds.n2.min, bounds.n2.max);
 let product = factor1 * factor2;
 if (level >= 1 && level <= 3) {
 if (factor1 < factor2) { const tmp = factor1; factor1 = factor2; factor2 = tmp; }
 }
-if (op === '') { n1 = factor1; n2 = factor2; result = product; }
+if (op === '*') { n1 = factor1; n2 = factor2; result = product; }
 else if (op === '/') { n1 = product; n2 = factor2; result = factor1; }
 return { n1: n1, n2: n2, result: result, requiredDecimals: 0, isRounding: false, op: op };
 }
@@ -1434,7 +1426,6 @@ op: 'R'
 };
 }
 
-// 🌟 عرض الأرقام بالعربية 🌟
 function formatNumberDisplay(value, maxDecimals, isRounding) {
 if (maxDecimals === undefined) maxDecimals = 0;
 if (isRounding === undefined) isRounding = false;
@@ -1532,14 +1523,14 @@ let farNumber = correct + (Math.random() < 0.5 ? -1 : 1) * Math.max(correct / 5,
 if (farNumber < 0) farNumber = correct * 2;
 addDistractor(farNumber);
 }
-} else if (op === '' || op === '/') {
+} else if (op === '*' || op === '/') {
 const n1 = questionData.n1, n2 = questionData.n2;
 if (decimalPlaces === 0 && correct > 10) {
 if (correct % 10 === 0 && correct / 10 !== 0) addDistractor(correct / 10);
 addDistractor(correct * 10);
 }
 if (op === '/') { addDistractor(n1 * n2); }
-else if (op === '') { addDistractor(Math.round(n1 / n2)); }
+else if (op === '*') { addDistractor(Math.round(n1 / n2)); }
 let smallOffset = decimalPlaces === 0 ? 1 : Math.pow(10, -decimalPlaces);
 if (distractors.size < 3) addDistractor(correct + smallOffset * generateNumberWithRange(1, 5));
 if (distractors.size < 3) addDistractor(correct - smallOffset * generateNumberWithRange(1, 5));
@@ -1637,7 +1628,7 @@ startTimer(TIME_LIMIT);
 }
 
 // ============================================================
-// 🌟🌟🌟 checkAnswer مع منطق الجولة 🌟🌟🌟
+// 🌟 checkAnswer 🌟
 // ============================================================
 function checkAnswer(selectedButton, selectedAnswer) {
 if (isProcessing) return;
